@@ -82,9 +82,11 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
             <!-- Left Column - Input -->
             <div class="flex flex-col h-full">
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col overflow-hidden">
+                    <label class="h-full">
                     <textarea name="text"
-                              class="flex-1 p-4 w-full resize-none border border-gray-200 rounded-t-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-800 placeholder-gray-400"
+                              class="flex-1 p-4 w-full h-full resize-none border border-gray-200 rounded-t-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-gray-800 placeholder-gray-400"
                               placeholder="Введите текст для обработки…"><?= htmlspecialchars($original) ?></textarea>
+                    </label>
                     <div class="border-t border-gray-200 p-4 bg-gray-50">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
@@ -131,14 +133,18 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                     </div>
                     <div class="flex-1 overflow-hidden">
                         <div id="result" class="tab-content h-full active">
+                            <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
                                     readonly><?= htmlspecialchars($text) ?></textarea>
+                            </label>
                         </div>
                         <div id="tokens" class="tab-content h-full hidden">
+                            <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
                                     readonly><?= json_encode($tokens, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?></textarea>
+                            </label>
                         </div>
                     </div>
                 </div>
