@@ -172,6 +172,11 @@ class ReplaceQuotes
             return true;
         }
 
+        // Перед кавычкой стоит открывающая кавычка-елочка?
+        if ($tokens[$prev_index]['value'] === '«') {
+            return true;
+        }
+
         $prev_value = $tokens[$prev_index]['value'];
 
         // Если предыдущий токен заканчивается на:

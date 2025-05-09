@@ -39,6 +39,10 @@ final class QuoteTest extends TestCase
         $original = '«Часы "Электроника ЧН-54" в корпусе из нержавеющей стали»';
         $expected = '&laquo;Часы &bdquo;Электроника ЧН-54&ldquo; в&nbsp;корпусе из&nbsp;нержавеющей стали&raquo;';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = '""Белград" Отель"';
+        $expected = '&laquo;&bdquo;Белград&ldquo; Отель&raquo;';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testOdd()
