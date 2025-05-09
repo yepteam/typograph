@@ -10,7 +10,7 @@ composer require yepteam/typograph
 
 ## Использование
 
-```
+```php
 use Yepteam\Typograph\Typograph;
 
 $typograph = new Typograph();
