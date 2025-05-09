@@ -21,10 +21,12 @@
   "minimum-stability": "stable",
   "archive": {
     "exclude": [
-      "/tests",
-      "/vendor",
+      "tests/",
+      "vendor/",
       "composer.lock",
-      "index.php"
+      "index.php",
+      "phpunit.xml",
+      ".gitignore"
     ]
   }
 }
