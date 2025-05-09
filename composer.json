@@ -2,6 +2,7 @@
   "name": "yepteam/typograph",
   "version": "1.0.0",
   "type": "library",
+  "license": "MIT",
   "autoload": {
     "psr-4": {
       "Yepteam\\Typograph\\": "src/"
