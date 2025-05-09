@@ -22,9 +22,9 @@
   "archive": {
     "exclude": [
       "/tests",
-      "/index.php",
       "/vendor",
-      "composer.lock"
+      "composer.lock",
+      "index.php"
     ]
   }
 }
