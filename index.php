@@ -15,9 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Выбираем режим обработки
     $decode = ($encoding === 'use_symbols');
-    $text = Typograph::format($original, $tokens, $decode);
 
-    if (mb_strlen($text) > 65536) {
+    $typograph = new Typograph();
+
+    $text = $typograph->format($original, $decode);
+    $tokens = $typograph->getTokens();
+
+    if (mb_strlen($text) > 4096) {
         $tokens = [];
     }
 
