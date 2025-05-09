@@ -265,6 +265,10 @@ final class NbspTest extends TestCase
         $original = '200 ГВт';
         $expected = '200&nbsp;ГВт';
         $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '(4 картины)';
+        $expected = '(4&nbsp;картины)';
+        $this->assertEquals($expected, $typograph->format($original));
     }
 
     public function testNotAfterNumber()
