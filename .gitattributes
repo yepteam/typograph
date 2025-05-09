@@ -1,0 +1,10 @@
+# Директории, исключаемые из архивов
+/tests export-ignore
+/vendor export-ignore
+
+# Файлы, исключаемые из архивов
+/composer.lock export-ignore
+/index.php export-ignore
+/phpunit.xml export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore

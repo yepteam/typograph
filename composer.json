@@ -18,15 +18,5 @@
   "scripts": {
     "test": "vendor/bin/phpunit"
   },
-  "minimum-stability": "stable",
-  "archive": {
-    "exclude": [
-      "tests/",
-      "vendor/",
-      "composer.lock",
-      "index.php",
-      "phpunit.xml",
-      ".gitignore"
-    ]
-  }
+  "minimum-stability": "stable"
 }
