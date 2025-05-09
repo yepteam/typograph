@@ -421,4 +421,14 @@ final class NbspTest extends TestCase
         $expected = 'Согласен с<strong>&nbsp;условиями</strong> пользовательского соглашения';
         $this->assertStringStartsWith($expected, $typograph->format($original));
     }
+
+    public function testBeforeSingleCharacter()
+    {
+        $typograph = new Typograph();
+
+        $original = 'за 200 миллионов ₽.';
+        $expected = 'миллионов&nbsp;₽.';
+        $this->assertStringEndsWith($expected, $typograph->format($original));
+    }
+
 }

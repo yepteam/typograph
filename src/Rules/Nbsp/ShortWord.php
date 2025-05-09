@@ -5,7 +5,7 @@ namespace Yepteam\Typograph\Rules\Nbsp;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
- * Замена пробела после короткого слова на неразрывный пробел
+ * Замена пробела до или после короткого слова на неразрывный пробел
  */
 class ShortWord
 {
@@ -29,8 +29,8 @@ class ShortWord
 
     public static function apply(int $index, array &$tokens): void
     {
-        // Токен должен быть словом
-        if ($tokens[$index]['type'] !== 'word') {
+        // Токен должен быть словом или одиночным символом
+        if (!in_array($tokens[$index]['type'], ['word', 'char'])) {
             return;
         }
 

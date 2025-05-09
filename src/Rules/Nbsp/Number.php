@@ -192,7 +192,7 @@ class Number
 
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
         if ($prev_index !== false) {
-            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'char'])) {
+            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'punctuation', 'char'])) {
                 // Ничего не делаем
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
@@ -250,6 +250,17 @@ class Number
 
             // Перед числом токен char?
             if ($tokens[$prev_index]['type'] === 'char') {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+            // Перед числом знак препинания?
+            if ($tokens[$prev_index]['type'] === 'punctuation') {
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',

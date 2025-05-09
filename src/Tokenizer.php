@@ -180,6 +180,16 @@ class Tokenizer
             'name' => 'space',
             'pattern' => '/\s/',
         ],
+        [
+            'type' => 'deg',
+            'name' => 'deg',
+            'pattern' => '/°|℃|℉/u',
+        ],
+        [
+            'type' => 'punctuation',
+            'name' => 'punctuation',
+            'pattern' => '/\p{P}/u',
+        ]
     ];
 
     private array $patterns;
