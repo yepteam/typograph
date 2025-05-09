@@ -13,44 +13,54 @@ final class DashTest extends TestCase
 
     public function testDoubleDashToNdash()
     {
+        $typograph = new Typograph();
+
         $original = '--';
-        $this->assertEquals(self::MDASH, Typograph::format($original));
+        $this->assertEquals(self::MDASH, $typograph->format($original));
 
         $original = 'Москва -- Сочи';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
 
         $original = '-- Именно так';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
     }
 
     public function testMdashToNdash()
     {
+        $typograph = new Typograph();
+
         $original = '2010&mdash;2020 гг';
-        $this->assertStringContainsString(self::NDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::NDASH, $typograph->format($original));
     }
 
     public function testNdashToMdash()
     {
+        $typograph = new Typograph();
+
         $original = '– Что делать?';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
 
         $original = 'слева – справа';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
     }
 
     public function testHyphenToMdash()
     {
+        $typograph = new Typograph();
+
         $original = 'а - аа';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
 
         $original = 'слева** - справа';
-        $this->assertStringContainsString(self::MDASH, Typograph::format($original));
+        $this->assertStringContainsString(self::MDASH, $typograph->format($original));
     }
 
     public function testHyphenToMinus()
     {
+        $typograph = new Typograph();
+
         $original = 'Температура: -2°С';
-        $this->assertStringContainsString(self::MINUS, Typograph::format($original));
+        $this->assertStringContainsString(self::MINUS, $typograph->format($original));
     }
 
 }

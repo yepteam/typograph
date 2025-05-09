@@ -19,6 +19,8 @@ final class MemoryTest extends TestCase
      */
     public function test4096()
     {
+        $typograph = new Typograph();
+        
         // Строка 64 символа
         $original = 'Часы&nbsp;наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
         $expected = 'Часы наручные &laquo;Электроника 77А&raquo; в&nbsp;корпусе из&nbsp;нержавеющей стали.' . PHP_EOL;
@@ -29,7 +31,7 @@ final class MemoryTest extends TestCase
         $longExpected = trim(str_repeat($expected, $count));
 
         // Проверяем результат
-        $this->assertEquals($longExpected, Typograph::format($longText));
+        $this->assertEquals($longExpected, $typograph->format($longText));
     }
 
     /**
@@ -38,6 +40,8 @@ final class MemoryTest extends TestCase
      */
     public function test65536()
     {
+        $typograph = new Typograph();
+        
         // Строка 64 символа
         $original = 'Часы&nbsp;наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
         $expected = 'Часы наручные &laquo;Электроника 77А&raquo; в&nbsp;корпусе из&nbsp;нержавеющей стали.' . PHP_EOL;
@@ -48,6 +52,6 @@ final class MemoryTest extends TestCase
         $longExpected = trim(str_repeat($expected, $count));
 
         // Проверяем результат
-        $this->assertEquals($longExpected, Typograph::format($longText));
+        $this->assertEquals($longExpected, $typograph->format($longText));
     }
 }
