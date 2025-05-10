@@ -3,11 +3,9 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
-use Yepteam\Typograph\Tokenizer;
 
 /**
- * Заменяет mdash на ndash в следующих случаях:
- * 1. mdash находится между числами (игнорируя теги)
+ * Заменяет mdash на ndash
  */
 class MdashToNdash
 {

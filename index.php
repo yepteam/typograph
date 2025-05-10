@@ -14,11 +14,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $encoding = $_POST['encoding'] ?? 'xml_entity';
 
     // Выбираем режим обработки
-    $decode = ($encoding === 'use_symbols');
+    $use_symbols = ($encoding === 'use_symbols');
 
     $typograph = new Typograph();
 
-    $text = $typograph->format($original, $decode);
+    $text = $typograph->format($original, $use_symbols);
     $tokens = $typograph->getTokens();
 
     if (mb_strlen($text) > 4096) {
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 session_start();
 $original = $_SESSION['original'] ?? $default;
 $encoding = $_SESSION['encoding'] ?? 'xml_entity';
-$decode = ($encoding === 'use_symbols');
+$use_symbols = ($encoding === 'use_symbols');
 $text = $_SESSION['text'] ?? '';
 $tokens = $_SESSION['tokens'] ?? [];
 

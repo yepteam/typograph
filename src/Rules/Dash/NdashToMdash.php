@@ -3,12 +3,9 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
-use Yepteam\Typograph\Tokenizer;
 
 /**
- * Заменяет дефис на длинное тире (игнорируя теги) в двух случаях:
- * 1. Между пробелами
- * 2. В начале строки (после new-line или первый в тексте), если после него пробел
+ * Заменяет дефис на длинное тире (игнорируя теги)
  */
 class NdashToMdash
 {

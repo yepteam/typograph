@@ -6,10 +6,7 @@ use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
- * Замена пробела на nbsp перед числом,
- * если перед пробелом есть точка (токен dot), а перед ней - строчная буква
- *
- * Примеры: `op. 9`, `кв. 12` → `op.&nbsp;9`, `кв.&nbsp;12`
+ * Замена пробела до или после числа на неразрывный пробел
  */
 class Number
 {

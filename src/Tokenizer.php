@@ -4,6 +4,10 @@ namespace Yepteam\Typograph;
 
 class Tokenizer
 {
+    /**
+     * @var array[] Шаблоны для распознавания токенов
+     * @psalm-var array<array{type: string, name: string, pattern: string}>
+     */
     const TOKEN_PATTERNS = [
         [
             'type' => 'tag',
@@ -192,13 +196,13 @@ class Tokenizer
         ]
     ];
 
-    private array $patterns;
-
-    public function __construct()
-    {
-        $this->patterns = self::TOKEN_PATTERNS;
-    }
-
+    /**
+     * Разбивает текст на токены с учетом переносов строк
+     *
+     * @param string $input Входной текст для токенизации
+     * @return array[] Массив токенов
+     * @psalm-return array<array{type: string, value: string}>
+     */
     public function tokenize(string $input): array
     {
         $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -228,6 +232,13 @@ class Tokenizer
         return $all_tokens;
     }
 
+    /**
+     * Разбивает одну строку текста на токены
+     *
+     * @param string $input Входная строка для токенизации
+     * @return array[] Массив токенов
+     * @psalm-return array<array{type: string, value: string}>
+     */
     public function tokenizeLine(string $input): array
     {
         $input = html_entity_decode($input);
@@ -235,10 +246,10 @@ class Tokenizer
 
         $tokens = [];
 
-        // Удаляем лишние пробелы в каждой строке и заменяем множественные пробелы на один
+        // Удаляем лишние пробелы в каждой строке и заменяем повторяющиеся пробелы на один
         $lines = explode(PHP_EOL, $input);
         $processedLines = array_map(function ($line) {
-            // Заменяем множественные пробелы на один, но сохраняем табуляции и другие whitespace
+            // Заменяем повторяющиеся пробелы на один, но сохраняем табуляции и др.
             return preg_replace('/ +/u', ' ', trim($line));
         }, $lines);
         $processedInput = implode(PHP_EOL, $processedLines);
@@ -250,7 +261,7 @@ class Tokenizer
             $foundToken = null;
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
 
-            foreach ($this->patterns as $pattern) {
+            foreach (self::TOKEN_PATTERNS as $pattern) {
                 if (!preg_match($pattern['pattern'], $substr, $matches, PREG_OFFSET_CAPTURE)) {
                     continue;
                 }
@@ -262,9 +273,6 @@ class Tokenizer
                         'type' => $pattern['type'],
                         'value' => $tokenValue,
                     ];
-                    /*if (!empty($pattern['name'])) {
-                        $foundToken['name'] = $pattern['name'];
-                    }*/
                     break;
                 }
             }
@@ -274,7 +282,10 @@ class Tokenizer
                 $offset += mb_strlen($foundToken['value'], 'UTF-8');
             } else {
                 $char = mb_substr($processedInput, $offset, 1, 'UTF-8');
-                $tokens[] = ['type' => 'char', 'value' => $char];
+                $tokens[] = [
+                    'type' => 'char',
+                    'value' => $char
+                ];
                 $offset++;
             }
         }
@@ -282,6 +293,13 @@ class Tokenizer
         return $tokens;
     }
 
+    /**
+     * Собирает текст из массива токенов
+     *
+     * @param array[] $tokens Массив токенов
+     * @psalm-param array<array{type: string, value: string}> $tokens
+     * @return string Собранный текст
+     */
     public function toString(array $tokens): string
     {
         $result = '';

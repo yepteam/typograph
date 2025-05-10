@@ -6,12 +6,23 @@ use Yepteam\Typograph\Rules\{Dash, Formatting, Nbsp, Punctuation, Quotes, Specia
 
 class Typograph
 {
+    /**
+     * @var array Массив для хранения токенов текста
+     */
     private array $tokens = [];
 
-    public function format(string $text, $decode = false): string
+    /**
+     * Форматирует текст с применением типографских правил
+     *
+     * @param string $text Исходный текст для обработки
+     * @param bool $use_symbols Флаг замены буквенных кодов на готовые символы
+     * @return string Обработанный текст с применением типографских правил
+     */
+    public function format(string $text, bool $use_symbols = false): string
     {
         $tokenizer = new Tokenizer();
 
+        // Преобразование текста в массив токенов
         $this->tokens = $tokenizer->tokenize($text);
 
         // Сброс счетчиков состояния кавычек
@@ -59,7 +70,7 @@ class Typograph
             Quotes\ReplaceQuotes::apply($index, $this->tokens);
         }
 
-        if (!$decode) {
+        if (!$use_symbols) {
             // Преобразование символов в HTML-сущности (кроме тегов)
             Formatting\HtmlEntities::applyToAll($this->tokens);
         }
@@ -67,6 +78,11 @@ class Typograph
         return $tokenizer->toString($this->tokens);
     }
 
+    /**
+     * Возвращает массив токенов после обработки
+     *
+     * @return array Массив токенов
+     */
     public function getTokens(): array
     {
         return $this->tokens;

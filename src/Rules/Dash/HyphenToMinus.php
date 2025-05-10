@@ -5,9 +5,7 @@ namespace Yepteam\Typograph\Rules\Dash;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
- * Заменяет дефис на mdash (игнорируя теги):
- * 1. Между пробелами
- * 2. В начале строки (после new-line или первый в тексте), если после него пробел
+ * Заменяет дефис на mdash (игнорируя теги)
  */
 class HyphenToMinus
 {
