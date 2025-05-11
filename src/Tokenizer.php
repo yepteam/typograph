@@ -241,7 +241,10 @@ class Tokenizer
      */
     public function tokenizeLine(string $input): array
     {
-        $input = html_entity_decode($input);
+        if (mb_strlen($input) === 0) {
+            return [];
+        }
+
         $input = html_entity_decode($input);
 
         $tokens = [];
@@ -277,17 +280,20 @@ class Tokenizer
                 }
             }
 
+            // Если токен найден
             if ($foundToken) {
                 $tokens[] = $foundToken;
                 $offset += mb_strlen($foundToken['value'], 'UTF-8');
-            } else {
-                $char = mb_substr($processedInput, $offset, 1, 'UTF-8');
-                $tokens[] = [
-                    'type' => 'char',
-                    'value' => $char
-                ];
-                $offset++;
+                continue;
             }
+
+            // Токен не найден — сохраняем как одиночный символ
+            $char = mb_substr($processedInput, $offset, 1, 'UTF-8');
+            $tokens[] = [
+                'type' => 'char',
+                'value' => $char
+            ];
+            $offset++;
         }
 
         return $tokens;
