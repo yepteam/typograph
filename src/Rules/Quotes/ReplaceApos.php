@@ -25,6 +25,26 @@ class ReplaceApos
             return;
         }
 
+        // Находим токен перед апострофом
+        $prev_index = TokenHelper::findPrevToken($tokens, $index);
+        if ($prev_index === false) {
+            $tokens[$index] = [
+                'type' => 'rsquo',
+                'value' => '’',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+            return;
+        }
+
+        if ($tokens[$prev_index]['type'] === 'number') {
+            $tokens[$index] = [
+                'type' => 'prime',
+                'value' => '′',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+            return;
+        }
+
         $tokens[$index] = [
             'type' => 'rsquo',
             'value' => '’',

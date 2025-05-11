@@ -141,6 +141,11 @@ class Tokenizer
         ],
         [
             'type' => 'quote',
+            'name' => 'prime',
+            'pattern' => '/′|&prime;/'
+        ],
+        [
+            'type' => 'quote',
             'name' => 'quot',
             'pattern' => '/"|&quot;/'
         ],

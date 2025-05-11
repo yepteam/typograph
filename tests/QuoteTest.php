@@ -99,6 +99,10 @@ EOF
         $original = 'Труба 3/4"';
         $expected = 'Труба 3/4&Prime;';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = "59° 57' 00\"";
+        $expected = '59&deg; 57&prime; 00&Prime;';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
 }
