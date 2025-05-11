@@ -13,8 +13,15 @@ class ReplaceApos
     {
         $current = $tokens[$index];
 
-        // Применимо только к токену apos
-        if ($current['type'] !== 'apos') {
+        // Применимо только к токенам apos и word
+        if (!in_array($current['type'], ['apos', 'word'])) {
+            return;
+        }
+
+        // Замена апострофа в слове
+        if ($current['type'] === 'word') {
+            $tokens[$index]['value'] = str_replace("'", '’', $tokens[$index]['value']);
+            $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
 

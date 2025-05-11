@@ -85,6 +85,11 @@ EOF
         );
 
         $this->assertSame($expected, $typograph->format($original));
+
+        // https://habr.com/ru/articles/57351/
+        $original = "Д'Артаньян, Сара О'Коннор";
+        $expected = "Д&rsquo;Артаньян, Сара О&rsquo;Коннор";
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testPrime()
