@@ -2,6 +2,8 @@
 
 namespace Yepteam\Typograph;
 
+use Yepteam\Typograph\Helpers\StringHelper;
+
 class Tokenizer
 {
     /**
@@ -217,6 +219,8 @@ class Tokenizer
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
         $input = str_replace(' ', ' ', $input);
 
+        $input = StringHelper::replaceNewlinesInTags($input);
+
         $lines = explode(PHP_EOL, $input);
 
         $all_tokens = [];
@@ -256,11 +260,20 @@ class Tokenizer
 
         // Удаляем лишние пробелы в каждой строке и заменяем повторяющиеся пробелы на один
         $lines = explode(PHP_EOL, $input);
-        $processedLines = array_map(function ($line) {
+
+        $lines = array_map(function ($line) {
+
+            if(str_contains($line, 'data-typograph-new-line')){
+                return $line;
+            }
+
             // Заменяем повторяющиеся пробелы на один, но сохраняем табуляции и др.
             return preg_replace('/ +/u', ' ', trim($line));
         }, $lines);
-        $processedInput = implode(PHP_EOL, $processedLines);
+
+        $processedInput = implode(PHP_EOL, $lines);
+
+        $processedInput = str_replace(' data-typograph-new-line ', PHP_EOL, $processedInput);
 
         $offset = 0;
         $length = mb_strlen($processedInput, 'UTF-8');

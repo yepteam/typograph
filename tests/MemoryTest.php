@@ -17,10 +17,10 @@ final class MemoryTest extends TestCase
      * Использование памяти: ~26M
      * Время выполнения: ~00:00.040
      */
-    public function test4096()
+    public function test64()
     {
         $typograph = new Typograph();
-        
+
         // Строка 64 символа
         $original = 'Часы наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
         $expected = 'Часы наручные &laquo;Электроника 77А&raquo; в&nbsp;корпусе из&nbsp;нержавеющей стали.' . PHP_EOL;
@@ -38,13 +38,36 @@ final class MemoryTest extends TestCase
      * Использование памяти: ~38M
      * Время выполнения: ~00:00.330
      */
-    public function test65536()
+    public function test1024()
     {
         $typograph = new Typograph();
-        
+
         // Строка 64 символа
         $original = 'Часы наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
         $expected = 'Часы наручные &laquo;Электроника 77А&raquo; в&nbsp;корпусе из&nbsp;нержавеющей стали.' . PHP_EOL;
+
+        $count = 1024; // повторения
+
+        $longText = str_repeat($original, $count);
+        $longExpected = trim(str_repeat($expected, $count));
+
+        // Проверяем результат
+        $this->assertEquals($longExpected, $typograph->format($longText));
+
+
+    }
+
+    /**
+     * Использование памяти: ~38M
+     * Время выполнения: ~00:00.330
+     */
+    public function testTags1024()
+    {
+        $typograph = new Typograph();
+
+        // Строка 64 символа
+        $original = 'Часы <strong>"Электроника 77А"</strong> в корпусе из стали.' . PHP_EOL;
+        $expected = 'Часы <strong>&laquo;Электроника 77А&raquo;</strong> в&nbsp;корпусе из&nbsp;стали.' . PHP_EOL;
 
         $count = 1024; // повторения
 
