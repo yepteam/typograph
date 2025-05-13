@@ -218,6 +218,7 @@ class Tokenizer
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
         $input = str_replace(' ', ' ', $input);
+        $input = str_replace(' ', ' ', $input);
 
         $input = StringHelper::replaceNewlinesInTags($input);
 
@@ -263,7 +264,7 @@ class Tokenizer
 
         $lines = array_map(function ($line) {
 
-            if(str_contains($line, 'data-typograph-new-line')){
+            if (str_contains($line, 'data-typograph-new-line')) {
                 return $line;
             }
 
