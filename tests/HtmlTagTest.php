@@ -49,4 +49,13 @@ final class HtmlTagTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testTagWithAttribute()
+    {
+        $typograph = new Typograph();
+
+        $original = "<form data-default='{\"br\":\"<br>\"}'>Текст в форме</form>";
+        $expected = "<form data-default='{\"br\":\"<br>\"}'>Текст в&nbsp;форме</form>";
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }
