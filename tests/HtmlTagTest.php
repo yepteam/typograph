@@ -73,4 +73,32 @@ final class HtmlTagTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testDoctype()
+    {
+        $typograph = new Typograph();
+
+        $original = '<!DOCTYPE html>';
+        $expected = '<!DOCTYPE html>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
+        $expected = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+        "http://www.w3.org/TR/html4/strict.dtd">';
+        $expected = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+        "http://www.w3.org/TR/html4/strict.dtd">';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testComment()
+    {
+        $typograph = new Typograph();
+
+        $original = '<!-- Комментарий в коде -->';
+        $expected = '<!-- Комментарий в коде -->';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }

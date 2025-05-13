@@ -13,6 +13,16 @@ class Tokenizer
     const TOKEN_PATTERNS = [
         [
             'type' => 'tag',
+            'name' => 'doctype',
+            'pattern' => '/<!DOCTYPE\s[^>]+>/i',
+        ],
+        [
+            'type' => 'tag',
+            'name' => 'comment',
+            'pattern' => '/<!--.*?-->/s',
+        ],
+        [
+            'type' => 'tag',
             'name' => 'script',
             'pattern' => '/<script\b[^>]*>.*?<\/script>/is',
         ],
@@ -402,6 +412,8 @@ class Tokenizer
         $this->specialTags = [];
 
         $patterns = [
+            'doctype' => '/<!DOCTYPE\s[^>]+>/i',
+            'comment' => '/<!--.*?-->/s',
             'script' => '/<script\b[^>]*>[\s\S]*?<\/script>/is',
             'style' => '/<style\b[^>]*>[\s\S]*?<\/style>/is',
             'pre' => '/<pre\b[^>]*>[\s\S]*?<\/pre>/is',
