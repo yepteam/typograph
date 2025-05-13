@@ -335,34 +335,37 @@ class Tokenizer
                 }
 
                 // Проверяем, что совпадение найдено в начале строки
-                if ($matches[0][1] == 0) {
-                    $tokenValue = $matches[0][0];
+                if ($matches[0][1] != 0) {
+                    continue;
+                }
 
-                    // Для тегов извлекаем название тега
-                    if ($pattern['type'] === 'tag') {
-                        // Проверяем, является ли это закрывающим тегом
-                        if (preg_match('/<\/([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
-                            $tagName = $tagMatches[1];
-                        } // Или открывающим/самозакрывающимся тегом
-                        elseif (preg_match('/<([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
-                            $tagName = $tagMatches[1];
-                        } else {
-                            $tagName = 'unknown';
-                        }
+                $tokenValue = $matches[0][0];
 
-                        $foundToken = [
-                            'type' => $pattern['type'],
-                            'name' => strtolower($tagName), // сохраняем имя тега в lowercase
-                            'value' => $tokenValue,
-                        ];
+                // Для тегов извлекаем название тега
+                if ($pattern['type'] === 'tag') {
+                    // Проверяем, является ли это закрывающим тегом
+                    if (preg_match('/<\/([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                        $tagName = $tagMatches[1];
+                    } // Или открывающим/самозакрывающимся тегом
+                    elseif (preg_match('/<([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                        $tagName = $tagMatches[1];
                     } else {
-                        $foundToken = [
-                            'type' => $pattern['type'],
-                            'value' => $tokenValue,
-                        ];
+                        $tagName = 'unknown';
                     }
+
+                    $foundToken = [
+                        'type' => $pattern['type'],
+                        'name' => strtolower($tagName), // сохраняем имя тега в lowercase
+                        'value' => $tokenValue,
+                    ];
                     break;
                 }
+
+                $foundToken = [
+                    'type' => $pattern['type'],
+                    'value' => $tokenValue,
+                ];
+                break;
             }
 
             // Если токен найден
