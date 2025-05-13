@@ -13,6 +13,16 @@ class Tokenizer
     const TOKEN_PATTERNS = [
         [
             'type' => 'tag',
+            'name' => 'script',
+            'pattern' => '/<script\b[^>]*>.*?<\/script>/is',
+        ],
+        [
+            'type' => 'tag',
+            'name' => 'style',
+            'pattern' => '/<style\b[^>]*>.*?<\/style>/is',
+        ],
+        [
+            'type' => 'tag',
             'name' => 'tag',
             'pattern' => '/<\/?[a-z][a-z0-9]*\b[^>]*>|<!DOCTYPE\s[^>]+>|<!--(?:[^-]|-(?!->))*-->/i',
         ],

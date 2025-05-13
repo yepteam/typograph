@@ -31,4 +31,22 @@ final class HtmlTagTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testTagScript()
+    {
+        $typograph = new Typograph();
+
+        $original = '<script>console.log("Hello World!");</script>';
+        $expected = '<script>console.log("Hello World!");</script>';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testTagStyle()
+    {
+        $typograph = new Typograph();
+
+        $original = '<style>body { font-family: "sans-serif" }</style>';
+        $expected = '<style>body { font-family: "sans-serif" }</style>';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }
