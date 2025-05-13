@@ -2,6 +2,7 @@
 
 namespace Yepteam\Typograph\Rules\Nbsp;
 
+use Yepteam\Typograph\Helpers\HtmlHelper;
 use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
@@ -31,8 +32,20 @@ class Mdash
             return;
         }
 
+        $after_space_tag_index = TokenHelper::findPrevToken($tokens, $index, 'tag');
+        $before_space_tag_index = TokenHelper::findPrevToken($tokens, $space_index, 'tag');
+
+        if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+        if ($before_space_tag_index !== false && in_array($tokens[$before_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
         // Перед пробелом ищем токен, игнорируя некоторые символы
-        $prev_index = TokenHelper::findPrevToken($tokens, $space_index, null, function ($token) {
+        $prev_index = TokenHelper::findPrevToken($tokens, $space_index, [], function ($token) {
             return $token['type'] === 'tag' ||
                 in_array($token['value'], [
                     '*',

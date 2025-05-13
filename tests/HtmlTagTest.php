@@ -22,11 +22,11 @@ final class HtmlTagTest extends TestCase
 
         $original = '<button 
     class="btn btn-primary">
-    Отправить
+    Отправить   в  корзину
 </button>';
         $expected = '<button 
     class="btn btn-primary">
-Отправить
+Отправить в&nbsp;корзину
 </button>';
         $this->assertEquals($expected, $typograph->format($original));
     }
@@ -46,6 +46,21 @@ final class HtmlTagTest extends TestCase
 
         $original = '<style>body { font-family: "sans-serif" }</style>';
         $expected = '<style>body { font-family: "sans-serif" }</style>';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testTagPre()
+    {
+        $typograph = new Typograph();
+
+        $original = '<pre>
+    Ничего&nbsp;
+    не  менять
+</pre>';
+        $expected = '<pre>
+    Ничего&nbsp;
+    не  менять
+</pre>';
         $this->assertEquals($expected, $typograph->format($original));
     }
 

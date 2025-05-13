@@ -431,4 +431,29 @@ final class NbspTest extends TestCase
         $this->assertStringEndsWith($expected, $typograph->format($original));
     }
 
+    public function testNoNbspNearTags()
+    {
+        $typograph = new Typograph();
+
+        $original = '<p>Текст в</p> <p>Новой строке</p>';
+        $expected = '<p>Текст в</p> <p>Новой строке</p>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '<div>Текст в</div> <div>Новой строке</div>';
+        $expected = '<div>Текст в</div> <div>Новой строке</div>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '<div>Текст </div><div>— Новая строка</div>';
+        $expected = '<div>Текст </div><div>&mdash;&nbsp;Новая строка</div>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = 'Текст в<br> Новой строке';
+        $expected = 'Текст в<br> Новой строке';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = 'Текст в <br>Новой строке';
+        $expected = 'Текст в <br>Новой строке';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }

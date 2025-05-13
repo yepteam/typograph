@@ -2,6 +2,7 @@
 
 namespace Yepteam\Typograph\Rules\Nbsp;
 
+use Yepteam\Typograph\Helpers\HtmlHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
@@ -156,6 +157,18 @@ class ShortWord
 
         // Следующий токен должен быть пробелом
         if ($space_index === false) {
+            return;
+        }
+
+        $tag_index = TokenHelper::findNextToken($tokens, $index, 'tag');
+        $after_space_tag_index = TokenHelper::findNextToken($tokens, $space_index, 'tag');
+
+        if ($tag_index !== false && in_array($tokens[$tag_index]['name'], HtmlHelper::$new_line_tags)) {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+        if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
 

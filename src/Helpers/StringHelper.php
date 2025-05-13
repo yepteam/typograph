@@ -129,14 +129,4 @@ class StringHelper
         return $isWord && $isUppercase;
     }
 
-    public static function replaceNewlinesInTags($input, string $replacement = ' data-typograph-new-line '): string
-    {
-        $pattern = '/<([^>]*)>/';
-
-        return (string)preg_replace_callback($pattern, function ($matches) use ($replacement) {
-            $content = $matches[1];
-            $content = str_replace(["\r\n", "\r", "\n"], $replacement, $content);
-            return '<' . $content . '>';
-        }, $input);
-    }
 }

@@ -40,7 +40,7 @@ class TokenHelper
     public static function findPrevToken(
         array        $tokens,
         int          $currentIndex,
-        array|string $type = null,
+        array|string $type = [],
         ?callable    $ignoreCallback = null
     ): int|false
     {
@@ -52,13 +52,13 @@ class TokenHelper
 
             $shouldIgnore = $ignoreCallback !== null
                 ? $ignoreCallback($tokens[$prevIdx])
-                : ($tokens[$prevIdx]['type'] === 'tag');
+                : (!in_array('tag', $type) && $tokens[$prevIdx]['type'] === 'tag');
 
             if ($shouldIgnore) {
                 continue;
             }
 
-            if ($type !== null && !in_array($tokens[$prevIdx]['type'], $type)) {
+            if (!empty($type) && !in_array($tokens[$prevIdx]['type'], $type)) {
                 return false;
             }
 
@@ -72,7 +72,7 @@ class TokenHelper
      * Находит индекс ближайшего следующего токена, который не является тегом
      * @param array $tokens
      * @param int $currentIndex
-     * @param array|string|null $type Если указано, вернет false, если следующий токен не этого типа
+     * @param array|string $type Если указано, вернет false, если следующий токен не этого типа
      * @param callable|null $ignoreCallback
      * Произвольный метод для игнорирования токенов.
      * Если не указан - пропускаются все теги.
@@ -81,7 +81,7 @@ class TokenHelper
     public static function findNextToken(
         array        $tokens,
         int          $currentIndex,
-        array|string $type = null,
+        array|string $type = [],
         ?callable    $ignoreCallback = null
     ): int|false
     {
@@ -93,13 +93,13 @@ class TokenHelper
 
             $shouldIgnore = $ignoreCallback !== null
                 ? $ignoreCallback($tokens[$nextIdx])
-                : ($tokens[$nextIdx]['type'] === 'tag');
+                : (!in_array('tag', $type) && $tokens[$nextIdx]['type'] === 'tag');
 
             if ($shouldIgnore) {
                 continue;
             }
 
-            if ($type !== null && !in_array($tokens[$nextIdx]['type'], $type)) {
+            if (!empty($type) && !in_array($tokens[$nextIdx]['type'], $type)) {
                 return false;
             }
 
@@ -114,6 +114,11 @@ class TokenHelper
      */
     public static function isAtStartOfSentence(array $tokens, int $index): bool
     {
+        $prev_tag_index = TokenHelper::findPrevToken($tokens, $index, 'tag');
+        if ($prev_tag_index !== false && in_array($tokens[$prev_tag_index]['name'], HtmlHelper::$new_line_tags)) {
+            return true;
+        }
+
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
 
         // Перед токеном нет ничего (кроме тегов)

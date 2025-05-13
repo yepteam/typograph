@@ -2,7 +2,7 @@
 
 namespace Yepteam\Typograph;
 
-use Yepteam\Typograph\Helpers\StringHelper;
+use Yepteam\Typograph\Helpers\HtmlHelper;
 
 class Tokenizer
 {
@@ -20,6 +20,11 @@ class Tokenizer
             'type' => 'tag',
             'name' => 'style',
             'pattern' => '/<style\b[^>]*>.*?<\/style>/is',
+        ],
+        [
+            'type' => 'tag',
+            'name' => 'pre',
+            'pattern' => '/<pre\b[^>]*>.*?<\/pre>/is',
         ],
         [
             'type' => 'tag',
@@ -213,6 +218,8 @@ class Tokenizer
         ]
     ];
 
+    private array $specialTags = [];
+
     /**
      * Разбивает текст на токены с учетом переносов строк
      *
@@ -222,15 +229,18 @@ class Tokenizer
      */
     public function tokenize(string $input): array
     {
+        // Сначала выделяем специальные теги (script, style, pre) с их содержимым
+        $input = $this->preserveSpecialTags($input);
+
+        // Декодируем символы
         $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $input = trim($input);
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
-        $input = str_replace(' ', ' ', $input);
-        $input = str_replace(' ', ' ', $input);
+        $input = str_replace([' ', ' '], ' ', $input);
 
-        $input = StringHelper::replaceNewlinesInTags($input);
+        $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
 
         $lines = explode(PHP_EOL, $input);
 
@@ -269,12 +279,11 @@ class Tokenizer
 
         $tokens = [];
 
-        // Удаляем лишние пробелы в каждой строке и заменяем повторяющиеся пробелы на один
         $lines = explode(PHP_EOL, $input);
 
         $lines = array_map(function ($line) {
 
-            if (str_contains($line, 'data-typograph-new-line')) {
+            if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
                 return $line;
             }
 
@@ -284,7 +293,7 @@ class Tokenizer
 
         $processedInput = implode(PHP_EOL, $lines);
 
-        $processedInput = str_replace(' data-typograph-new-line ', PHP_EOL, $processedInput);
+        $processedInput = HtmlHelper::restoreNewlinesInTags($processedInput);
 
         $offset = 0;
         $length = mb_strlen($processedInput, 'UTF-8');
@@ -293,6 +302,23 @@ class Tokenizer
             $foundToken = null;
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
 
+            // Проверяем, не начинается ли подстрока с сохраненного специального тега
+            if (preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {
+                $tagType = $tagMatches[1];
+                $tagId = $tagMatches[2];
+                $tagContent = $this->restoreSpecialTag($tagType, $tagId);
+
+                $tokens[] = [
+                    'type' => 'tag',
+                    'name' => strtolower($tagType),
+                    'value' => $tagContent,
+                ];
+
+                $offset += mb_strlen($tagMatches[0], 'UTF-8');
+                continue;
+            }
+
+            // Обычная обработка токенов
             foreach (self::TOKEN_PATTERNS as $pattern) {
                 if (!preg_match($pattern['pattern'], $substr, $matches, PREG_OFFSET_CAPTURE)) {
                     continue;
@@ -301,10 +327,30 @@ class Tokenizer
                 // Проверяем, что совпадение найдено в начале строки
                 if ($matches[0][1] == 0) {
                     $tokenValue = $matches[0][0];
-                    $foundToken = [
-                        'type' => $pattern['type'],
-                        'value' => $tokenValue,
-                    ];
+
+                    // Для тегов извлекаем название тега
+                    if ($pattern['type'] === 'tag') {
+                        // Проверяем, является ли это закрывающим тегом
+                        if (preg_match('/<\/([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                            $tagName = $tagMatches[1];
+                        } // Или открывающим/самозакрывающимся тегом
+                        elseif (preg_match('/<([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                            $tagName = $tagMatches[1];
+                        } else {
+                            $tagName = 'unknown';
+                        }
+
+                        $foundToken = [
+                            'type' => $pattern['type'],
+                            'name' => strtolower($tagName), // сохраняем имя тега в lowercase
+                            'value' => $tokenValue,
+                        ];
+                    } else {
+                        $foundToken = [
+                            'type' => $pattern['type'],
+                            'value' => $tokenValue,
+                        ];
+                    }
                     break;
                 }
             }
@@ -342,5 +388,46 @@ class Tokenizer
             $result .= $token['value'];
         }
         return $result;
+    }
+
+    /**
+     * Сохраняет специальные теги (script, style, pre) с их содержимым.
+     * Заменяет их на временные метки в тексте.
+     *
+     * @param string $input
+     * @return string
+     */
+    private function preserveSpecialTags(string $input): string
+    {
+        $this->specialTags = [];
+
+        $patterns = [
+            'script' => '/<script\b[^>]*>[\s\S]*?<\/script>/is',
+            'style' => '/<style\b[^>]*>[\s\S]*?<\/style>/is',
+            'pre' => '/<pre\b[^>]*>[\s\S]*?<\/pre>/is',
+        ];
+
+        foreach ($patterns as $tagType => $pattern) {
+            $input = preg_replace_callback($pattern, function ($matches) use ($tagType) {
+                $id = count($this->specialTags);
+                $this->specialTags["{$tagType}:{$id}"] = $matches[0];
+                return "[SPECIAL_TAG:{$tagType}:{$id}]";
+            }, $input);
+        }
+
+        return $input;
+    }
+
+    /**
+     * Восстанавливает специальный тег по его типу и ID
+     *
+     * @param string $tagType
+     * @param int $tagId
+     * @return string
+     */
+    private function restoreSpecialTag(string $tagType, int $tagId): string
+    {
+        $key = "$tagType:$tagId";
+        return $this->specialTags[$key] ?? '';
     }
 }
