@@ -269,6 +269,26 @@ final class NbspTest extends TestCase
         $original = '(4 картины)';
         $expected = '(4&nbsp;картины)';
         $this->assertEquals($expected, $typograph->format($original));
+
+        $original = 'упомянута 9 раз («Лучшая опера»)';
+        $expected = 'упомянута 9&nbsp;раз (';
+        $this->assertStringStartsWith($expected, $typograph->format($original));
+
+        $original = 'упомянута 3 раза';
+        $expected = 'упомянута 3&nbsp;раза';
+        $this->assertStringStartsWith($expected, $typograph->format($original));
+
+        $original = "упомянута 3 раза" . PHP_EOL . "сегодня";
+        $expected = "упомянута 3&nbsp;раза" . PHP_EOL . "сегодня";
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = "упомянута 1 раз" . PHP_EOL . "сегодня";
+        $expected = "упомянута 1&nbsp;раз" . PHP_EOL . "сегодня";
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'упомянута 3 раза (в одном эпизоде)';
+        $expected = 'упомянута 3&nbsp;раза (';
+        $this->assertStringStartsWith($expected, $typograph->format($original));
     }
 
     public function testNotAfterNumber()

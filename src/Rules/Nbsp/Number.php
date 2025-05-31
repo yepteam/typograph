@@ -167,7 +167,16 @@ class Number
 
         // Перед числом знак валюты?
         if (in_array($prev_value, StringHelper::$currency_symbols)) {
+            // Заменяем токен space на nbsp
+            $tokens[$space_index] = [
+                'type' => 'nbsp',
+                'value' => ' ',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+        }
 
+        // Перед числом число до 3 знаков?
+        if (preg_match('/^\d{1,3}$/u', $prev_value)) {
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
@@ -195,6 +204,9 @@ class Number
                 return;
             }
         }
+
+        // Флаг наличия nbsp перед числом
+        $has_nbsp_before_number = $tokens[$prev_index]['type'] === 'nbsp';
 
         $next_index = TokenHelper::findNextToken($tokens, $space_index);
         if ($next_index === false) {
@@ -285,13 +297,32 @@ class Number
         // После числа текст длиной 4 символа
         if ($next_value_length === 4) {
             $next_index = TokenHelper::findNextToken($tokens, $next_index);
+
+            // После текста ничего нет?
             if ($next_index === false) {
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                // Перед числом не было nbsp?
+                if (!$has_nbsp_before_number) {
+                    // Заменяем токен space на nbsp
+                    $tokens[$space_index] = [
+                        'type' => 'nbsp',
+                        'value' => ' ',
+                        'rule' => __CLASS__ . ':' . __LINE__,
+                    ];
+                }
                 return;
             }
 
+            // После текста перенос строки?
             if ($tokens[$next_index]['type'] === 'new-line') {
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                // Перед числом не было nbsp?
+                if (!$has_nbsp_before_number) {
+                    // Заменяем токен space на nbsp
+                    $tokens[$space_index] = [
+                        'type' => 'nbsp',
+                        'value' => ' ',
+                        'rule' => __CLASS__ . ':' . __LINE__,
+                    ];
+                }
                 return;
             }
 
@@ -306,6 +337,16 @@ class Number
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
+            }
+
+            // После текста пробел?
+            if ($tokens[$next_index]['type'] === 'space') {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
             }
         }
 
@@ -326,8 +367,41 @@ class Number
             $next_index = TokenHelper::findNextToken($tokens, $next_index);
             $next_value = $tokens[$next_index]['value'] ?? '';
 
-            // После текста ничего нет или примыкающий знак препинания
-            if ($next_index === false || in_array($next_value, TokenHelper::$right_adjacent_marks)) {
+            // После текста ничего нет
+            if ($next_index === false) {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+            // После текста перенос строки?
+            if ($tokens[$next_index]['type'] === 'new-line') {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+            // После текста примыкающий знак препинания
+            if (in_array($next_value, TokenHelper::$right_adjacent_marks)) {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+            // После текста пробел
+            if ($tokens[$next_index]['type'] === 'space') {
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
