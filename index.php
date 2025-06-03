@@ -1,6 +1,8 @@
 <?php
+
 ini_set("display_errors", 1);
 
+use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 use Yepteam\Typograph\Typograph;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -8,17 +10,23 @@ require __DIR__ . '/vendor/autoload.php';
 $default = '';
 $tokens = [];
 
+$entity_format_options = HtmlEntities::$formats;
+
+$entity_format = $_POST['format'] ?? 'named';
+
 // Обработка POST-запроса
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $original = $_POST['text'] ?? $default;
-    $encoding = $_POST['encoding'] ?? 'xml_entity';
 
-    // Выбираем режим обработки
-    $use_symbols = ($encoding === 'use_symbols');
+    if(!in_array($entity_format, $entity_format_options)){
+        $encoding = 'named';
+    }
 
-    $typograph = new Typograph();
+    $typograph = new Typograph([
+        'entities' => $entity_format
+    ]);
 
-    $text = $typograph->format($original, $use_symbols);
+    $text = $typograph->format($original);
     $tokens = $typograph->getTokens();
 
     if (mb_strlen($text) > 4096) {
@@ -30,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $_SESSION['original'] = $original;
     $_SESSION['text'] = $text;
     $_SESSION['tokens'] = $tokens;
-    $_SESSION['encoding'] = $encoding;
+    $_SESSION['format'] = $entity_format;
 
     // Перенаправляем на эту же страницу методом GET
     header('Location: ./');
@@ -40,10 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Получаем данные из сессии (если есть)
 session_start();
 $original = $_SESSION['original'] ?? $default;
-$encoding = $_SESSION['encoding'] ?? 'xml_entity';
-$use_symbols = ($encoding === 'use_symbols');
 $text = $_SESSION['text'] ?? '';
 $tokens = $_SESSION['tokens'] ?? [];
+$entity_format = $_SESSION['format'] ?? 'named';
 
 // Очищаем сессию
 unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['encoding']);
@@ -90,20 +97,15 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                     <div class="border-t border-gray-200 p-4 bg-gray-50">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
+                                <?php foreach ($entity_format_options as $entity_format_option): ?>
                                 <div class="flex items-center">
-                                    <input id="encoding_xml" name="encoding" type="radio" value="xml_entity"
+                                    <input id="encoding_<?= $entity_format_option ?>" name="format" type="radio" value="<?= $entity_format_option ?>"
                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        <?= $encoding === 'xml_entity' ? 'checked' : '' ?>>
-                                    <label for="encoding_xml" class="ml-2 text-sm text-gray-700">Буквенными
-                                        кодами</label>
+                                        <?= $entity_format === $entity_format_option ? 'checked' : '' ?>>
+                                    <label for="encoding_<?= $entity_format_option ?>" class="ml-2 text-sm text-gray-700">
+                                        <?= $entity_format_option ?></label>
                                 </div>
-                                <div class="flex items-center">
-                                    <input id="encoding_symbols" name="encoding" type="radio" value="use_symbols"
-                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        <?= $encoding === 'use_symbols' ? 'checked' : '' ?>>
-                                    <label for="encoding_symbols" class="ml-2 text-sm text-gray-700">Готовыми
-                                        символами</label>
-                                </div>
+                                <?php endforeach; ?>
                             </div>
                             <button type="submit"
                                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">

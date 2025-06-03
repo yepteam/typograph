@@ -174,7 +174,9 @@ final class NbspTest extends TestCase
 
     public function testBeforeNumber()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named',
+        ]);
 
         $original = 'Начинается текст подраздела 1…';
         $expected = 'Начинается текст подраздела&nbsp;1';
@@ -185,8 +187,8 @@ final class NbspTest extends TestCase
         $this->assertStringStartsWith($expected, $typograph->format($original));
 
         $original = 'Палата № 6';
-        $expected = 'Палата &#8470;&nbsp;6';
-        $this->assertEquals($expected, $typograph->format($original));
+        $expected = '&nbsp;6';
+        $this->assertStringEndsWith($expected, $typograph->format($original));
 
         $original = '€ 60-80';
         $expected = '&nbsp;60';

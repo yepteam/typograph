@@ -9,65 +9,119 @@ final class QuoteTest extends TestCase
 {
     public function testLevel1()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
 
         $original = '"Электроника"';
-        $expected = '&laquo;Электроника&raquo;';
+        $expected = '«Электроника»';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = 'Часы "Электроника"';
-        $expected = 'Часы &laquo;Электроника&raquo;';
+        $expected = 'Часы «Электроника»';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = 'Часы "Электроника" в корпусе из нержавеющей стали';
-        $expected = 'Часы &laquo;Электроника&raquo; в';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
-
-        $original = '"Правило 42"';
-        $this->assertStringStartsWith('&laquo;', $typograph->format($original));
-        $this->assertStringEndsWith('&raquo;', $typograph->format($original));
-
-        $original = '"Правило № 42"';
-        $this->assertStringStartsWith('&laquo;', $typograph->format($original));
-        $this->assertStringEndsWith('&raquo;', $typograph->format($original));
+        $expected = 'Часы «Электроника» в корпусе из нержавеющей стали';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testLevel2()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
 
         $original = '«Часы "Электроника ЧН-54" в корпусе из нержавеющей стали»';
-        $expected = '&laquo;Часы &bdquo;Электроника ЧН-54&ldquo; в&nbsp;корпусе из&nbsp;нержавеющей стали&raquo;';
+        $expected = '«Часы „Электроника ЧН-54“ в корпусе из нержавеющей стали»';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = '""Белград" Отель"';
-        $expected = '&laquo;&bdquo;Белград&ldquo; Отель&raquo;';
+        $expected = '«„Белград“ Отель»';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
+    public function testAfterNumber()
+    {
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
+
+        $original = '"Правило 42"';
+        $this->assertSame('«Правило 42»', $typograph->format($original));
+
+        $original = '"Правило № 42"';
+        $this->assertSame('«Правило № 42»', $typograph->format($original));
+    }
+
+    public function testCustomQuotes()
+    {
+        $typograph = new Typograph([
+            'quotes' => [
+                ['‹ ', ' ›'],
+                ['›', '‹'],
+            ],
+            'entities' => 'raw'
+        ]);
+
+        $original = '"Часы "Электроника ЧН-54" в корпусе из нержавеющей стали"';
+        $expected = '‹ Часы ›Электроника ЧН-54‹ в корпусе из нержавеющей стали ›';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
+    public function testDeep()
+    {
+        $typograph = new Typograph([
+            'quotes' => [
+                ['«', '»'],
+                ['„', '“'],
+                ['‘', '’'],
+                ['“', '”'],
+            ],
+            'entities' => 'raw',
+            'nbsp' => []
+        ]);
+
+        $original = 'Он вздохнул и сказал: "Мне вчера пришло письмо со словами: "Вот что написал автор: "Этот символ — "золотой ключ" — нельзя терять", а потом добавил кое-что ещё". Я даже не знал, как на это реагировать".';
+        $expected = 'Он вздохнул и сказал: «Мне вчера пришло письмо со словами: „Вот что написал автор: ‘Этот символ — “золотой ключ” — нельзя терять’, а потом добавил кое-что ещё“. Я даже не знал, как на это реагировать».';
         $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testOdd()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
 
-        $original = '«ООО «Рога копыта»';
-        $expected = '&laquo;ООО &laquo;Рога копыта&raquo;';
+        $original = '«ООО «Рога и копыта»';
+        $expected = '«ООО «Рога и копыта»';
         $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testMultiline()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
 
-        $original = '(глава «Записок» Мертвого дома)
+        $original = '(глава "Записок" Мертвого дома)
+(Из книги "Истина и метод")';
+        $expected = '(глава «Записок» Мертвого дома)
 (Из книги «Истина и метод»)';
-        $expected = '(глава &laquo;Записок&raquo; Мертвого дома)
-(Из&nbsp;книги &laquo;Истина и&nbsp;метод&raquo;)';
         $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testApos()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
 
         $original = trim(<<<EOF
 "Hello 'world'"  
@@ -77,10 +131,10 @@ final class QuoteTest extends TestCase
 EOF
         );
         $expected = trim(<<<EOF
-&laquo;Hello &rsquo;world&rsquo;&raquo;
-&rsquo;Hello &laquo;world&raquo;&rsquo;
-&laquo;Hello &rsquo;world&rsquo;&raquo;
-&rsquo;Hello &laquo;world&raquo;&rsquo;
+«Hello ’world’»
+’Hello «world»’
+«Hello ’world’»
+’Hello «world»’
 EOF
         );
 
@@ -88,13 +142,16 @@ EOF
 
         // https://habr.com/ru/articles/57351/
         $original = "Д'Артаньян, Сара О'Коннор";
-        $expected = "Д&rsquo;Артаньян, Сара О&rsquo;Коннор";
+        $expected = "Д’Артаньян, Сара О’Коннор";
         $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testPrime()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'nbsp' => [],
+        ]);
 
         $original = 'Труба 3/4"';
         $expected = 'Труба 3/4&Prime;';

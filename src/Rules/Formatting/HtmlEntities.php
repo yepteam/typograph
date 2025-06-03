@@ -3,35 +3,91 @@
 namespace Yepteam\Typograph\Rules\Formatting;
 
 /**
- * Преобразование символов в HTML-сущности (кроме тегов)
+ * Преобразование только символов с HTML-мнемониками в сущности
  */
 class HtmlEntities
 {
-    public static function applyToAll(array &$tokens): void
+    public static array $formats = [
+        'named',   // Использует именованные сущности (например, &amp;)
+        'numeric', // Использует числовые сущности только для символов с мнемониками
+        'hex',     // Использует hex-сущности только для символов с мнемониками
+        'raw',     // Без преобразований
+    ];
+
+    public static function applyToAll(array &$tokens, string $format = 'named'): void
     {
-        for ($index = 0; $index < count($tokens); $index++) {
-
-            // Пропускаем теги
-            if ($tokens[$index]['type'] === 'tag') {
-                continue;
-            }
-
-            $value = $tokens[$index]['value'];
-
-            // Пропускаем уже преобразованные сущности
-            if (preg_match('/&(?:[a-z]+|#\d+);/i', $value)) {
-                continue;
-            }
-
-            $value = htmlentities($value);
-
-            // Ко́шка → Ко&#769;шка
-            $value = str_replace("\xCC\x81", '&#769;', $value);
-
-            // № → &#8470;
-            $value = str_replace("№", '&#8470;', $value);
-
-            $tokens[$index]['value'] = $value;
+        if (!in_array($format, self::$formats)) {
+            $format = 'named';
         }
+
+        if ($format === 'raw') {
+            return;
+        }
+
+        foreach ($tokens as &$token) {
+            if ($token['type'] === 'tag') {
+                continue;
+            }
+
+            $token['value'] = self::convert($token['value'], $format);
+        }
+    }
+
+    private static function convert(string $text, string $format): string
+    {
+        $result = '';
+        $length = mb_strlen($text, 'UTF-8');
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = mb_substr($text, $i, 1, 'UTF-8');
+            $ord = mb_ord($char, 'UTF-8');
+
+            // комбинируемый знак ударения
+            if ($ord === 769) {
+                $result .= match ($format) {
+                    'named', 'numeric' => "&#$ord;",
+                    'hex' => "&#x" . dechex($ord) . ";",
+                    default => $char
+                };
+                continue;
+            }
+
+            // Знак рубля (нет мнемоники в HTML)
+            if ($ord === 8381) {
+                $result .= match ($format) {
+                    'numeric' => "&#$ord;",
+                    'hex' => "&#x" . dechex($ord) . ";",
+                    default => $char
+                };
+                continue;
+            }
+
+            // Знак номера (появился в HTML5)
+            if ($ord === 8470) {
+                $result .= match ($format) {
+                    'named', 'numeric' => "&#$ord;",
+                    'hex' => "&#x" . dechex($ord) . ";",
+                    default => $char
+                };
+                continue;
+            }
+
+            // Проверяем, есть ли у символа именованная мнемоника
+            $entity = htmlentities($char, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            if ($entity === $char) {
+                $result .= $char;
+                continue;
+            }
+
+            // Преобразуем в выбранный формат
+            $result .= match ($format) {
+                'named' => $entity,
+                'numeric' => "&#$ord;",
+                'hex' => "&#x" . dechex($ord) . ";",
+                default => $char
+            };
+        }
+
+        return $result;
     }
 }

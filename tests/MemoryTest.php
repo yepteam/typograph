@@ -15,7 +15,7 @@ final class MemoryTest extends TestCase
 {
     /**
      * Использование памяти: ~26M
-     * Время выполнения: ~00:00.040
+     * Время выполнения: ~00:00.048
      */
     public function test64()
     {
@@ -36,7 +36,7 @@ final class MemoryTest extends TestCase
 
     /**
      * Использование памяти: ~38M
-     * Время выполнения: ~00:00.330
+     * Время выполнения: ~00:00.450
      */
     public function test1024()
     {
@@ -58,8 +58,8 @@ final class MemoryTest extends TestCase
     }
 
     /**
-     * Использование памяти: ~38M
-     * Время выполнения: ~00:00.330
+     * Использование памяти: ~36M
+     * Время выполнения: ~00:00.350
      */
     public function testTags1024()
     {

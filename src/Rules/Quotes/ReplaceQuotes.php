@@ -21,6 +21,8 @@ class ReplaceQuotes
      */
     private static array $isQuoteOpenArr = [];
 
+    private static array $quoteMarks = [];
+
     /**
      * Сброс счетчиков состояния кавычек
      */
@@ -30,8 +32,27 @@ class ReplaceQuotes
         self::$isQuoteOpenArr = [];
     }
 
+    /**
+     * Установка массива кавычек
+     * @param array|false|null $quoteMarks
+     * @return void
+     */
+    public static function setQuoteMarks(array|false|null $quoteMarks): void
+    {
+        if (empty($quoteMarks)) {
+            self::$quoteMarks = [];
+        } else {
+            self::$quoteMarks = $quoteMarks;
+        }
+    }
+
     public static function apply(int $index, array &$tokens): void
     {
+        // Не обрабатывать кавычки при пустом массиве
+        if (empty(self::$quoteMarks)) {
+            return;
+        }
+
         $current = $tokens[$index];
 
         // Применимо только к токену quote
@@ -195,20 +216,18 @@ class ReplaceQuotes
      */
     private static function getOpeningQuote(int $level): string
     {
-        return match ($level) {
-            0 => '«', // &laquo;
-            default => '„' // &bdquo;
-        };
+        return self::$quoteMarks[$level][0]
+            ?? self::$quoteMarks[count(self::$quoteMarks) - 1][0]
+            ?? '«';
     }
 
     /**
      * Возвращает закрывающую кавычку для текущего уровня вложенности
      */
-    private static function getClosingQuote(int $level, array $isQuoteOpenArr, array $tokens, int $index): string
+    private static function getClosingQuote(int $level): string
     {
-        return match ($level) {
-            0 => '»', // &raquo;
-            default => '“'
-        };
+        return self::$quoteMarks[$level][1]
+            ?? self::$quoteMarks[count(self::$quoteMarks) - 1][1]
+            ?? '»';
     }
 }

@@ -28,8 +28,20 @@ class ShortWord
         'уж', // вы&nbsp;уж не&nbsp;друг мой, вы&nbsp;уж не&nbsp;мой верный раб (Война и мир)
     ];
 
-    public static function apply(int $index, array &$tokens): void
+    /**
+     * Расстановка неразрывных пробелов до и после короткого слова
+     *
+     * @param int $index Индекс токена
+     * @param array $tokens Массив всех токенов
+     * @param int|bool $max_length Максимальная длина короткого слова
+     * @return void
+     */
+    public static function apply(int $index, array &$tokens, int|bool $max_length = 2): void
     {
+        if ($max_length === true) {
+            $max_length = 2;
+        }
+
         // Токен должен быть словом или одиночным символом
         if (!in_array($tokens[$index]['type'], ['word', 'char'])) {
             return;
@@ -38,7 +50,7 @@ class ShortWord
         $current_word_length = mb_strlen($tokens[$index]['value']);
 
         // Токен должен быть коротким словом
-        if ($current_word_length > 2) {
+        if ($current_word_length > $max_length) {
             return;
         }
 
