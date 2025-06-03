@@ -10,6 +10,8 @@ class Typograph
      * @param array{
      *      // Режим кодирования
      *      // named - буквенными кодами
+     *      // numeric - числовыми кодами
+     *      // hex - шестнадцатеричными кодами
      *      // raw - готовыми символами
      *      entities: 'named'|'numeric'|'hex'|'raw',
      *
