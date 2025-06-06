@@ -9,7 +9,9 @@ final class HtmlTagTest extends TestCase
 {
     public function testTag()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<b>Текст</b>';
         $expected = '<b>Текст</b>';
@@ -18,7 +20,9 @@ final class HtmlTagTest extends TestCase
 
     public function testTagMultiline()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<button 
     class="btn btn-primary">
@@ -33,7 +37,9 @@ final class HtmlTagTest extends TestCase
 
     public function testTagScript()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<script>console.log("Hello World!");</script>';
         $expected = '<script>console.log("Hello World!");</script>';
@@ -42,7 +48,9 @@ final class HtmlTagTest extends TestCase
 
     public function testTagStyle()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<style>body { font-family: "sans-serif" }</style>';
         $expected = '<style>body { font-family: "sans-serif" }</style>';
@@ -51,7 +59,9 @@ final class HtmlTagTest extends TestCase
 
     public function testTagPre()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<pre>
     Ничего&nbsp;
@@ -66,7 +76,9 @@ final class HtmlTagTest extends TestCase
 
     public function testTagWithAttribute()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = "<form data-default='{\"br\":\"<br>\"}'>Текст в форме</form>";
         $expected = "<form data-default='{\"br\":\"<br>\"}'>Текст в&nbsp;форме</form>";
@@ -75,7 +87,9 @@ final class HtmlTagTest extends TestCase
 
     public function testDoctype()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<!DOCTYPE html>';
         $expected = '<!DOCTYPE html>';
@@ -94,7 +108,9 @@ final class HtmlTagTest extends TestCase
 
     public function testComment()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<!-- Комментарий в коде -->';
         $expected = '<!-- Комментарий в коде -->';

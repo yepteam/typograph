@@ -9,7 +9,9 @@ final class HtmlEntityTest extends TestCase
 {
     public function testPreEntity()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Опера-сказка в&nbsp;3&nbsp;действиях';
         $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
@@ -21,7 +23,9 @@ final class HtmlEntityTest extends TestCase
 
     public function testPreEntityTwice()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Опера-сказка в&nbsp;3&amp;nbsp;действиях';
         $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
@@ -45,7 +49,9 @@ final class HtmlEntityTest extends TestCase
 
     public function testGreek()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'от греч. τύπος';
         $expected = 'от&nbsp;греч. &tau;ύ&pi;&omicron;&sigmaf;';

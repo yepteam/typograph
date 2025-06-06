@@ -19,7 +19,9 @@ final class MemoryTest extends TestCase
      */
     public function test64()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         // Строка 64 символа
         $original = 'Часы наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
@@ -40,7 +42,9 @@ final class MemoryTest extends TestCase
      */
     public function test1024()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         // Строка 64 символа
         $original = 'Часы наручные "Электроника 77А" в корпусе из нержавеющей стали.' . PHP_EOL;
@@ -63,7 +67,9 @@ final class MemoryTest extends TestCase
      */
     public function testTags1024()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         // Строка 64 символа
         $original = 'Часы <strong>"Электроника 77А"</strong> в корпусе из стали.' . PHP_EOL;

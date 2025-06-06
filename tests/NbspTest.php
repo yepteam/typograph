@@ -9,7 +9,9 @@ final class NbspTest extends TestCase
 {
     public function testBeforeMdash()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
         $original = 'Крикну — а в ответ тишина';
@@ -47,7 +49,9 @@ final class NbspTest extends TestCase
 
     public function testNotBeforeMdash()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '* — справа';
         $expected = '* &mdash; справа';
@@ -68,7 +72,9 @@ final class NbspTest extends TestCase
 
     public function testAfterMdash()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Вы всё ещё кипятите? — Тогда мы идём к вам!';
         $expected = 'кипятите? &mdash;&nbsp;Тогда';
@@ -77,7 +83,9 @@ final class NbspTest extends TestCase
 
     public function testNotAfterMdash()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'см. 3.2 — 3.31.';
         $expected = '&mdash; 3.31.';
@@ -86,7 +94,9 @@ final class NbspTest extends TestCase
 
     public function testBeforeShortWord()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Содержание подраздела А…';
         $expected = 'Содержание подраздела&nbsp;А';
@@ -119,7 +129,9 @@ final class NbspTest extends TestCase
 
     public function testAfterShortWord()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
         $original = 'Коляныч пошел за пивом';
@@ -157,7 +169,9 @@ final class NbspTest extends TestCase
 
     public function testNotAfterShortWord()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'читайте с. 272-294';
         $expected = 'читайте&nbsp;с. 272-294';
@@ -197,7 +211,9 @@ final class NbspTest extends TestCase
 
     public function testNotBeforeNumber()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '+ 2';
         $expected = '+ 2';
@@ -214,7 +230,9 @@ final class NbspTest extends TestCase
 
     public function testAfterNumber()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '8 201 794';
         $expected = '8&nbsp;201&nbsp;794';
@@ -295,7 +313,9 @@ final class NbspTest extends TestCase
 
     public function testNotAfterNumber()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'представлена в 2006 году';
         $expected = 'представлена в&nbsp;2006 году';
@@ -340,7 +360,9 @@ final class NbspTest extends TestCase
 
     public function testBeforeParticleWord()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Съешь же ещё этих мягких французских булок';
         $expected = 'Съешь&nbsp;же ещё этих мягких французских булок';
@@ -361,7 +383,9 @@ final class NbspTest extends TestCase
 
     public function testBeforeYear()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '1941–1945 гг.';
         $expected = '1945&nbsp;гг.';
@@ -370,7 +394,9 @@ final class NbspTest extends TestCase
 
     public function testNotBeforeShortWord()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Было дело, да';
         $expected = 'Было дело, да';
@@ -384,7 +410,9 @@ final class NbspTest extends TestCase
 
     public function testInitial()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '(подраздел Ф. М. Достоевского)';
         $expected = '(подраздел Ф.&nbsp;М.&nbsp;Достоевского)';
@@ -433,7 +461,9 @@ final class NbspTest extends TestCase
 
     public function testTags()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'Согласен с <strong>условиями</strong> пользовательского соглашения';
         $expected = 'Согласен с&nbsp;<strong>условиями</strong> пользовательского соглашения';
@@ -446,7 +476,9 @@ final class NbspTest extends TestCase
 
     public function testBeforeSingleCharacter()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = 'за 200 миллионов ₽.';
         $expected = 'миллионов&nbsp;₽.';
@@ -455,7 +487,9 @@ final class NbspTest extends TestCase
 
     public function testNoNbspNearTags()
     {
-        $typograph = new Typograph();
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
 
         $original = '<p>Текст в</p> <p>Новой строке</p>';
         $expected = '<p>Текст в</p> <p>Новой строке</p>';

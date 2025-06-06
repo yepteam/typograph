@@ -81,7 +81,7 @@ class Typograph
      * @var array Параметры по умолчанию
      */
     private array $defaultOptions = [
-        'entities' => 'named',
+        'entities' => 'raw',
         'ellipsis' => 'hellip',
         'quotes' => [
             ['«', '»'],
