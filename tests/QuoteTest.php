@@ -162,4 +162,20 @@ EOF
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testReversed()
+    {
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
+
+        $original = '»Есть люди, которых интересует именно «Лебединое озеро», — сказал он с улыбкой.';
+        $expected = '«Есть люди, которых интересует именно «Лебединое озеро», — сказал он с улыбкой.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '"Есть люди, которых интересует именно "Лебединое озеро", — сказал он.';
+        $expected = '«Есть люди, которых интересует именно «Лебединое озеро», — сказал он.';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
 }

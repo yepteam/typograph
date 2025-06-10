@@ -21,6 +21,11 @@ class ReplaceQuotes
      */
     private static array $isQuoteOpenArr = [];
 
+    /**
+     * Массив для хранения кавычек по уровням вложенности.
+     * Каждый элемент - массив из двух строк (открывающая и закрывающая кавычки)
+     * @var array<array{array{string, string}}>
+     */
     private static array $quoteMarks = [];
 
     /**
@@ -76,10 +81,20 @@ class ReplaceQuotes
         // Для открывающей кавычки ищем соответствующую закрывающую
         if ($isOpeningQuote) {
             $closingIndex = self::findMatchingClosingQuote($tokens, $index);
+
+            // Не нашли закрывающую кавычку?
             if ($closingIndex === null) {
-                $current['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                $current['rule'] = __CLASS__ . ':' . __LINE__;
+
+                // Заменяем символ кавычки для этого уровня
+                $current['value'] = self::getOpeningQuote(self::$quoteLevel);
+                // Указываем уровень кавычки для отладки
+                $current['level'] = self::$quoteLevel;
+
                 $tokens[$index] = $current;
-                return; // Не нашли закрывающую кавычку - оставляем как есть
+
+                // Выходим, не меняя уровень вложенности
+                return;
             }
 
             // Повышаем уровень кавычек
@@ -188,14 +203,24 @@ class ReplaceQuotes
     {
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
 
-        // Кавычка стоит в начале текста — открывающая
+        // Кавычка стоит в начале — открывающая
         if ($prev_index === false) {
             return true;
         }
 
-        // Перед кавычкой стоит открывающая кавычка-елочка?
-        if ($tokens[$prev_index]['value'] === '«') {
+        // Кавычка стоит в начале строки — открывающая
+        if($tokens[$prev_index]['type'] === 'new-line'){
             return true;
+        }
+
+        // Перед кавычкой стоит открывающая кавычка?
+        foreach (self::$quoteMarks as $quoteLevel) {
+            if (!isset($quoteLevel[0])) {
+                continue;
+            }
+            if ($tokens[$prev_index]['value'] === $quoteLevel[0]) {
+                return true;
+            }
         }
 
         $prev_value = $tokens[$prev_index]['value'];
@@ -216,6 +241,10 @@ class ReplaceQuotes
      */
     private static function getOpeningQuote(int $level): string
     {
+        if($level < 0) {
+            $level = 0;
+        }
+
         return self::$quoteMarks[$level][0]
             ?? self::$quoteMarks[count(self::$quoteMarks) - 1][0]
             ?? '«';
@@ -226,6 +255,10 @@ class ReplaceQuotes
      */
     private static function getClosingQuote(int $level): string
     {
+        if($level < 0) {
+            $level = 0;
+        }
+
         return self::$quoteMarks[$level][1]
             ?? self::$quoteMarks[count(self::$quoteMarks) - 1][1]
             ?? '»';
