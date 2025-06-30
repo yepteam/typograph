@@ -2,6 +2,7 @@
 
 namespace Yepteam\Typograph\Rules\Quotes;
 
+use PhpParser\Token;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
@@ -146,9 +147,23 @@ class ReplaceQuotes
             return false;
         }
 
+        // Перед Prime должно быть число
         $prev_number_index = TokenHelper::findPrevToken($tokens, $index, 'number');
         if ($prev_number_index === false) {
             return false;
+        }
+
+        // Проверяем токен перед числом, игнорируя пробел, nbsp и теги
+        $before_number_index = TokenHelper::findPrevIgnoringTokens($tokens, $prev_number_index, ['space', 'nbsp', 'tag']);
+        if ($before_number_index) {
+            // Перед числом не должно быть знака номера
+            if ($tokens[$before_number_index]['value'] === '№') {
+                return false;
+            }
+            // Перед числом не должно быть знака решетки
+            if ($tokens[$before_number_index]['value'] === '#') {
+                return false;
+            }
         }
 
         return true;
@@ -203,13 +218,23 @@ class ReplaceQuotes
     {
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
 
-        // Кавычка стоит в начале — открывающая
+        // Кавычка стоит в начале
         if ($prev_index === false) {
             return true;
         }
 
-        // Кавычка стоит в начале строки — открывающая
-        if($tokens[$prev_index]['type'] === 'new-line'){
+        // Кавычка стоит в начале строки
+        if ($tokens[$prev_index]['type'] === 'new-line') {
+            return true;
+        }
+
+        // Кавычка стоит после открывающей скобки
+        if (str_ends_with($tokens[$prev_index]['value'], '(')) {
+            return true;
+        }
+
+        // Кавычка стоит после открывающей квадратной скобки
+        if (str_ends_with($tokens[$prev_index]['value'], '[')) {
             return true;
         }
 
@@ -241,7 +266,7 @@ class ReplaceQuotes
      */
     private static function getOpeningQuote(int $level): string
     {
-        if($level < 0) {
+        if ($level < 0) {
             $level = 0;
         }
 
@@ -255,7 +280,7 @@ class ReplaceQuotes
      */
     private static function getClosingQuote(int $level): string
     {
-        if($level < 0) {
+        if ($level < 0) {
             $level = 0;
         }
 

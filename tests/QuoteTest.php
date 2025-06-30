@@ -50,11 +50,17 @@ final class QuoteTest extends TestCase
             'nbsp' => [],
         ]);
 
-        $original = '"Правило 42"';
-        $this->assertSame('«Правило 42»', $typograph->format($original));
+        $original = '"Концерт 5"';
+        $this->assertSame('«Концерт 5»', $typograph->format($original));
 
-        $original = '"Правило № 42"';
-        $this->assertSame('«Правило № 42»', $typograph->format($original));
+        $original = '"Концерт № 5"';
+        $this->assertSame('«Концерт № 5»', $typograph->format($original));
+
+        $original = '("Концерт № 5")';
+        $this->assertSame('(«Концерт № 5»)', $typograph->format($original));
+
+        $original = '(«Концерт № 5″ на музыку Прокофьева)';
+        $this->assertSame('(«Концерт № 5» на музыку Прокофьева)', $typograph->format($original));
     }
 
     public function testCustomQuotes()
