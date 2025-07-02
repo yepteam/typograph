@@ -25,6 +25,10 @@ final class QuoteTest extends TestCase
         $original = 'Часы "Электроника" в корпусе из нержавеющей стали';
         $expected = 'Часы «Электроника» в корпусе из нержавеющей стали';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'автор-“классик“';
+        $expected = 'автор-«классик»';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testLevel2()

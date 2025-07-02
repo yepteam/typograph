@@ -228,13 +228,19 @@ class ReplaceQuotes
             return true;
         }
 
-        // Кавычка стоит после открывающей скобки
-        if (str_ends_with($tokens[$prev_index]['value'], '(')) {
-            return true;
+        $next_index = TokenHelper::findNextToken($tokens, $index);
+
+        // Кавычка стоит в конце
+        if ($next_index === false) {
+            return false;
         }
 
-        // Кавычка стоит после открывающей квадратной скобки
-        if (str_ends_with($tokens[$prev_index]['value'], '[')) {
+        $next_value = $tokens[$next_index]['value'];
+
+        // Если следующий токен начинается на:
+        // - букву
+        // - цифру
+        if (preg_match('/^[\p{L}\d].*/u', $next_value)) {
             return true;
         }
 
@@ -247,6 +253,7 @@ class ReplaceQuotes
                 return true;
             }
         }
+
 
         $prev_value = $tokens[$prev_index]['value'];
 
