@@ -4,6 +4,7 @@ namespace Yepteam\Typograph\Rules\Nbsp;
 
 use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 
 /**
  * Замена пробела до или после числа на неразрывный пробел
@@ -24,9 +25,8 @@ class Number
 
     public static function applyBefore(int $index, array &$tokens): void
     {
+        // Предыдущий токен должен быть пробелом
         $space_index = TokenHelper::findPrevToken($tokens, $index, 'space');
-
-        // Перед числом должен быть пробел
         if ($space_index === false) {
             return;
         }
@@ -60,7 +60,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -91,7 +91,7 @@ class Number
                     // Заменяем токен space на nbsp
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => ' ',
+                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                     return;
@@ -101,7 +101,7 @@ class Number
                     // Заменяем токен space на nbsp
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => ' ',
+                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                     return;
@@ -126,7 +126,7 @@ class Number
                 return;
             }
 
-            $next_dash_index = TokenHelper::findNextToken($tokens, $index, ['hyphen', 'ndash', 'mdash']);
+            $next_dash_index = TokenHelper::findNextToken($tokens, $index, ['hyphen', 'nbhy', 'ndash', 'mdash']);
             if ($next_dash_index !== false) {
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
@@ -135,7 +135,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -150,7 +150,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -170,7 +170,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
         }
@@ -180,7 +180,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
         }
@@ -215,7 +215,7 @@ class Number
             return;
         }
 
-        if (in_array($tokens[$next_index]['type'], ['hyphen', 'ndash', 'mdash'])) {
+        if (in_array($tokens[$next_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash'])) {
             // Ничего не делаем
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
@@ -227,7 +227,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -252,7 +252,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -262,7 +262,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -273,7 +273,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -288,7 +288,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -305,7 +305,7 @@ class Number
                     // Заменяем токен space на nbsp
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => ' ',
+                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                 }
@@ -319,7 +319,7 @@ class Number
                     // Заменяем токен space на nbsp
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => ' ',
+                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                 }
@@ -333,7 +333,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -344,7 +344,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -356,7 +356,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -372,7 +372,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -383,7 +383,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -394,7 +394,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -405,7 +405,7 @@ class Number
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => ' ',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -424,7 +424,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -436,7 +436,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -447,7 +447,7 @@ class Number
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => ' ',
+                'value' => HtmlEntities::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;

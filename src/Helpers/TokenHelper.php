@@ -31,7 +31,7 @@ class TokenHelper
      * Находит индекс ближайшего предыдущего токена, который не является тегом
      * @param array $tokens
      * @param int $currentIndex
-     * @param array|string|null $type Если указано, вернет false, если следующий токен не этого типа
+     * @param array|string $type Если указано, вернет false, если следующий токен не этого типа
      * @param callable|null $ignoreCallback
      * Произвольный метод для игнорирования токенов.
      * Если не указан - пропускаются все теги.

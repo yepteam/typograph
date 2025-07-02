@@ -3,6 +3,7 @@
 namespace Yepteam\Typograph;
 
 use Yepteam\Typograph\Helpers\HtmlHelper;
+use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 
 class Tokenizer
 {
@@ -89,7 +90,7 @@ class Tokenizer
         [
             'type' => 'word',
             'name' => 'word',
-            'pattern' => '/\b[\p{L}\p{M}\p{Nd}\'‘’ʼ]+(?:-[\p{L}\p{M}\p{Nd}\'‘’ʼ]+)*\b/u',
+            'pattern' => '/\b[\p{L}\p{M}\p{Nd}\'‘’ʼ]+(?:-(?!\d)[\p{L}\p{M}\p{Nd}\'‘’ʼ]+)*\b/u',
         ],
         [
             'type' => 'new-line',
@@ -249,6 +250,9 @@ class Tokenizer
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
         $input = str_replace([' ', ' '], ' ', $input);
+
+        // Заменяем все неразрывные дефисы на обычные
+        $input = str_replace([HtmlEntities::decodeEntity('&#8209;')], '-', $input);
 
         $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
 

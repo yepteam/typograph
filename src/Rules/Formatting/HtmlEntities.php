@@ -33,6 +33,11 @@ class HtmlEntities
         }
     }
 
+    public static function decodeEntity(string $encoded): string
+    {
+        return html_entity_decode($encoded, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
     private static function convert(string $text, string $format): string
     {
         $result = '';
@@ -44,6 +49,16 @@ class HtmlEntities
 
             // комбинируемый знак ударения
             if ($ord === 769) {
+                $result .= match ($format) {
+                    'named', 'numeric' => "&#$ord;",
+                    'hex' => "&#x" . dechex($ord) . ";",
+                    default => $char
+                };
+                continue;
+            }
+
+            // Неразрывный дефис
+            if ($ord === 8209) {
                 $result .= match ($format) {
                     'named', 'numeric' => "&#$ord;",
                     'hex' => "&#x" . dechex($ord) . ";",

@@ -14,7 +14,7 @@ class HyphenToMdash
         $current = $tokens[$index];
 
         // Применимо только к дефису
-        if (!in_array($current['type'], ['hyphen', 'double-hyphen'])) {
+        if (!in_array($current['type'], ['hyphen', 'double-hyphen', 'nbhy'])) {
             return;
         }
 

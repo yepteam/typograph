@@ -31,6 +31,7 @@ final class QuoteTest extends TestCase
     {
         $typograph = new Typograph([
             'entities' => 'raw',
+            'dash' => [],
             'nbsp' => [],
         ]);
 
@@ -70,7 +71,8 @@ final class QuoteTest extends TestCase
                 ['‹ ', ' ›'],
                 ['›', '‹'],
             ],
-            'entities' => 'raw'
+            'dash' => [],
+            'entities' => 'raw',
         ]);
 
         $original = '"Часы "Электроника ЧН-54" в корпусе из нержавеющей стали"';

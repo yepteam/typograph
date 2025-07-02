@@ -24,10 +24,19 @@ class Typograph
      *      // Массив кавычек по каждому уровню
      *      // [] - не обрабатывать кавычки
      *      // [
-     *      //   ['«', '»'], // кавычки 1 уровня
-     *      //   ['„', '“'], // кавычки 2 уровня
+     *      //   ['«', '»'], // Кавычки 1 уровня
+     *      //   ['„', '“'], // Кавычки 2 уровня
      *      // ]
      *      quotes: array<int, array{string, string}>,
+     *
+     *      // Правила замены знаков минус/дефис/тире
+     *      dash: array<string, array{
+     *          'hyphen-to-mdash', // дефис на Mdash
+     *          'hyphen-to-minus', // дефис на минус
+     *          'mdash-to-ndash', // Mdash на Ndash
+     *          'ndash-to-mdash', // Ndash на Mdash
+     *          'hyphen-to-nbhy', // обычный дефис на неразрывный
+     *      }>,
      *
      *      // Правила расстановки неразрывных пробелов
      *      nbsp: array<string, array{
@@ -87,6 +96,13 @@ class Typograph
             ['«', '»'],
             ['„', '“'],
         ],
+        'dash' => [
+            'hyphen-to-mdash' => true,
+            'hyphen-to-minus' => true,
+            'mdash-to-ndash' => true,
+            'ndash-to-mdash' => true,
+            'hyphen-to-nbhy' => 2,
+        ],
         'nbsp' => [
             'initial' => true,
             'mdash' => true,
@@ -119,17 +135,34 @@ class Typograph
             // Замена некоторых символов
             Special\SpecialSymbols::apply($index, $this->tokens);
 
-            // Замена hyphen на minus
-            Dash\HyphenToMinus::apply($index, $this->tokens);
+            // Правила замены знаков минус/дефис/тире
+            if (isset($this->options['dash'])) {
 
-            // Замена hyphen на mdash
-            Dash\HyphenToMdash::apply($index, $this->tokens);
+                if (!empty($this->options['dash']['hyphen-to-minus'])) {
+                    // Замена дефиса на минус
+                    Dash\HyphenToMinus::apply($index, $this->tokens);
+                }
 
-            // Замена ndash на mdash
-            Dash\NdashToMdash::apply($index, $this->tokens);
+                if (!empty($this->options['dash']['hyphen-to-mdash'])) {
+                    // Замена дефиса на mdash
+                    Dash\HyphenToMdash::apply($index, $this->tokens);
+                }
 
-            // Замена mdash на ndash
-            Dash\MdashToNdash::apply($index, $this->tokens);
+                if (!empty($this->options['dash']['ndash-to-mdash'])) {
+                    // Замена ndash на mdash
+                    Dash\NdashToMdash::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['dash']['mdash-to-ndash'])) {
+                    // Замена mdash на ndash
+                    Dash\MdashToNdash::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['dash']['hyphen-to-nbhy'])) {
+                    // Замена обычного дефиса на неразрывный
+                    Dash\NonBreakingHyphen::apply($index, $this->tokens, $this->options['dash']['hyphen-to-nbhy']);
+                }
+            }
 
             // Правила расстановки неразрывных пробелов
             if (isset($this->options['nbsp'])) {

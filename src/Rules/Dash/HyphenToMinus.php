@@ -14,7 +14,7 @@ class HyphenToMinus
         $current = $tokens[$index];
 
         // Применимо только к дефису
-        if ($current['type'] !== 'hyphen') {
+        if (!in_array($current['type'], ['hyphen', 'nbhy'])) {
             return;
         }
 

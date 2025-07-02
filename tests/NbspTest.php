@@ -170,7 +170,8 @@ final class NbspTest extends TestCase
     public function testNotAfterShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => 'named',
+            'dash' => [],
         ]);
 
         $original = 'читайте с. 272-294';
@@ -231,7 +232,8 @@ final class NbspTest extends TestCase
     public function testAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => 'named',
+            'dash' => [],
         ]);
 
         $original = '8 201 794';
@@ -314,7 +316,8 @@ final class NbspTest extends TestCase
     public function testNotAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => 'named',
+            'dash' => [],
         ]);
 
         $original = 'представлена в 2006 году';
