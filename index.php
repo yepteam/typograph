@@ -95,8 +95,8 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                               placeholder="Введите текст для обработки…"><?= htmlspecialchars($original) ?></textarea>
                     </label>
                     <div class="border-t border-gray-200 p-4 bg-gray-50">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
+                        <div class="flex flex-wrap gap-4 items-center justify-between">
+                            <div class="flex items-center gap-4">
                                 <?php foreach ($entity_format_options as $entity_format_option): ?>
                                 <div class="flex items-center">
                                     <input id="encoding_<?= $entity_format_option ?>" name="format" type="radio" value="<?= $entity_format_option ?>"
