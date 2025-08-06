@@ -13,13 +13,13 @@ class Typograph
      *      // numeric - числовыми кодами
      *      // hex - шестнадцатеричными кодами
      *      // raw - готовыми символами
-     *      entities: 'named'|'numeric'|'hex'|'raw',
+     *      entities?: 'named'|'numeric'|'hex'|'raw',
      *
      *      // Многоточия
      *      // hellip - замена трех точек на символ многоточия
      *      // dots - замена символа многоточия на три точки
      *      // none - не обрабатывать многоточия
-     *      ellipsis: 'hellip'|'dots'|'none',
+     *      ellipsis?: 'hellip'|'dots'|'none',
      *
      *      // Массив кавычек по каждому уровню
      *      // [] - не обрабатывать кавычки
@@ -27,10 +27,10 @@ class Typograph
      *      //   ['«', '»'], // Кавычки 1 уровня
      *      //   ['„', '“'], // Кавычки 2 уровня
      *      // ]
-     *      quotes: array<int, array{string, string}>,
+     *      quotes?: array<int, array{string, string}>,
      *
      *      // Правила замены знаков минус/дефис/тире
-     *      dash: array<string, array{
+     *      dash?: array<string, array{
      *          'hyphen-to-mdash', // дефис на Mdash
      *          'hyphen-to-minus', // дефис на минус
      *          'mdash-to-ndash', // Mdash на Ndash
@@ -39,7 +39,7 @@ class Typograph
      *      }>,
      *
      *      // Правила расстановки неразрывных пробелов
-     *      nbsp: array<string, array{
+     *      nbsp?: array<string, array{
      *          'initial', // До и после инициалов
      *          'mdash', // До и после тире
      *          'number', // До и после числа
