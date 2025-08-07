@@ -226,7 +226,12 @@ class Tokenizer
             'type' => 'punctuation',
             'name' => 'punctuation',
             'pattern' => '/\p{P}/u',
-        ]
+        ],
+        [
+            'type' => 'emoji',
+            'name' => 'emoji',
+            'pattern' => '/\p{Emoji}/u',
+        ],
     ];
 
     private array $specialTags = [];

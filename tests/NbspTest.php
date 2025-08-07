@@ -515,4 +515,35 @@ final class NbspTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testNoNbspNearEmoji()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+        ]);
+
+        $original = 'Привет 😀';
+        $expected = 'Привет 😀';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // \u{231A}: ⌚ default emoji presentation character (Emoji_Presentation)
+        $original = 'Привет ⌚';
+        $expected = 'Привет ⌚';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // \u{2194}\u{FE0F}: ↔️ default text presentation character rendered as emoji
+        $original = 'Привет ↔️';
+        $expected = 'Привет &harr;️';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // \u{1F469}: 👩 emoji modifier base (Emoji_Modifier_Base)
+        $original = 'Привет 👩';
+        $expected = 'Привет 👩';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // \u{1F469}\u{1F3FF}: 👩🏿 emoji modifier base followed by a modifier
+        $original = 'Привет 👩🏿';
+        $expected = 'Привет 👩🏿';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }
