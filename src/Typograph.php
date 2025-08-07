@@ -30,21 +30,21 @@ class Typograph
      *      quotes?: array<int, array{string, string}>,
      *
      *      // Правила замены знаков минус/дефис/тире
-     *      dash?: array<string, array{
-     *          'hyphen-to-mdash', // дефис на Mdash
-     *          'hyphen-to-minus', // дефис на минус
-     *          'mdash-to-ndash', // Mdash на Ndash
-     *          'ndash-to-mdash', // Ndash на Mdash
-     *          'hyphen-to-nbhy', // обычный дефис на неразрывный
-     *      }>,
+     *      dash?: array{
+     *          'hyphen-to-mdash'?: bool, // дефис на mdash
+     *          'hyphen-to-minus'?: bool, // дефис на минус
+     *          'mdash-to-ndash'?: bool, // mdash на ndash
+     *          'ndash-to-mdash'?: bool, // ndash на mdash
+     *          'hyphen-to-nbhy'?: bool|int, // неразрывный дефис
+     *      },
      *
      *      // Правила расстановки неразрывных пробелов
-     *      nbsp?: array<string, array{
-     *          'initial', // До и после инициалов
-     *          'mdash', // До и после тире
-     *          'number', // До и после числа
-     *          'short-word', // До и после короткого слова
-     *      }>
+     *      nbsp?: array{
+     *          'initial'?: bool, // до и после инициалов
+     *          'mdash'?: bool, // до и после тире
+     *          'number'?: bool, // до и после числа
+     *          'short-word'?: bool|int, // до и после короткого слова
+     *      }
      *  }|bool $options Массив опций или флаг замены буквенных кодов на готовые символы
      *  true - Форматирование готовыми символами
      *  false - Форматирование буквенными кодами
@@ -62,11 +62,14 @@ class Typograph
      */
     public function setOptions(array|bool $options): void
     {
+        // Форматирование буквенными кодами
         if ($options === false) {
             $options = [
                 'entities' => 'named'
             ];
         }
+
+        // Форматирование готовыми символами
         if ($options === true) {
             $options = [
                 'entities' => 'raw'
@@ -101,7 +104,7 @@ class Typograph
             'hyphen-to-minus' => true,
             'mdash-to-ndash' => true,
             'ndash-to-mdash' => true,
-            'hyphen-to-nbhy' => 2,
+            'hyphen-to-nbhy' => true,
         ],
         'nbsp' => [
             'initial' => true,

@@ -10,8 +10,12 @@ use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
  */
 class NonBreakingHyphen
 {
-    public static function apply(int $index, array &$tokens, int $max_length): void
+    public static function apply(int $index, array &$tokens, int|bool $max_length = 2): void
     {
+        if ($max_length === true) {
+            $max_length = 2;
+        }
+
         // Токен должен быть дефисом
         if ($tokens[$index]['type'] !== 'hyphen') {
 

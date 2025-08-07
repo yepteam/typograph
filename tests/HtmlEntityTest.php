@@ -53,6 +53,7 @@ final class HtmlEntityTest extends TestCase
             'entities' => 'named'
         ]);
 
+        /** @noinspection SpellCheckingInspection */
         $original = 'от греч. τύπος';
         $expected = 'от&nbsp;греч. &tau;ύ&pi;&omicron;&sigmaf;';
         $this->assertEquals($expected, $typograph->format($original));
