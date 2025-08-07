@@ -58,21 +58,18 @@ $typograph = new Typograph([
 
     // Правила замены знаков минус/дефис/тире    
     'dash' => [
-        'hyphen-to-mdash' => true, // дефис на Mdash
+        'hyphen-to-mdash' => true, // дефис на mdash
         'hyphen-to-minus' => true, // дефис на минус
-        'mdash-to-ndash' => true, // Mdash на Ndash
-        'ndash-to-mdash' => true, // Ndash на Mdash
-        
-        // Замена обычного дефиса на неразрывный
-        // указывается максимальная длина строки до/после дефиса
-        'hyphen-to-nbhy' => 2, 
+        'mdash-to-ndash'  => true, // mdash на ndash
+        'ndash-to-mdash'  => true, // ndash на mdash
+        'hyphen-to-nbhy'  => true, // дефис на неразрывный
     ],
     
     // Правила расстановки неразрывных пробелов
     'nbsp' => [
-        'initial' => true, // до и после инициалов
-        'mdash' => true, // до и после тире
-        'number' => true, // до и после числа
+        'initial'    => true, // до и после инициалов
+        'mdash'      => true, // до и после тире
+        'number'     => true, // до и после числа
         'short-word' => true, // до и после короткого слова
     ],
 ]);
