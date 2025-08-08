@@ -483,9 +483,9 @@ final class NbspTest extends TestCase
             'entities' => 'named'
         ]);
 
-        $original = 'за 200 миллионов ₽.';
+        $original = 'миллионов ₽.';
         $expected = 'миллионов&nbsp;₽.';
-        $this->assertStringEndsWith($expected, $typograph->format($original));
+        $this->assertEquals($expected, $typograph->format($original));
     }
 
     public function testNoNbspNearTags()

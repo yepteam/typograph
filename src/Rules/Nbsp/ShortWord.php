@@ -54,6 +54,11 @@ class ShortWord
             return;
         }
 
+        // Пропускаем знаки препинания и другие символы
+        if (preg_match('/[.,!?;:+\-=<>|&^*\/()\[\]{}—–]/u', $tokens[$index]['value'])){
+            return;
+        }
+
         self::applyBefore($index, $tokens);
 
         self::applyAfter($index, $tokens);
@@ -179,6 +184,7 @@ class ShortWord
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
+
         if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
@@ -201,6 +207,17 @@ class ShortWord
         if ($prev_dash_token_index !== false) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
+        }
+
+        $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
+
+        // Если есть токен перед коротким словом
+        if($prev_token_index){
+
+            // Предыдущий токен должен быть пробелом или nbsp
+            if (!in_array($tokens[$prev_token_index]['type'], ['space', 'nbsp'])) {
+                return;
+            }
         }
 
         // Заменить пробел после короткого слова на nbsp

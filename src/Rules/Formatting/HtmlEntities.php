@@ -29,6 +29,10 @@ class HtmlEntities
                 continue;
             }
 
+            if ($token['type'] === 'entity') {
+                continue;
+            }
+
             $token['value'] = self::convert($token['value'], $format);
         }
     }

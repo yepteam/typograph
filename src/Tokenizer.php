@@ -13,6 +13,21 @@ class Tokenizer
      */
     const TOKEN_PATTERNS = [
         [
+            'type' => 'entity',
+            'name' => 'amp',
+            'pattern' => '/&amp;/'
+        ],
+        [
+            'type' => 'entity',
+            'name' => 'lt',
+            'pattern' => '/&lt;/'
+        ],
+        [
+            'type' => 'entity',
+            'name' => 'gt',
+            'pattern' => '/&gt;/'
+        ],
+        [
             'type' => 'tag',
             'name' => 'doctype',
             'pattern' => '/<!DOCTYPE\s[^>]+>/i',
@@ -40,7 +55,7 @@ class Tokenizer
         [
             'type' => 'tag',
             'name' => 'tag',
-            'pattern' => '/<\/?[a-z][a-z0-9]*(?:\s+[a-z0-9_-]+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?)*\s*\/?>/is',
+            'pattern' => '/<\/?[a-z][a-z0-9-]*(?:\s+[a-z0-9_-]+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?)*\s*\/?>/i',
         ],
         [
             'type' => 'tag',
@@ -245,13 +260,10 @@ class Tokenizer
      */
     public function tokenize(string $input): array
     {
+        $input = trim($input);
+
         // Сначала выделяем специальные теги (script, style, pre) с их содержимым
         $input = $this->preserveSpecialTags($input);
-
-        // Декодируем символы
-        $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $input = trim($input);
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
         $input = str_replace([' ', ' '], ' ', $input);
@@ -294,7 +306,7 @@ class Tokenizer
             return [];
         }
 
-        $input = html_entity_decode($input);
+        $input = HtmlHelper::safeHtmlEntityDecode($input);
 
         $tokens = [];
 

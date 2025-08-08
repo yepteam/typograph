@@ -135,6 +135,12 @@ class Typograph
 
         for ($index = 0; $index < count($this->tokens); $index++) {
 
+            // Если текущий токен — HTML тег, ничего в нём не трогаем (чтобы не ломать имена/атрибуты)
+            $tokenType = $this->tokens[$index]['type'] ?? null;
+            if ($tokenType === 'tag') {
+                continue;
+            }
+
             // Замена некоторых символов
             Special\SpecialSymbols::apply($index, $this->tokens);
 

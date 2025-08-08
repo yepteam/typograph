@@ -138,7 +138,7 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                             <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
-                                    readonly><?= htmlspecialchars($text) ?></textarea>
+                                    readonly><?= htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></textarea>
                             </label>
                         </div>
                         <div id="tokens" class="tab-content h-full hidden">

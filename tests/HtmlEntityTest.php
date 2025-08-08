@@ -16,23 +16,6 @@ final class HtmlEntityTest extends TestCase
         $original = 'Опера-сказка в&nbsp;3&nbsp;действиях';
         $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
         $this->assertEquals($expected, $typograph->format($original));
-
-        $original = 'Опера-сказка в&amp;nbsp;3&amp;nbsp;действиях';
-        $this->assertEquals($expected, $typograph->format($original));
-    }
-
-    public function testPreEntityTwice()
-    {
-        $typograph = new Typograph([
-            'entities' => 'named'
-        ]);
-
-        $original = 'Опера-сказка в&nbsp;3&amp;nbsp;действиях';
-        $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
-        $this->assertEquals($expected, $typograph->format($original));
-
-        $original = 'Опера-сказка в&amp;nbsp;3&amp;nbsp;действиях';
-        $this->assertEquals($expected, $typograph->format($original));
     }
 
     public function testAcute()

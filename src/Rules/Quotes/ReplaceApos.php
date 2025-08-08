@@ -5,7 +5,7 @@ namespace Yepteam\Typograph\Rules\Quotes;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
- * Заменяет кавычки
+ * Замена апострофа
  */
 class ReplaceApos
 {
@@ -15,6 +15,11 @@ class ReplaceApos
 
         // Применимо только к токенам apos и word
         if (!in_array($current['type'], ['apos', 'word'])) {
+            return;
+        }
+
+        // В слове должен присутствовать апостроф
+        if ($current['type'] === 'word' && !str_contains($tokens[$index]['value'], "'")) {
             return;
         }
 

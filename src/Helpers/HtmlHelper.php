@@ -90,4 +90,31 @@ class HtmlHelper
         return str_replace(' data-typograph-new-line ', PHP_EOL, $html);
     }
 
+    /**
+     * Безопасно декодирует HTML сущности, не затрагивая &lt; и &gt;
+     * для предотвращения случайного создания HTML тегов
+     *
+     * @param string $input
+     * @return string
+     */
+    public static function safeHtmlEntityDecode(string $input): string
+    {
+        // Если есть двойное экранирование (например, &amp;lt;) - не трогаем
+        if (str_contains($input, '&amp;')) {
+            return $input;
+        }
+
+        // Временно заменяем &lt; и &gt; на уникальные маркеры
+        $tempLt = '___TEMP_LT___';
+        $tempGt = '___TEMP_GT___';
+
+        $input = str_replace(['&lt;', '&gt;'], [$tempLt, $tempGt], $input);
+
+        // Декодируем все остальные HTML сущности
+        $input = html_entity_decode($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // Возвращаем обратно закодированные < и >
+        return str_replace([$tempLt, $tempGt], ['&lt;', '&gt;'], $input);
+    }
+
 }

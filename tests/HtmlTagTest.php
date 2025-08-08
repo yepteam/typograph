@@ -18,6 +18,60 @@ final class HtmlTagTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testTagEntitiesRaw()
+    {
+        $typograph = new Typograph([
+            'entities' => 'raw'
+        ]);
+
+        // Стандартный HTML-тег остаётся нетронутым
+        $original = '<b>Жирный</b>';
+        $expected = '<b>Жирный</b>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Кастомный HTML5-тег остаётся нетронутым
+        $original = '<my-component>Текст</my-component>';
+        $expected = '<my-component>Текст</my-component>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Уже закодированный "тег" не превращаем обратно
+        $original = '&lt;script&gt;alert(1)&lt;/script&gt;';
+        $expected = '&lt;script&gt;alert(1)&lt;/script&gt;';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Частично закодированные конструкции — тоже безопасно
+        $original = '&lt;TOKEN&gt; <';
+        $expected = '&lt;TOKEN&gt; <';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testEntitiesNamed()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
+
+        // Стандартный HTML-тег сохраняется
+        $original = '<i>Курсив</i>';
+        $expected = '<i>Курсив</i>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Кастомный HTML5-тег сохраняется
+        $original = '<custom-widget>Data</custom-widget>';
+        $expected = '<custom-widget>Data</custom-widget>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Уже закодированный "тег" не раскодируем (XSS-безопасность)
+        $original = '&lt;img src=x onerror=alert(1)&gt;';
+        $expected = '&lt;img src=x onerror=alert(1)&gt;';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Сырые символы & < > кодируются
+        $original = '& < >';
+        $expected = '&amp; &lt; &gt;';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
     public function testTagMultiline()
     {
         $typograph = new Typograph([
