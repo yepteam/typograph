@@ -171,4 +171,11 @@ final class HtmlTagTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testOnlyHtml()
+    {
+        $typograph = new Typograph(['entities' => 'named']);
+        $html = '<div><p></p></div>';
+        $this->assertSame($html, $typograph->format($html));
+    }
+
 }

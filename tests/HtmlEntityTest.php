@@ -9,9 +9,7 @@ final class HtmlEntityTest extends TestCase
 {
     public function testPreEntity()
     {
-        $typograph = new Typograph([
-            'entities' => 'named'
-        ]);
+        $typograph = new Typograph(['entities' => 'named']);
 
         $original = 'Опера-сказка в&nbsp;3&nbsp;действиях';
         $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
@@ -20,10 +18,7 @@ final class HtmlEntityTest extends TestCase
 
     public function testAcute()
     {
-        $typograph = new Typograph([
-            'entities' => 'named',
-            'nbsp' => [],
-        ]);
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
 
         $original = 'Тире́ - один из знаков препинания';
         $expected = 'Тире&#769; &mdash; один из знаков препинания';
@@ -32,9 +27,7 @@ final class HtmlEntityTest extends TestCase
 
     public function testGreek()
     {
-        $typograph = new Typograph([
-            'entities' => 'named'
-        ]);
+        $typograph = new Typograph(['entities' => 'named']);
 
         /** @noinspection SpellCheckingInspection */
         $original = 'от греч. τύπος';
@@ -44,14 +37,8 @@ final class HtmlEntityTest extends TestCase
 
     public function testQuotes()
     {
-        $typographNamed = new Typograph([
-            'entities' => 'named',
-            'nbsp' => [],
-        ]);
-        $typographNumeric = new Typograph([
-            'entities' => 'numeric',
-            'nbsp' => [],
-        ]);
+        $typographNamed = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographNumeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
 
         $original = 'ООО «Рога и копыта»';
         $expectedNamed = 'ООО &laquo;Рога и копыта&raquo;';
@@ -62,14 +49,8 @@ final class HtmlEntityTest extends TestCase
 
     public function testRub()
     {
-        $typographNamed = new Typograph([
-            'entities' => 'named',
-            'nbsp' => [],
-        ]);
-        $typographNumeric = new Typograph([
-            'entities' => 'numeric',
-            'nbsp' => [],
-        ]);
+        $typographNamed = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographNumeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
 
         $original = '100 ₽';
         $expectedNamed = '100 ₽';
@@ -80,14 +61,8 @@ final class HtmlEntityTest extends TestCase
 
     public function testNumero()
     {
-        $typographNamed = new Typograph([
-            'entities' => 'named',
-            'nbsp' => [],
-        ]);
-        $typographNumeric = new Typograph([
-            'entities' => 'numeric',
-            'nbsp' => [],
-        ]);
+        $typographNamed = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographNumeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
 
         $original = 'Палата № 6';
         $expected = 'Палата &#8470; 6';
@@ -95,5 +70,34 @@ final class HtmlEntityTest extends TestCase
         $this->assertEquals($expected, $typographNumeric->format($original));
     }
 
+    public function testExistingEntitiesNotDoubleEncoded()
+    {
+        $typograph = new Typograph(['entities' => 'named']);
+
+        $original = 'Copyright &copy; 2025';
+        $expected = 'Copyright &copy; 2025';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '2&times;2';
+        $expected = '2&times;2';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '1 &lt; 2 &amp;&amp; 3 &gt; 2';
+        $expected = '1 &lt; 2 &amp;&amp; 3 &gt; 2';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testCurrencies()
+    {
+        $named = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $numeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
+
+        $original = '$ 100, € 200, ¥ 300';
+        $expectedNamed = '$ 100, &euro; 200, &yen; 300';
+        $expectedNumeric = '$ 100, &#8364; 200, &#165; 300';
+
+        $this->assertEquals($expectedNamed, $named->format($original));
+        $this->assertEquals($expectedNumeric, $numeric->format($original));
+    }
 
 }

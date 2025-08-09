@@ -43,7 +43,8 @@ class ShortWord
         }
 
         // Токен должен быть словом или одиночным символом
-        if (!in_array($tokens[$index]['type'], ['word', 'char'])) {
+        // punctuation добавлен для &amp;
+        if (!in_array($tokens[$index]['type'], ['word', 'char', 'punctuation'])) {
             return;
         }
 
@@ -54,8 +55,13 @@ class ShortWord
             return;
         }
 
-        // Пропускаем знаки препинания и другие символы
-        if (preg_match('/[.,!?;:+\-=<>|&^*\/()\[\]{}—–]/u', $tokens[$index]['value'])){
+        // Проверка допустимых символов
+        // Разрешены:
+        // - Буквы любого языка (\p{L})
+        // - Символы валют (\p{Sc}, например $, €, £, ¥)
+        // - Амперсанд (&)
+        // - Дефис
+        if (!preg_match('/^[\p{L}\p{Sc}&-]+$/u', $tokens[$index]['value'])) {
             return;
         }
 
@@ -64,6 +70,13 @@ class ShortWord
         self::applyAfter($index, $tokens);
     }
 
+    /**
+     * Установка неразрывного пробела перед коротким словом
+     *
+     * @param int $index
+     * @param array $tokens
+     * @return void
+     */
     public static function applyBefore(int $index, array &$tokens): void
     {
         $space_index = TokenHelper::findPrevToken($tokens, $index, 'space');
@@ -119,13 +132,37 @@ class ShortWord
             return;
         }
 
+        // Если перед пробелом точка
+        if ($tokens[$before_space_index]['value'] === '.') {
+
+            $before_dot_token = TokenHelper::findPrevToken($tokens, $before_space_index);
+
+            // Если перед точкой слово
+            if ($tokens[$before_dot_token]['type'] === 'word') {
+                // Заменить пробел перед коротким словом на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+        }
+
         // Предыдущий токен должен заканчивается одним из:
         // - буква
         // - цифра
         // - точка
+        // - амперсанд
         if (!preg_match('/.*[\p{L}\d.]$/u', $tokens[$before_space_index]['value'])) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
-            return;
+
+            // Исключение для амперсанда (FAMILY & CO)
+            if ($tokens[$before_space_index]['value'] !== '&amp;') {
+                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                return;
+            }
         }
 
         $next_index = TokenHelper::findNextToken($tokens, $index);
@@ -168,6 +205,13 @@ class ShortWord
         $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
     }
 
+    /**
+     * Установка неразрывного пробела после короткого слова
+     *
+     * @param int $index
+     * @param array $tokens
+     * @return void
+     */
     public static function applyAfter(int $index, array &$tokens): void
     {
         $space_index = TokenHelper::findNextToken($tokens, $index, 'space');
@@ -193,7 +237,13 @@ class ShortWord
         $after_space_index = TokenHelper::findNextToken($tokens, $space_index);
 
         // Если после пробела entity
-        if($after_space_index !== false && $tokens[$after_space_index]['type'] === 'entity'){
+        if ($after_space_index !== false && $tokens[$after_space_index]['type'] === 'entity') {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
+        // Если после пробела один из символов
+        if ($after_space_index !== false && preg_match('/[.,!?;:+\-=<>|^*\/()\[\]{}—–]/u', $tokens[$after_space_index]['value'])) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
@@ -220,7 +270,7 @@ class ShortWord
         $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
 
         // Если есть токен перед коротким словом
-        if($prev_token_index){
+        if ($prev_token_index) {
 
             // Предыдущий токен должен быть пробелом или nbsp
             if (!in_array($tokens[$prev_token_index]['type'], ['space', 'nbsp'])) {

@@ -546,6 +546,25 @@ final class NbspTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testNbspNearAmp()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+        ]);
+
+        $original = 'FAMILY &amp; CO';
+        $expected = 'FAMILY &amp;&nbsp;CO';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = 'Mr. & Mrs.';
+        $expected = 'Mr.&nbsp;&amp;&nbsp;Mrs.';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = 'Dolce & Gabbana';
+        $expected = 'Dolce &amp;&nbsp;Gabbana';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
     public function testNoNbspNearEntities()
     {
         $typograph = new Typograph([
@@ -566,6 +585,14 @@ final class NbspTest extends TestCase
 
         $original = 'A &lt; B';
         $expected = 'A &lt; B';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
+    public function testNoNbspNearSpecialCharacters()
+    {
+        $typograph = new Typograph(['entities' => 'named']);
+        $original = '↑ ↓ ± ≈ ≠ 😊';
+        $expected = '&uarr; &darr; &plusmn; &asymp; &ne; 😊';
         $this->assertEquals($expected, $typograph->format($original));
     }
 
