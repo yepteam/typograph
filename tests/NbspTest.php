@@ -546,4 +546,15 @@ final class NbspTest extends TestCase
         $this->assertEquals($expected, $typograph->format($original));
     }
 
+    public function testNoNbspNearEntities()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+        ]);
+
+        $original = '1 &lt; 2';
+        $expected = '1 &lt; 2';
+        $this->assertEquals($expected, $typograph->format($original));
+    }
+
 }

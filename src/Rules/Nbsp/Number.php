@@ -37,6 +37,13 @@ class Number
             return;
         }
 
+        // Если перед пробелом entity
+        if ($tokens[$before_space_index]['type'] === 'entity') {
+            // То nbsp слева не ставим
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
         // Если перед пробелом строка заканчивается:
         // - знаком «плюс»
         // - знаком «минус»
@@ -190,23 +197,27 @@ class Number
 
     public static function applyAfter(int $index, array &$tokens): void
     {
-        // Следующий токен должен быть пробелом
+        // После числа должен быть пробел
         $space_index = TokenHelper::findNextToken($tokens, $index, 'space');
         if ($space_index === false) {
             return;
         }
 
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
+
         if ($prev_index !== false) {
+            // Перед числом нет одного из:
+            // - пробел
+            // - неразрывный пробел
+            // - дефис
+            // - пунктуация
+            // - одиночный символ
             if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'punctuation', 'char'])) {
                 // Ничего не делаем
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
             }
         }
-
-        // Флаг наличия nbsp перед числом
-        $has_nbsp_before_number = $tokens[$prev_index]['type'] === 'nbsp';
 
         $next_index = TokenHelper::findNextToken($tokens, $space_index);
         if ($next_index === false) {
@@ -215,7 +226,13 @@ class Number
             return;
         }
 
-        if (in_array($tokens[$next_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash'])) {
+        // Если токен после пробела является одним из:
+        // - дефис
+        // - неразрывный дефис
+        // - ndash
+        // - mdash
+        // - entity
+        if (in_array($tokens[$next_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash', 'entity'])) {
             // Ничего не делаем
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
@@ -293,6 +310,9 @@ class Number
             ];
             return;
         }
+
+        // Флаг наличия nbsp перед числом
+        $has_nbsp_before_number = $tokens[$prev_index]['type'] === 'nbsp';
 
         // После числа текст длиной 4 символа
         if ($next_value_length === 4) {
