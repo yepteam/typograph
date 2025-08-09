@@ -133,7 +133,9 @@ class Typograph
         // Сброс счетчиков состояния кавычек
         Quotes\ReplaceQuotes::resetQuoteLevels();
 
-        for ($index = 0; $index < count($this->tokens); $index++) {
+        $tokens_count = count($this->tokens);
+
+        for ($index = 0; $index < $tokens_count; $index++) {
 
             // Если текущий токен — HTML тег, ничего в нём не трогаем (чтобы не ломать имена/атрибуты)
             $tokenType = $this->tokens[$index]['type'] ?? null;
