@@ -34,6 +34,11 @@ final class HtmlTagTest extends TestCase
         $expected = '<my-component>Текст</my-component>';
         $this->assertEquals($expected, $typograph->format($original));
 
+        // Тег c namespace остаётся нетронутым
+        $original = '<isbn:number>1568491379</isbn:number>';
+        $expected = '<isbn:number>1568491379</isbn:number>';
+        $this->assertEquals($expected, $typograph->format($original));
+
         // Уже закодированный "тег" не превращаем обратно
         $original = '&lt;script&gt;alert(1)&lt;/script&gt;';
         $expected = '&lt;script&gt;alert(1)&lt;/script&gt;';
@@ -59,6 +64,11 @@ final class HtmlTagTest extends TestCase
         // Кастомный HTML5-тег сохраняется
         $original = '<custom-widget>Data</custom-widget>';
         $expected = '<custom-widget>Data</custom-widget>';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Тег c namespace сохраняется
+        $original = '<isbn:number>1568491379</isbn:number>';
+        $expected = '<isbn:number>1568491379</isbn:number>';
         $this->assertEquals($expected, $typograph->format($original));
 
         // Уже закодированный "тег" не раскодируем (XSS-безопасность)

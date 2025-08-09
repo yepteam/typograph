@@ -45,7 +45,7 @@ class Tokenizer
         [
             'type' => 'tag',
             'name' => 'tag',
-            'pattern' => '/<\/?[a-z][a-z0-9-]*(?:\s+[a-z0-9_-]+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?)*\s*\/?>/i',
+            'pattern' => '/<\/?[a-z][a-z0-9]*(?:[:-][a-z0-9]+)*(?:\s+[a-z0-9_-]+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]+))?)*\s*\/?>/i',
         ],
         [
             'type' => 'tag',
@@ -353,10 +353,10 @@ class Tokenizer
                 // Для тегов извлекаем название тега
                 if ($pattern['type'] === 'tag') {
                     // Проверяем, является ли это закрывающим тегом
-                    if (preg_match('/<\/([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                    if (preg_match('/<\/([a-z][a-z0-9]*(?:[:-][a-z0-9]+)*)/i', $tokenValue, $tagMatches)) {
                         $tagName = $tagMatches[1];
                     } // Или открывающим/самозакрывающимся тегом
-                    elseif (preg_match('/<([a-z][a-z0-9]*)/i', $tokenValue, $tagMatches)) {
+                    elseif (preg_match('/<([a-z][a-z0-9]*(?:[:-][a-z0-9]+)*)/i', $tokenValue, $tagMatches)) {
                         $tagName = $tagMatches[1];
                     } else {
                         $tagName = 'unknown';
