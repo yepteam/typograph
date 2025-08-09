@@ -190,6 +190,14 @@ class ShortWord
             return;
         }
 
+        $after_space_index = TokenHelper::findNextToken($tokens, $space_index);
+
+        // Если после пробела entity
+        if($after_space_index !== false && $tokens[$after_space_index]['type'] === 'entity'){
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
         // Если значение является частицей или наречием
         if (in_array($tokens[$index]['value'], array_merge(self::$particles, self::$adverbs))) {
 

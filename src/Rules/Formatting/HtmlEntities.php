@@ -33,6 +33,11 @@ class HtmlEntities
                 continue;
             }
 
+            // Проверяем, не содержит ли значение токена HTML-сущности
+            if (preg_match('/&(?:[a-zA-Z0-9]+|#[0-9]{1,7}|#x[0-9a-fA-F]{1,6});/', $token['value'])) {
+                continue;
+            }
+
             $token['value'] = self::convert($token['value'], $format);
         }
     }

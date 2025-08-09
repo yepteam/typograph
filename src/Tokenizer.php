@@ -14,18 +14,8 @@ class Tokenizer
     const TOKEN_PATTERNS = [
         [
             'type' => 'entity',
-            'name' => 'amp',
-            'pattern' => '/&amp;/'
-        ],
-        [
-            'type' => 'entity',
-            'name' => 'lt',
-            'pattern' => '/&lt;/'
-        ],
-        [
-            'type' => 'entity',
-            'name' => 'gt',
-            'pattern' => '/&gt;/'
+            'name' => 'entity',
+            'pattern' => '/&(?!(?:ndash|mdash)\b)(?:[a-zA-Z0-9]+|#[0-9]{1,7}|#x[0-9a-fA-F]{1,6});/'
         ],
         [
             'type' => 'tag',
@@ -305,8 +295,6 @@ class Tokenizer
         if (mb_strlen($input) === 0) {
             return [];
         }
-
-        $input = HtmlHelper::safeHtmlEntityDecode($input);
 
         $tokens = [];
 

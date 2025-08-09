@@ -55,15 +55,15 @@ final class NbspTest extends TestCase
 
         $original = '* — справа';
         $expected = '* &mdash; справа';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
+        $this->assertEquals($expected, $typograph->format($original));
 
         $original = 'слева * — справа';
         $expected = 'слева * &mdash; справа';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
+        $this->assertEquals($expected, $typograph->format($original));
 
         $original = 'слева ** &mdash; справа';
         $expected = 'слева ** &mdash; справа';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
+        $this->assertEquals($expected, $typograph->format($original));
 
         $original = '\'слева\' — справа';
         $unexpected = '&nbsp;';
@@ -552,8 +552,20 @@ final class NbspTest extends TestCase
             'entities' => 'named',
         ]);
 
+        // Nbsp/Number
+
         $original = '1 &lt; 2';
         $expected = '1 &lt; 2';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        $original = '1 &times; 2';
+        $expected = '1 &times; 2';
+        $this->assertEquals($expected, $typograph->format($original));
+
+        // Nbsp/ShortWord
+
+        $original = 'A &lt; B';
+        $expected = 'A &lt; B';
         $this->assertEquals($expected, $typograph->format($original));
     }
 
