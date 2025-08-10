@@ -18,8 +18,8 @@ $entity_format = $_POST['format'] ?? 'named';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $original = $_POST['text'] ?? $default;
 
-    if(!in_array($entity_format, $entity_format_options)){
-        $encoding = 'named';
+    if (!in_array($entity_format, $entity_format_options, true)) {
+        $entity_format = 'named';
     }
 
     $typograph = new Typograph([
@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Получаем данные из сессии (если есть)
 session_start();
+session_regenerate_id(true);
 $original = $_SESSION['original'] ?? $default;
 $text = $_SESSION['text'] ?? '';
 $tokens = $_SESSION['tokens'] ?? [];
@@ -145,7 +146,7 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                             <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
-                                    readonly><?= json_encode($tokens, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?></textarea>
+                                    readonly><?= htmlspecialchars(json_encode($tokens, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
                             </label>
                         </div>
                     </div>
