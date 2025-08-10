@@ -319,7 +319,19 @@ class Tokenizer
 
         while ($offset < $length) {
             $foundToken = null;
+            $prevSubstr = $substr ?? '';
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
+
+            if (str_starts_with($substr, '+-') && !str_starts_with($prevSubstr, '+')) {
+                $tokens[] = [
+                    'type' => 'entity',
+                    'name' => 'plusmn',
+                    'value' => '&plusmn;',
+                ];
+
+                $offset += 2;
+                continue;
+            }
 
             // Проверяем, не начинается ли подстрока с сохраненного специального тега
             if (preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {

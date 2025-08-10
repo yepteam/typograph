@@ -89,15 +89,38 @@ final class HtmlEntityTest extends TestCase
 
     public function testCurrencies()
     {
-        $named = new Typograph(['entities' => 'named', 'nbsp' => []]);
-        $numeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
+        $typographNamed = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographNumeric = new Typograph(['entities' => 'numeric', 'nbsp' => []]);
 
         $original = '$ 100, € 200, ¥ 300';
         $expectedNamed = '$ 100, &euro; 200, &yen; 300';
         $expectedNumeric = '$ 100, &#8364; 200, &#165; 300';
 
-        $this->assertEquals($expectedNamed, $named->format($original));
-        $this->assertEquals($expectedNumeric, $numeric->format($original));
+        $this->assertEquals($expectedNamed, $typographNamed->format($original));
+        $this->assertEquals($expectedNumeric, $typographNumeric->format($original));
+    }
+
+    public function testPlusMinus()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+
+        $original1 = '±';
+        $original2 = '+-';
+        $expected = '&plusmn;';
+        $this->assertEquals($expected, $typograph->format($original1));
+        $this->assertEquals($expected, $typograph->format($original2));
+
+        $original1 = '±2';
+        $original2 = '+-2';
+        $expected = '&plusmn;2';
+        $this->assertEquals($expected, $typograph->format($original1));
+        $this->assertEquals($expected, $typograph->format($original2));
+
+        $original1 = 'C++-API';
+        $original2 = 'https://localhost:8000/?q=text+-sample';
+        $unexpected = '&plusmn;';
+        $this->assertStringNotContainsString($unexpected, $typograph->format($original1));
+        $this->assertStringNotContainsString($unexpected, $typograph->format($original2));
     }
 
 }

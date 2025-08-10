@@ -30,6 +30,13 @@ class SpecialSymbols
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 break;
+            case 'plusmn':
+                $tokens[$index] = [
+                    'type' => 'plusmn',
+                    'value' => '±',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                break;
         }
     }
 }
