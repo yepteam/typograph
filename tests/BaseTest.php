@@ -19,4 +19,11 @@ final class BaseTest extends TestCase
         $this->assertSame('', $typograph->format(' '));
         $this->assertSame('', $typograph->format('   '));
     }
+
+    public function testSerializedStr()
+    {
+        $typograph = new Typograph(['entities' => 'named']);
+        $str = 's:11:"Привет, мир";';
+        $this->assertSame($str, $typograph->format($str));
+    }
 }

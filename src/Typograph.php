@@ -122,6 +122,17 @@ class Typograph
      */
     public function format(string $text): string
     {
+        $text = trim($text);
+
+        if (!mb_strlen($text)) {
+            return $text;
+        }
+
+        // Не форматировать сериализованные строки
+        if (preg_match('/^[abdisON]:(.*);/', $text)) {
+            return $text;
+        }
+
         $tokenizer = new Tokenizer();
 
         // Преобразование текста в массив токенов
