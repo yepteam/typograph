@@ -296,18 +296,7 @@ class Number
                 return;
             }
 
-            // Перед числом не пробел?
-            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp'])) {
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
-                return;
-            }
-
-            // Заменяем токен space на nbsp
-            $tokens[$space_index] = [
-                'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
-            ];
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
 

@@ -359,6 +359,10 @@ final class NbspTest extends TestCase
         $original = '+5...+10 °С';
         $expected = '10 ';
         $this->assertStringContainsString($expected, $typograph->format($original));
+
+        $original = 'за 200 миллионов рублей.';
+        $expected = '200 миллионов';
+        $this->assertStringContainsString($expected, $typograph->format($original));
     }
 
     public function testBeforeParticleWord()
