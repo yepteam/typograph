@@ -351,7 +351,7 @@ class Tokenizer
                 $tokenValue = $matches[0][0];
 
                 // Для тегов извлекаем название тега
-                if ($pattern['type'] === 'tag') {
+                if ($pattern['type'] === 'tag' && $pattern['name'] !== 'shortcode') {
                     // Проверяем, является ли это закрывающим тегом
                     if (preg_match('/<\/([a-z][a-z0-9]*(?:[:-][a-z0-9]+)*)/i', $tokenValue, $tagMatches)) {
                         $tagName = $tagMatches[1];
@@ -372,6 +372,7 @@ class Tokenizer
 
                 $foundToken = [
                     'type' => $pattern['type'],
+                    'name' => $pattern['name'],
                     'value' => $tokenValue,
                 ];
                 break;
@@ -413,7 +414,7 @@ class Tokenizer
     }
 
     /**
-     * Сохраняет специальные теги (script, style, pre) с их содержимым.
+     * Сохраняет специальные теги (script, style, pre) и блочные шорткоды с их содержимым.
      * Заменяет их на временные метки в тексте.
      *
      * @param string $input
@@ -423,6 +424,21 @@ class Tokenizer
     {
         $this->specialTags = [];
 
+        // 1. Сначала обрабатываем блочные шорткоды [tag]...[/tag]
+        // Это более надежный паттерн, который правильно обработает даже вложенные шорткоды.
+        // Он ищет открывающий тег, затем лениво ищет любое содержимое до тех пор,
+        // пока не встретит соответствующий ему закрывающий тег.
+        $shortcodeBlockPattern = '/\[([a-z0-9_-]+)\b[^]]*]((?:(?!\[\/])[\s\S])*)\[\/]/is';
+
+        $input = preg_replace_callback($shortcodeBlockPattern, function ($matches) {
+            // Используем имя шорткода (например, 'embed') в качестве типа тега
+            $tagType = strtolower($matches[1]);
+            $id = count($this->specialTags);
+            $this->specialTags["$tagType:$id"] = $matches[0];
+            return "[SPECIAL_TAG:$tagType:$id]";
+        }, $input);
+
+        // 2. Затем обрабатываем остальные специальные HTML теги как и раньше
         $patterns = [
             'doctype' => '/<!DOCTYPE\s[^>]+>/i',
             'comment' => '/<!--.*?-->/s',
