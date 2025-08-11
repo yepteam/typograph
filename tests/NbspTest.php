@@ -402,7 +402,8 @@ final class NbspTest extends TestCase
     public function testNotBeforeShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => 'named',
+            'dash' => []
         ]);
 
         $original = 'Было дело, да';
@@ -412,6 +413,18 @@ final class NbspTest extends TestCase
         // Война и мир
         $original = 'вы уж не друг мой, вы уж не мой верный раб';
         $expected = 'вы&nbsp;уж не&nbsp;друг мой, вы&nbsp;уж не&nbsp;мой верный раб';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Тарифы зон А и Б';
+        $expected = 'Тарифы зон&nbsp;А и&nbsp;Б';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Тарифы зон А - Б - В';
+        $expected = 'Тарифы зон А&nbsp;- Б&nbsp;- В';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Тарифы зон А или Б';
+        $expected = 'Тарифы зон&nbsp;А или&nbsp;Б';
         $this->assertSame($expected, $typograph->format($original));
     }
 

@@ -13,7 +13,7 @@ class Mdash
 {
     public static function apply(int $index, array &$tokens): void
     {
-        if ($tokens[$index]['type'] !== 'mdash') {
+        if (!in_array($tokens[$index]['type'], ['mdash', 'hyphen'])) {
             return;
         }
 
