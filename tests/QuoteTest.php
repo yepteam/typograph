@@ -68,6 +68,18 @@ final class QuoteTest extends TestCase
         $this->assertSame('(«Концерт № 5» на музыку Прокофьева)', $typograph->format($original));
     }
 
+    public function testNoSpace()
+    {
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+        ]);
+
+        $original = '"Приход"/"Расход"';
+        $expected = '«Приход»/«Расход»';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
     public function testCustomQuotes()
     {
         $typograph = new Typograph([

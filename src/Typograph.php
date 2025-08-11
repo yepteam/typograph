@@ -8,43 +8,51 @@ class Typograph
 {
     /**
      * @param array{
-     *      // Режим кодирования
-     *      // named - буквенными кодами
-     *      // numeric - числовыми кодами
-     *      // hex - шестнадцатеричными кодами
-     *      // raw - готовыми символами
-     *      entities?: 'named'|'numeric'|'hex'|'raw',
+     *     // Режим кодирования
+     *     // named - буквенными кодами
+     *     // numeric - числовыми кодами
+     *     // hex - шестнадцатеричными кодами
+     *     // raw - готовыми символами
+     *     entities?: 'named'|'numeric'|'hex'|'raw',
      *
-     *      // Многоточия
-     *      // hellip - замена трех точек на символ многоточия
-     *      // dots - замена символа многоточия на три точки
-     *      // none - не обрабатывать многоточия
-     *      ellipsis?: 'hellip'|'dots'|'none',
+     *     // Многоточия
+     *     // hellip - замена трех точек на символ многоточия
+     *     // dots - замена символа многоточия на три точки
+     *     // none - не обрабатывать многоточия
+     *     ellipsis?: 'hellip'|'dots'|'none',
      *
-     *      // Массив кавычек по каждому уровню
-     *      // [] - не обрабатывать кавычки
-     *      // [
-     *      //   ['«', '»'], // Кавычки 1 уровня
-     *      //   ['„', '“'], // Кавычки 2 уровня
-     *      // ]
-     *      quotes?: array<int, array{string, string}>,
+     *     // Массив кавычек по каждому уровню
+     *     // [] - не обрабатывать кавычки
+     *     // [
+     *     //   ['«', '»'], // Кавычки 1 уровня
+     *     //   ['„', '“'], // Кавычки 2 уровня
+     *     // ]
+     *     quotes?: array<int, array{string, string}>,
      *
-     *      // Правила замены знаков минус/дефис/тире
-     *      dash?: array{
-     *          'hyphen-to-mdash'?: bool, // дефис на mdash
-     *          'hyphen-to-minus'?: bool, // дефис на минус
-     *          'mdash-to-ndash'?: bool, // mdash на ndash
-     *          'ndash-to-mdash'?: bool, // ndash на mdash
-     *          'hyphen-to-nbhy'?: bool|int, // неразрывный дефис
-     *      },
+     *     // Правила замены знаков минус/дефис/тире
+     *     dash?: array{
+     *         'hyphen-to-mdash'?: bool, // дефис на mdash
+     *         'hyphen-to-minus'?: bool, // дефис на минус
+     *         'mdash-to-ndash'?: bool, // mdash на ndash
+     *         'ndash-to-mdash'?: bool, // ndash на mdash
+     *         'hyphen-to-nbhy'?: bool|int, // неразрывный дефис
+     *     },
      *
-     *      // Правила расстановки неразрывных пробелов
-     *      nbsp?: array{
-     *          'initial'?: bool, // до и после инициалов
-     *          'mdash'?: bool, // до и после тире
-     *          'number'?: bool, // до и после числа
-     *          'short-word'?: bool|int, // до и после короткого слова
-     *      }
+     *     // Правила расстановки неразрывных пробелов
+     *     nbsp?: array{
+     *         'initial'?: bool, // до и после инициалов
+     *         'mdash'?: bool, // до и после тире
+     *         'number'?: bool, // до и после числа
+     *         'short-word'?: bool|int, // до и после короткого слова
+     *     },
+     *
+     *     // Правила для специальных символов
+     *     special?: array{
+     *         'plus-minus'?: bool, // замена +- на ± (&plusmn;)
+     *         'times'?: bool, // замена x на × (&times;) — между числами
+     *         'copyright'?: bool, // (C) -> © (&copy;)
+     *         'reg-mark'?: bool,  // (R) -> ® (&reg;)
+     *     }
      *  }|bool $options Массив опций или флаг замены буквенных кодов на готовые символы
      *  true - Форматирование готовыми символами
      *  false - Форматирование буквенными кодами
@@ -112,6 +120,12 @@ class Typograph
             'number' => true,
             'short-word' => true,
         ],
+        'special' => [
+            'plus-minus' => true,
+            'times' => true,
+            'copyright' => true,
+            'reg-mark' => true,
+        ],
     ];
 
     /**
@@ -154,8 +168,29 @@ class Typograph
                 continue;
             }
 
-            // Замена некоторых символов
-            Special\SpecialSymbols::apply($index, $this->tokens);
+            // Правила для специальных символов
+            if (isset($this->options['special'])) {
+
+                if (!empty($this->options['special']['plus-minus'])) {
+                    // замена +- на ±
+                    Special\ReplacePlusMinus::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['special']['times'])) {
+                    // замена x на × между числами
+                    Special\ReplaceTimes::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['special']['copyright'])) {
+                    // замена (c) → © (&copy;)
+                    Special\ReplaceCopyright::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['special']['reg-mark'])) {
+                    // замена (r) → ® (&reg;)
+                    Special\ReplaceRegMark::apply($index, $this->tokens);
+                }
+            }
 
             // Правила замены знаков минус/дефис/тире
             if (isset($this->options['dash'])) {

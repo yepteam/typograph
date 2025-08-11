@@ -16,15 +16,15 @@ final class DashTest extends TestCase
 
         $original = '--';
         $expected = '—';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = 'Москва -- Сочи';
         $expected = 'Москва — Сочи';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = '-- Именно так';
         $expected = '— Именно так';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testMdashToNdash()
@@ -36,11 +36,11 @@ final class DashTest extends TestCase
 
         $original = '2010&mdash;2020 гг';
         $expected = '2010&ndash;2020 гг';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = '2015—2020 гг';
         $expected = '2015&ndash;2020 гг';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testNdashToMdash()
@@ -52,11 +52,11 @@ final class DashTest extends TestCase
 
         $original = '&ndash; Что делать?';
         $expected = '&mdash; Что делать?';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = 'туда – сюда';
         $expected = 'туда &mdash; сюда';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testHyphenToMdash()
@@ -68,11 +68,11 @@ final class DashTest extends TestCase
 
         $original = 'туда - сюда';
         $expected = 'туда &mdash; сюда';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = 'слева** - справа';
         $expected = 'слева** &mdash; справа';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testHyphenToMinus()
@@ -84,7 +84,7 @@ final class DashTest extends TestCase
 
         $original = 'Температура: -2°С';
         $expected = 'Температура: &minus;2°С';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
 }

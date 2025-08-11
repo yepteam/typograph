@@ -13,7 +13,7 @@ final class HtmlEntityTest extends TestCase
 
         $original = 'Опера-сказка в&nbsp;3&nbsp;действиях';
         $expected = 'Опера-сказка в&nbsp;3&nbsp;действиях';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testAcute()
@@ -22,7 +22,7 @@ final class HtmlEntityTest extends TestCase
 
         $original = 'Тире́ - один из знаков препинания';
         $expected = 'Тире&#769; &mdash; один из знаков препинания';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testGreek()
@@ -32,7 +32,7 @@ final class HtmlEntityTest extends TestCase
         /** @noinspection SpellCheckingInspection */
         $original = 'от греч. τύπος';
         $expected = 'от&nbsp;греч. &tau;ύ&pi;&omicron;&sigmaf;';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testQuotes()
@@ -43,8 +43,8 @@ final class HtmlEntityTest extends TestCase
         $original = 'ООО «Рога и копыта»';
         $expectedNamed = 'ООО &laquo;Рога и копыта&raquo;';
         $expectedNumeric = 'ООО &#171;Рога и копыта&#187;';
-        $this->assertEquals($expectedNamed, $typographNamed->format($original));
-        $this->assertEquals($expectedNumeric, $typographNumeric->format($original));
+        $this->assertSame($expectedNamed, $typographNamed->format($original));
+        $this->assertSame($expectedNumeric, $typographNumeric->format($original));
     }
 
     public function testRub()
@@ -55,8 +55,8 @@ final class HtmlEntityTest extends TestCase
         $original = '100 ₽';
         $expectedNamed = '100 ₽';
         $expectedNumeric = '100 &#8381;';
-        $this->assertEquals($expectedNamed, $typographNamed->format($original));
-        $this->assertEquals($expectedNumeric, $typographNumeric->format($original));
+        $this->assertSame($expectedNamed, $typographNamed->format($original));
+        $this->assertSame($expectedNumeric, $typographNumeric->format($original));
     }
 
     public function testNumero()
@@ -66,8 +66,8 @@ final class HtmlEntityTest extends TestCase
 
         $original = 'Палата № 6';
         $expected = 'Палата &#8470; 6';
-        $this->assertEquals($expected, $typographNamed->format($original));
-        $this->assertEquals($expected, $typographNumeric->format($original));
+        $this->assertSame($expected, $typographNamed->format($original));
+        $this->assertSame($expected, $typographNumeric->format($original));
     }
 
     public function testExistingEntitiesNotDoubleEncoded()
@@ -75,16 +75,13 @@ final class HtmlEntityTest extends TestCase
         $typograph = new Typograph(['entities' => 'named']);
 
         $original = 'Copyright &copy; 2025';
-        $expected = 'Copyright &copy; 2025';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($original, $typograph->format($original));
 
         $original = '2&times;2';
-        $expected = '2&times;2';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($original, $typograph->format($original));
 
         $original = '1 &lt; 2 &amp;&amp; 3 &gt; 2';
-        $expected = '1 &lt; 2 &amp;&amp; 3 &gt; 2';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($original, $typograph->format($original));
     }
 
     public function testCurrencies()
@@ -96,31 +93,8 @@ final class HtmlEntityTest extends TestCase
         $expectedNamed = '$ 100, &euro; 200, &yen; 300';
         $expectedNumeric = '$ 100, &#8364; 200, &#165; 300';
 
-        $this->assertEquals($expectedNamed, $typographNamed->format($original));
-        $this->assertEquals($expectedNumeric, $typographNumeric->format($original));
-    }
-
-    public function testPlusMinus()
-    {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
-
-        $original1 = '±';
-        $original2 = '+-';
-        $expected = '&plusmn;';
-        $this->assertEquals($expected, $typograph->format($original1));
-        $this->assertEquals($expected, $typograph->format($original2));
-
-        $original1 = '±2';
-        $original2 = '+-2';
-        $expected = '&plusmn;2';
-        $this->assertEquals($expected, $typograph->format($original1));
-        $this->assertEquals($expected, $typograph->format($original2));
-
-        $original1 = 'C++-API';
-        $original2 = 'https://localhost:8000/?q=text+-sample';
-        $unexpected = '&plusmn;';
-        $this->assertStringNotContainsString($unexpected, $typograph->format($original1));
-        $this->assertStringNotContainsString($unexpected, $typograph->format($original2));
+        $this->assertSame($expectedNamed, $typographNamed->format($original));
+        $this->assertSame($expectedNumeric, $typographNumeric->format($original));
     }
 
 }

@@ -49,16 +49,22 @@ class TokenHelper
         }
 
         for ($prevIdx = $currentIndex - 1; $prevIdx >= 0; $prevIdx--) {
+            $token = $tokens[$prevIdx];
+
+            // Всегда пропускать 'empty' токены
+            if ($token['type'] === 'empty') {
+                continue;
+            }
 
             $shouldIgnore = $ignoreCallback !== null
-                ? $ignoreCallback($tokens[$prevIdx])
-                : (!in_array('tag', $type) && $tokens[$prevIdx]['type'] === 'tag');
+                ? $ignoreCallback($token)
+                : (!in_array('tag', $type) && $token['type'] === 'tag');
 
             if ($shouldIgnore) {
                 continue;
             }
 
-            if (!empty($type) && !in_array($tokens[$prevIdx]['type'], $type)) {
+            if (!empty($type) && !in_array($token['type'], $type)) {
                 return false;
             }
 
@@ -69,7 +75,7 @@ class TokenHelper
     }
 
     /**
-     * Находит индекс ближайшего следующего токена, который не является тегом
+     * Находит индекс ближайшего следующего токена, который не является тегом или пустым
      * @param array $tokens
      * @param int $currentIndex
      * @param array|string $type Если указано, вернет false, если следующий токен не этого типа
@@ -90,16 +96,22 @@ class TokenHelper
         }
 
         for ($nextIdx = $currentIndex + 1; $nextIdx < count($tokens); $nextIdx++) {
+            $token = $tokens[$nextIdx];
+
+            // Всегда пропускать 'empty' токены
+            if ($token['type'] === 'empty') {
+                continue;
+            }
 
             $shouldIgnore = $ignoreCallback !== null
-                ? $ignoreCallback($tokens[$nextIdx])
-                : (!in_array('tag', $type) && $tokens[$nextIdx]['type'] === 'tag');
+                ? $ignoreCallback($token)
+                : (!in_array('tag', $type) && $token['type'] === 'tag');
 
             if ($shouldIgnore) {
                 continue;
             }
 
-            if (!empty($type) && !in_array($tokens[$nextIdx]['type'], $type)) {
+            if (!empty($type) && !in_array($token['type'], $type)) {
                 return false;
             }
 
@@ -240,7 +252,7 @@ class TokenHelper
             if ($token['type'] === 'new-line') {
                 return true;
             }
-            if ($token['type'] !== 'tag') {
+            if ($token['type'] !== 'tag' && $token['type'] !== 'empty') {
                 break;
             }
             $prevIdx--;

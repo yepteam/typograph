@@ -80,12 +80,12 @@ class Tokenizer
         [
             'type' => 'number',
             'name' => 'number',
-            'pattern' => '/\d+/u',
+            'pattern' => '/\d+([.,]\d+)?/u',
         ],
         [
             'type' => 'copy',
             'name' => 'copy',
-            'pattern' => '/\(C\)/',
+            'pattern' => '/\([СсCc]\)/u',
         ],
         [
             'type' => 'reg',
@@ -319,19 +319,7 @@ class Tokenizer
 
         while ($offset < $length) {
             $foundToken = null;
-            $prevSubstr = $substr ?? '';
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
-
-            if (str_starts_with($substr, '+-') && !str_starts_with($prevSubstr, '+')) {
-                $tokens[] = [
-                    'type' => 'entity',
-                    'name' => 'plusmn',
-                    'value' => '&plusmn;',
-                ];
-
-                $offset += 2;
-                continue;
-            }
 
             // Проверяем, не начинается ли подстрока с сохраненного специального тега
             if (preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {
@@ -420,6 +408,11 @@ class Tokenizer
     {
         $result = '';
         foreach ($tokens as $token) {
+            // Добавляем проверку, чтобы пропускать "удаленные" токены
+            if (isset($token['type']) && $token['type'] === 'empty') {
+                continue;
+            }
+
             $result .= $token['value'];
         }
         return $result;

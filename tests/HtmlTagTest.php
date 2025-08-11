@@ -15,7 +15,7 @@ final class HtmlTagTest extends TestCase
 
         $original = '<b>Текст</b>';
         $expected = '<b>Текст</b>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagEntitiesRaw()
@@ -27,27 +27,27 @@ final class HtmlTagTest extends TestCase
         // Стандартный HTML-тег остаётся нетронутым
         $original = '<b>Жирный</b>';
         $expected = '<b>Жирный</b>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Кастомный HTML5-тег остаётся нетронутым
         $original = '<my-component>Текст</my-component>';
         $expected = '<my-component>Текст</my-component>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Тег c namespace остаётся нетронутым
         $original = '<isbn:number>1568491379</isbn:number>';
         $expected = '<isbn:number>1568491379</isbn:number>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Уже закодированный "тег" не превращаем обратно
         $original = '&lt;script&gt;alert(1)&lt;/script&gt;';
         $expected = '&lt;script&gt;alert(1)&lt;/script&gt;';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Частично закодированные конструкции — тоже безопасно
         $original = '&lt;TOKEN&gt; <';
         $expected = '&lt;TOKEN&gt; <';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testEntitiesNamed()
@@ -59,27 +59,27 @@ final class HtmlTagTest extends TestCase
         // Стандартный HTML-тег сохраняется
         $original = '<i>Курсив</i>';
         $expected = '<i>Курсив</i>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Кастомный HTML5-тег сохраняется
         $original = '<custom-widget>Data</custom-widget>';
         $expected = '<custom-widget>Data</custom-widget>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Тег c namespace сохраняется
         $original = '<isbn:number>1568491379</isbn:number>';
         $expected = '<isbn:number>1568491379</isbn:number>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Уже закодированный "тег" не раскодируем (XSS-безопасность)
         $original = '&lt;img src=x onerror=alert(1)&gt;';
         $expected = '&lt;img src=x onerror=alert(1)&gt;';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         // Сырые символы & < > кодируются
         $original = '& < >';
         $expected = '&amp; &lt; &gt;';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagMultiline()
@@ -96,7 +96,7 @@ final class HtmlTagTest extends TestCase
     class="btn btn-primary">
 Отправить в&nbsp;корзину
 </button>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagScript()
@@ -107,7 +107,7 @@ final class HtmlTagTest extends TestCase
 
         $original = '<script>console.log("Hello World!");</script>';
         $expected = '<script>console.log("Hello World!");</script>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagStyle()
@@ -118,7 +118,7 @@ final class HtmlTagTest extends TestCase
 
         $original = '<style>body { font-family: "sans-serif" }</style>';
         $expected = '<style>body { font-family: "sans-serif" }</style>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagPre()
@@ -135,7 +135,7 @@ final class HtmlTagTest extends TestCase
     Ничего&nbsp;
     не  менять
 </pre>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testTagWithAttribute()
@@ -146,7 +146,7 @@ final class HtmlTagTest extends TestCase
 
         $original = "<form data-default='{\"br\":\"<br>\"}'>Текст в форме</form>";
         $expected = "<form data-default='{\"br\":\"<br>\"}'>Текст в&nbsp;форме</form>";
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testDoctype()
@@ -157,17 +157,17 @@ final class HtmlTagTest extends TestCase
 
         $original = '<!DOCTYPE html>';
         $expected = '<!DOCTYPE html>';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
         $expected = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
         "http://www.w3.org/TR/html4/strict.dtd">';
         $expected = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
         "http://www.w3.org/TR/html4/strict.dtd">';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testComment()
@@ -178,7 +178,7 @@ final class HtmlTagTest extends TestCase
 
         $original = '<!-- Комментарий в коде -->';
         $expected = '<!-- Комментарий в коде -->';
-        $this->assertEquals($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testOnlyHtml()

@@ -33,7 +33,7 @@ final class MemoryTest extends TestCase
         $longExpected = trim(str_repeat($expected, $count));
 
         // Проверяем результат
-        $this->assertEquals($longExpected, $typograph->format($longText));
+        $this->assertSame($longExpected, $typograph->format($longText));
     }
 
     /**
@@ -56,7 +56,7 @@ final class MemoryTest extends TestCase
         $longExpected = trim(str_repeat($expected, $count));
 
         // Проверяем результат
-        $this->assertEquals($longExpected, $typograph->format($longText));
+        $this->assertSame($longExpected, $typograph->format($longText));
 
 
     }
@@ -81,6 +81,6 @@ final class MemoryTest extends TestCase
         $longExpected = trim(str_repeat($expected, $count));
 
         // Проверяем результат
-        $this->assertEquals($longExpected, $typograph->format($longText));
+        $this->assertSame($longExpected, $typograph->format($longText));
     }
 }
