@@ -72,5 +72,13 @@ $typograph = new Typograph([
         'number'     => true, // до и после числа
         'short-word' => true, // до и после короткого слова
     ],
+    
+    // Правила обработки специальных символов
+    'special' => [
+        'plus-minus' => true, // +- на ±
+        'times'      => true, // x на × между числами
+        'copyright'  => true, // (C) на ©
+        'reg-mark'   => true, // (R) на ®
+    ],
 ]);
 ```
