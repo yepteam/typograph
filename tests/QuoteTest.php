@@ -202,4 +202,17 @@ EOF
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testQuotesInHtml()
+    {
+        $typograph = new Typograph([
+            'entities' => 'raw',
+            'nbsp' => [],
+            'dash' => [],
+        ]);
+
+        $original = '<p>test - "test"</p><p>"test" - test</p>';
+        $expected = '<p>test - «test»</p><p>«test» - test</p>';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
 }

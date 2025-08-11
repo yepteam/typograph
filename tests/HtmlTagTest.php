@@ -179,6 +179,10 @@ final class HtmlTagTest extends TestCase
         $original = '<!-- Комментарий в коде -->';
         $expected = '<!-- Комментарий в коде -->';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<!-- <tag/> -->';
+        $expected = '<!-- <tag/> -->';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testOnlyHtml()

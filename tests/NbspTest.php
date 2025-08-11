@@ -98,6 +98,10 @@ final class NbspTest extends TestCase
             'entities' => 'named'
         ]);
 
+        $original = '15 мм';
+        $expected = '15&nbsp;мм';
+        $this->assertSame($expected, $typograph->format($original));
+
         $original = 'Содержание подраздела А…';
         $expected = 'Содержание подраздела&nbsp;А';
         $this->assertStringStartsWith($expected, $typograph->format($original));
@@ -236,6 +240,10 @@ final class NbspTest extends TestCase
             'dash' => [],
         ]);
 
+        $original = '1 декабря 2015';
+        $expected = '1&nbsp;декабря 2015';
+        $this->assertSame($expected, $typograph->format($original));
+
         $original = '8 201 794';
         $expected = '8&nbsp;201&nbsp;794';
         $this->assertSame($expected, $typograph->format($original));
@@ -254,6 +262,10 @@ final class NbspTest extends TestCase
 
         $original = 'нужно успеть к 16 мая';
         $expected = 'нужно успеть к&nbsp;16&nbsp;мая';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'предложение действует до 31 марта';
+        $expected = 'предложение действует до&nbsp;31&nbsp;марта';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = 'нужно успеть к 1 мая, обязательно';
@@ -487,11 +499,15 @@ final class NbspTest extends TestCase
 
         $original = 'Согласен с <strong>условиями</strong> пользовательского соглашения';
         $expected = 'Согласен с&nbsp;<strong>условиями</strong> пользовательского соглашения';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
 
         $original = 'Согласен с<strong> условиями</strong> пользовательского соглашения';
         $expected = 'Согласен с<strong>&nbsp;условиями</strong> пользовательского соглашения';
-        $this->assertStringStartsWith($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<p>15 мм</p>';
+        $expected = '<p>15&nbsp;мм</p>';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testBeforeSingleCharacter()

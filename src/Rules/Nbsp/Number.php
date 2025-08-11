@@ -212,7 +212,7 @@ class Number
             // - дефис
             // - пунктуация
             // - одиночный символ
-            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'punctuation', 'char'])) {
+            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'nbhy', 'punctuation', 'char'])) {
                 // Ничего не делаем
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
@@ -251,6 +251,7 @@ class Number
 
             // Все буквы кроме первой маленькие?
             if (StringHelper::isLowerCaseExceptFirst($tokens[$next_index]['value'])) {
+                // Ничего не делаем
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
             }
@@ -285,8 +286,15 @@ class Number
                 return;
             }
 
-            // Перед числом знак препинания?
-            if ($tokens[$prev_index]['type'] === 'punctuation') {
+            // Перед числом дефис?
+            if (in_array($tokens[$prev_index]['type'], ['hyphen', 'nbhy'])) {
+                // Ничего не делаем
+                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                return;
+            }
+
+            // Перед числом не nbsp и длина числа больше 2 символов?
+            if ($tokens[$prev_index]['type'] !== 'nbsp') {
                 // Заменяем токен space на nbsp
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
@@ -296,6 +304,17 @@ class Number
                 return;
             }
 
+            if (mb_strlen($tokens[$index]['value']) <= 2) {
+                // Заменяем токен space на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+
+            // Ничего не делаем
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
@@ -425,18 +444,6 @@ class Number
                 $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
                 return;
             }
-        }
-
-        // После числа следует буква или цифра?
-        if (StringHelper::isStartsWithAlphaNumeric($next_value)) {
-
-            // Заменяем токен space на nbsp
-            $tokens[$space_index] = [
-                'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
-            ];
-            return;
         }
 
         // После числа следует знак валюты?
