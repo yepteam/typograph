@@ -1,8 +1,9 @@
 PHP-библиотека для типографической обработки текста.
 
-![License](https://img.shields.io/github/license/yepteam/typograph?style=flat-square)
-![Packagist Version](https://img.shields.io/packagist/v/yepteam/typograph?style=flat-square)
-![Packagist Downloads](https://img.shields.io/packagist/dt/yepteam/typograph?style=flat-square)
+![License](https://img.shields.io/github/license/yepteam/typograph)
+![Packagist Version](https://img.shields.io/packagist/v/yepteam/typograph)
+![PHP Version](https://img.shields.io/packagist/php-v/yepteam/typograph)
+![Packagist Downloads](https://img.shields.io/packagist/dt/yepteam/typograph)
 
 ## Возможности
 
