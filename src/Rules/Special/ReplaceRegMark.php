@@ -2,26 +2,28 @@
 
 namespace Yepteam\Typograph\Rules\Special;
 
-/**
- * Заменяет (R) на символ ® в теге <sup>.
- */
 class ReplaceRegMark
 {
     /**
-     * @param int   $index  Индекс текущего токена.
+     * Заменяет токен типа 'reg', созданный токенизатором из (R) или (r),
+     * на символ зарегистрированного товарного знака ®.
+     *
+     * @param int   $index   Индекс текущего токена.
      * @param array &$tokens Массив токенов.
      */
     public static function apply(int $index, array &$tokens): void
     {
-        $token = $tokens[$index] ?? null;
+        $currentToken = $tokens[$index] ?? null;
 
-        if ($token && $token['type'] === 'reg') {
-            // Эта замена возвращает HTML, поэтому мы должны создать токен типа 'tag',
-            // чтобы он не кодировался классом HtmlEntities.
-            $tokens[$index]['type'] = 'tag';
-            $tokens[$index]['name'] = 'sup';
-            $tokens[$index]['value'] = '<sup class="reg">&reg;</sup>';
-            $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        // Ищем токен, который токенизатор пометил как 'reg'.
+        if (!$currentToken || $currentToken['type'] !== 'reg') {
+            return;
         }
+
+        // Сама логика замены остается прежней
+        $tokens[$index]['type'] = 'char';
+        $tokens[$index]['name'] = 'reg-mark';
+        $tokens[$index]['value'] = '®';
+        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
     }
 }
