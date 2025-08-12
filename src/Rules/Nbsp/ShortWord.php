@@ -291,6 +291,14 @@ class ShortWord
             return;
         }
 
+        $after_space_non_tag_index = TokenHelper::findNextToken($tokens, $space_index);
+
+        // После пробела нет ничего кроме тегов?
+        if ($after_space_non_tag_index === false) {
+            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
         $after_space_index = TokenHelper::findNextToken($tokens, $space_index);
 
         // Если после пробела entity
@@ -326,7 +334,7 @@ class ShortWord
 
         $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
 
-        // Если есть токен перед коротким словом
+        // Если перед коротким словом нет токена
         if (!$prev_token_index) {
 
             // Заменить пробел после короткого слова на nbsp

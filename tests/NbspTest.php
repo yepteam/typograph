@@ -189,6 +189,10 @@ final class NbspTest extends TestCase
         $original = 'и все же не могу';
         $expected = 'же не';
         $this->assertStringContainsString($expected, $typograph->format($original));
+
+        $original = 'и <span></span>';
+        $expected = $original;
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testBeforeNumber()
