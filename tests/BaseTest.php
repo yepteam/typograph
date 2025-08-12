@@ -13,11 +13,20 @@ final class BaseTest extends TestCase
         $this->assertSame('', $typograph->format(''));
     }
 
-    public function testSpaces()
+    public function testEmptySpaces()
     {
         $typograph = new Typograph(['entities' => 'named']);
         $this->assertSame('', $typograph->format(' '));
         $this->assertSame('', $typograph->format('   '));
+    }
+
+    public function testExtraSpaces()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $this->assertSame(
+            'В этом тексте лишние пробелы и табуляции',
+            $typograph->format('В     этом    тексте  лишние   пробелы  и     табуляции')
+        );
     }
 
     public function testSerializedStr()

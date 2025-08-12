@@ -301,13 +301,24 @@ class Tokenizer
         $lines = explode(PHP_EOL, $input);
 
         $lines = array_map(function ($line) {
-
             if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
                 return $line;
             }
 
-            // Заменяем повторяющиеся пробелы на один, но сохраняем табуляции и др.
-            return preg_replace('/ +/u', ' ', trim($line));
+            // Сохраняем табуляции только в начале строки
+            $leadingTabs = '';
+            $restOfLine = $line;
+
+            // Выделяем ведущие табуляции
+            if (preg_match('/^(\t+)(.*)/u', $line, $matches)) {
+                $leadingTabs = $matches[1];
+                $restOfLine = $matches[2];
+            }
+
+            // Заменяем все пробелы и табуляции в оставшейся части на один пробел
+            $restProcessed = preg_replace('/[\s\t]+/u', ' ', trim($restOfLine));
+
+            return $leadingTabs . $restProcessed;
         }, $lines);
 
         $processedInput = implode(PHP_EOL, $lines);
