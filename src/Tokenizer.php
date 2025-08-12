@@ -24,6 +24,16 @@ class Tokenizer
         ],
         [
             'type' => 'tag',
+            'name' => 'xml-declaration',
+            'pattern' => '/<\?xml\b[^?>]*\?>/i',
+        ],
+        [
+            'type' => 'tag',
+            'name' => 'php-tag',
+            'pattern' => '/<\?.*?\?>/s',
+        ],
+        [
+            'type' => 'tag',
             'name' => 'comment',
             'pattern' => '/<!--.*?-->/s',
         ],
@@ -370,7 +380,7 @@ class Tokenizer
                     elseif (preg_match('/<([a-z][a-z0-9]*(?:[:-][a-z0-9]+)*)/i', $tokenValue, $tagMatches)) {
                         $tagName = $tagMatches[1];
                     } else {
-                        $tagName = 'unknown';
+                        $tagName = $pattern['name'] ?? 'unknown';
                     }
 
                     $foundToken = [
