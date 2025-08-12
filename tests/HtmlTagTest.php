@@ -88,6 +88,7 @@ final class HtmlTagTest extends TestCase
             'entities' => 'named'
         ]);
 
+        /** @noinspection GrazieInspection */
         $original = '<button 
     class="btn btn-primary">
     Отправить   в  корзину
@@ -192,11 +193,35 @@ final class HtmlTagTest extends TestCase
         $this->assertSame($html, $typograph->format($html));
     }
 
+    public function testXmlDeclaration()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'dash' => [],
+            'quotes' => false
+        ]);
+        $typographRaw = new Typograph([
+            'entities' => 'raw',
+            'dash' => [],
+            'quotes' => false
+        ]);
+
+        $original = '<?xml version="1.0" encoding="UTF-8"?>';
+        $this->assertSame($original, $typograph->format($original));
+        $this->assertSame($original, $typographRaw->format($original));
+
+        $original = '&lt;xml version="1.0" encoding="UTF-8"?&gt;';
+        $this->assertSame($original, $typographRaw->format($original));
+    }
+
+    /**
+     * @noinspection JSUnresolvedReference, CommaExpressionJS, JSValidateTypes
+     */
     public function testScript()
     {
         $typograph = new Typograph(['entities' => 'named']);
 
-        $html = '<!-- Yandex.Metrika counter -->
+        $original = '<!-- Yandex.Metrika counter -->
 <script type="text/javascript" >
     (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
@@ -212,7 +237,7 @@ final class HtmlTagTest extends TestCase
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/12345678" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 <!-- /Yandex.Metrika counter -->';
-        $this->assertSame($html, $typograph->format($html));
+        $this->assertSame($original, $typograph->format($original));
     }
 
 }
