@@ -13,11 +13,6 @@ class Tokenizer
      */
     const TOKEN_PATTERNS = [
         [
-            'type' => 'entity',
-            'name' => 'entity',
-            'pattern' => '/&(?!(?:ndash|mdash)\b)(?:[a-zA-Z0-9]+|#[0-9]{1,7}|#x[0-9a-fA-F]{1,6});/'
-        ],
-        [
             'type' => 'tag',
             'name' => 'doctype',
             'pattern' => '/<!DOCTYPE\s[^>]+>/i',
@@ -78,14 +73,14 @@ class Tokenizer
             'pattern' => '/(?:\{|\(|)?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?:\}|\)|)?/',
         ],
         [
-            'type' => 'double-hyphen',
-            'name' => 'double-hyphen',
-            'pattern' => '/--/',
-        ],
-        [
             'type' => 'initial',
             'name' => 'initial',
             'pattern' => '/(?<=^|[(])\s*\K\p{Lu}\./u',
+        ],
+        [
+            'type' => 'double-hyphen',
+            'name' => 'double-hyphen',
+            'pattern' => '/--/',
         ],
         [
             'type' => 'number',
@@ -95,7 +90,7 @@ class Tokenizer
         [
             'type' => 'copy',
             'name' => 'copy',
-            'pattern' => '/\([СсCc]\)/u',
+            'pattern' => '/\([СсCc]\)|&copy;/u',
         ],
         [
             'type' => 'reg',
@@ -200,7 +195,7 @@ class Tokenizer
         [
             'type' => 'quote',
             'name' => 'ldquo',
-            'pattern' => '/“|&laquo;/'
+            'pattern' => '/“|&ldquo;/'
         ],
         [
             'type' => 'quote',
@@ -243,14 +238,19 @@ class Tokenizer
             'pattern' => '/°|℃|℉/u',
         ],
         [
-            'type' => 'punctuation',
-            'name' => 'punctuation',
-            'pattern' => '/\p{P}/u',
-        ],
-        [
             'type' => 'emoji',
             'name' => 'emoji',
             'pattern' => '/\p{Emoji}/u',
+        ],
+        [
+            'type' => 'entity',
+            'name' => 'entity',
+            'pattern' => '/&(?:[a-zA-Z0-9]+|#[0-9]{1,7}|#x[0-9a-fA-F]{1,6});/'
+        ],
+        [
+            'type' => 'punctuation',
+            'name' => 'punctuation',
+            'pattern' => '/\p{P}/u',
         ],
     ];
 
@@ -271,7 +271,7 @@ class Tokenizer
         $input = $this->preserveSpecialTags($input);
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
-        $input = str_replace([' ', ' '], ' ', $input);
+        $input = str_replace([' ', ' ', '&nbsp;'], ' ', $input);
 
         // Заменяем все неразрывные дефисы на обычные
         $input = str_replace([HtmlEntities::decodeEntity('&#8209;')], '-', $input);

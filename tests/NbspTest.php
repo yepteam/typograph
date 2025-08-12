@@ -7,6 +7,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 final class NbspTest extends TestCase
 {
+    public function testRemoveWrongNbsp()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named'
+        ]);
+
+        $original = 'И так&nbsp;далее';
+        $expected = 'И&nbsp;так далее';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
     public function testBeforeMdash()
     {
         $typograph = new Typograph([

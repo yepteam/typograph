@@ -215,4 +215,28 @@ EOF
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testEncodedQuotes()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => [], 'dash' => []]);
+        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => [], 'dash' => []]);
+
+        $original = 'Такие кавычки &quot;quot&quot; конвертируются.';
+        $expected = 'Такие кавычки &laquo;quot&raquo; конвертируются.';
+        $expectedRaw = 'Такие кавычки «quot» конвертируются.';
+        $this->assertSame($expected, $typograph->format($original));
+        $this->assertSame($expectedRaw, $typographRaw->format($original));
+
+        $original = 'Уровень &bdquo;кавычек&ldquo; исправляется';
+        $expected = 'Уровень &laquo;кавычек&raquo; исправляется';
+        $expectedRaw = 'Уровень «кавычек» исправляется';
+        $this->assertSame($expected, $typograph->format($original));
+        $this->assertSame($expectedRaw, $typographRaw->format($original));
+
+        $original = '&laquo;Внутренние &laquo;кавычки&raquo; меняются&raquo;';
+        $expected = '&laquo;Внутренние &bdquo;кавычки&ldquo; меняются&raquo;';
+        $expectedRaw = '«Внутренние „кавычки“ меняются»';
+        $this->assertSame($expected, $typograph->format($original));
+        $this->assertSame($expectedRaw, $typographRaw->format($original));
+    }
+
 }

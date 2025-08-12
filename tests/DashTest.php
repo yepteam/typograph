@@ -78,12 +78,12 @@ final class DashTest extends TestCase
     public function testHyphenToMinus()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => 'named',
             'nbsp' => [],
         ]);
 
         $original = 'Температура: -2°С';
-        $expected = 'Температура: &minus;2°С';
+        $expected = 'Температура: &minus;2&deg;С';
         $this->assertSame($expected, $typograph->format($original));
     }
 
