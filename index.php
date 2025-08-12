@@ -1,7 +1,5 @@
 <?php
 
-ini_set("display_errors", 1);
-
 use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 use Yepteam\Typograph\Typograph;
 
