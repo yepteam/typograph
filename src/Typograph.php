@@ -27,7 +27,7 @@ class Typograph
      *     //   ['«', '»'], // Кавычки 1 уровня
      *     //   ['„', '“'], // Кавычки 2 уровня
      *     // ]
-     *     quotes?: array<int, array{string, string}>,
+     *     quotes?: array<int, array{string, string}>|false,
      *
      *     // Правила замены знаков минус/дефис/тире
      *     dash?: array{
@@ -152,11 +152,15 @@ class Typograph
         // Преобразование текста в массив токенов
         $this->tokens = $tokenizer->tokenize($text);
 
-        // Установка массива кавычек
-        Quotes\ReplaceQuotes::setQuoteMarks($this->options['quotes'] ?? []);
+        // Если обработка кавычек включена
+        if (!empty($this->options['quotes'])) {
 
-        // Сброс счетчиков состояния кавычек
-        Quotes\ReplaceQuotes::resetQuoteLevels();
+            // Установка массива кавычек
+            Quotes\ReplaceQuotes::setQuoteMarks($this->options['quotes'] ?? []);
+
+            // Сброс счетчиков состояния кавычек
+            Quotes\ReplaceQuotes::resetQuoteLevels();
+        }
 
         $tokens_count = count($this->tokens);
 
@@ -255,11 +259,14 @@ class Typograph
                 Punctuation\HellipToThreeDots::apply($index, $this->tokens);
             }
 
-            // Замена апострофа
-            Quotes\ReplaceApos::apply($index, $this->tokens);
+            if (!empty($this->options['quotes'])) {
 
-            // Замена кавычек
-            Quotes\ReplaceQuotes::apply($index, $this->tokens);
+                // Замена апострофа
+                Quotes\ReplaceApos::apply($index, $this->tokens);
+
+                // Замена кавычек
+                Quotes\ReplaceQuotes::apply($index, $this->tokens);
+            }
         }
 
         // Преобразование символов
