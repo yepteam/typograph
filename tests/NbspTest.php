@@ -216,6 +216,10 @@ final class NbspTest extends TestCase
         $original = '€ 60-80';
         $expected = '&nbsp;60';
         $this->assertStringContainsString($expected, $typograph->format($original));
+
+        $original = 'гл. 4, стр. 5, рис. 7, илл. 9, ст. 6, п. 9';
+        $expected = 'гл.&nbsp;4, стр.&nbsp;5, рис.&nbsp;7, илл.&nbsp;9, ст.&nbsp;6, п.&nbsp;9';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testNotBeforeNumber()
@@ -254,6 +258,10 @@ final class NbspTest extends TestCase
 
         $original = 'написана в 1895 году, опубликована';
         $expected = 'написана в&nbsp;1895&nbsp;году, опубликована';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '40 тыс. руб.';
+        $expected = '40&nbsp;тыс. руб.';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = '100 000 руб.';
@@ -327,6 +335,23 @@ final class NbspTest extends TestCase
         $original = 'упомянута 3 раза (в одном эпизоде)';
         $expected = 'упомянута 3&nbsp;раза (';
         $this->assertStringStartsWith($expected, $typograph->format($original));
+
+        $original = '300 dpi 150 lpi';
+        $expected = '300&nbsp;dpi 150&nbsp;lpi';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
+    public function testPhoneNumber()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'dash' => [],
+        ]);
+
+        // libphonenumber\PhoneNumberFormat::INTERNATIONAL
+        $original = '+7 902 345-67-89';
+        $expected = '+7&nbsp;902 345-67-89';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testNotAfterNumber()

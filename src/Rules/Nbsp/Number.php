@@ -184,6 +184,14 @@ class Number
 
         // Перед числом число до 3 знаков?
         if (preg_match('/^\d{1,3}$/u', $prev_value)) {
+
+            $prev_prev_index = TokenHelper::findPrevToken($tokens, $prev_index);
+            if(!empty($prev_prev_index) && $tokens[$prev_prev_index]['type'] === 'nbsp'){
+                // Ничего не делаем
+                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                return;
+            }
+
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
@@ -379,7 +387,7 @@ class Number
         }
 
         // Следующий после пробела токен трехзначное число?
-        if (preg_match('/^\d{3}$/u', $next_value)) {
+        if (preg_match('/^\d{3}$/u', $next_value) && !$has_nbsp_before_number) {
 
             // Заменяем токен space на nbsp
             $tokens[$space_index] = [
