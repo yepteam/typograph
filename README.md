@@ -77,10 +77,11 @@ $typograph = new Typograph([
     
     // Правила обработки специальных символов
     'special' => [
-        'plus-minus' => true, // +- на ±
-        'times'      => true, // x на × между числами
         'copyright'  => true, // (C) на ©
+        'plus-minus' => true, // +- на ±
         'reg-mark'   => true, // (R) на ®
+        'times'      => true, // x на × между числами
+        'trade'      => true, // (rm) на ™
     ],
 ]);
 ```

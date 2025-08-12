@@ -15,12 +15,10 @@ class ReplaceRegMark
     {
         $currentToken = $tokens[$index] ?? null;
 
-        // Ищем токен, который токенизатор пометил как 'reg'.
         if (!$currentToken || $currentToken['type'] !== 'reg') {
             return;
         }
 
-        // Сама логика замены остается прежней
         $tokens[$index]['type'] = 'char';
         $tokens[$index]['name'] = 'reg-mark';
         $tokens[$index]['value'] = '®';

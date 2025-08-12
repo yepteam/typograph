@@ -30,28 +30,6 @@ final class SpecialTest extends TestCase
         }
     }
 
-    public function testReplaceRegMark()
-    {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
-        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
-
-        $latin_letters = [
-            'r', // Latin Lower
-            'R', // Latin Upper
-        ];
-
-        // Позитивные тесты с латиницей
-        foreach ($latin_letters as $letter) {
-            $original = sprintf('(%s)', $letter);
-            $this->assertSame('&reg;', $typograph->format($original));
-            $this->assertSame('®', $typographRaw->format($original));
-        }
-
-        // Тест в контексте строки
-        $this->assertSame('My Product&reg;', $typograph->format('My Product(R)'));
-        $this->assertSame('My Product ®', $typographRaw->format('My Product (r)'));
-    }
-
     public function testReplacePlusMinus()
     {
         $typograph = new Typograph(['entities' => 'named']);
@@ -72,6 +50,28 @@ final class SpecialTest extends TestCase
         // Отрицательный тест
         $this->assertStringNotContainsString('&plusmn;', $typograph->format('C++-API'));
         $this->assertStringNotContainsString('±', $typographRaw->format('C++-API'));
+    }
+
+    public function testReplaceRegMark()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
+
+        $latin_letters = [
+            'r', // Latin Lower
+            'R', // Latin Upper
+        ];
+
+        // Позитивные тесты с латиницей
+        foreach ($latin_letters as $letter) {
+            $original = sprintf('(%s)', $letter);
+            $this->assertSame('&reg;', $typograph->format($original));
+            $this->assertSame('®', $typographRaw->format($original));
+        }
+
+        // Тест в контексте строки
+        $this->assertSame('My Product&reg;', $typograph->format('My Product(R)'));
+        $this->assertSame('My Product ®', $typographRaw->format('My Product (r)'));
     }
 
     public function testReplaceTimes()
@@ -148,5 +148,20 @@ final class SpecialTest extends TestCase
         }
     }
 
+    public function testReplaceTrademark()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
+
+        // Срабатывает слитно
+        $original = 'Trademark(tm)';
+        $this->assertSame('Trademark&trade;', $typograph->format($original));
+        $this->assertSame('Trademark™', $typographRaw->format($original));
+
+        // Не срабатывает раздельно
+        $original = 'Trademark (tm)';
+        $this->assertSame($original, $typograph->format($original));
+        $this->assertSame($original, $typographRaw->format($original));
+    }
 
 }

@@ -48,10 +48,11 @@ class Typograph
      *
      *     // Правила для специальных символов
      *     special?: array{
-     *         'plus-minus'?: bool, // замена +- на ± (&plusmn;)
-     *         'times'?: bool, // замена x на × (&times;) — между числами
      *         'copyright'?: bool, // (C) -> © (&copy;)
+     *         'plus-minus'?: bool, // замена +- на ± (&plusmn;)
      *         'reg-mark'?: bool,  // (R) -> ® (&reg;)
+     *         'times'?: bool, // замена x на × (&times;) — между числами
+     *         'trade'?: bool, // замена (tm) на ™
      *     }
      *  }|bool $options Массив опций или флаг замены буквенных кодов на готовые символы
      *  true - Форматирование готовыми символами
@@ -121,10 +122,11 @@ class Typograph
             'short-word' => true,
         ],
         'special' => [
-            'plus-minus' => true,
-            'times' => true,
             'copyright' => true,
+            'plus-minus' => true,
             'reg-mark' => true,
+            'times' => true,
+            'trade' => true,
         ],
     ];
 
@@ -175,9 +177,19 @@ class Typograph
             // Правила для специальных символов
             if (isset($this->options['special'])) {
 
+                if (!empty($this->options['special']['copyright'])) {
+                    // замена (c) → © (&copy;)
+                    Special\ReplaceCopyright::apply($index, $this->tokens);
+                }
+
                 if (!empty($this->options['special']['plus-minus'])) {
                     // замена +- на ±
                     Special\ReplacePlusMinus::apply($index, $this->tokens);
+                }
+
+                if (!empty($this->options['special']['reg-mark'])) {
+                    // замена (r) → ® (&reg;)
+                    Special\ReplaceRegMark::apply($index, $this->tokens);
                 }
 
                 if (!empty($this->options['special']['times'])) {
@@ -185,14 +197,9 @@ class Typograph
                     Special\ReplaceTimes::apply($index, $this->tokens);
                 }
 
-                if (!empty($this->options['special']['copyright'])) {
-                    // замена (c) → © (&copy;)
-                    Special\ReplaceCopyright::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['special']['reg-mark'])) {
-                    // замена (r) → ® (&reg;)
-                    Special\ReplaceRegMark::apply($index, $this->tokens);
+                if (!empty($this->options['special']['trade'])) {
+                    // замена (tm) на ™
+                    Special\ReplaceTrademark::apply($index, $this->tokens);
                 }
             }
 

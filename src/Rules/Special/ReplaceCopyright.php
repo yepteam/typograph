@@ -15,9 +15,11 @@ class ReplaceCopyright
     {
         $token = $tokens[$index] ?? null;
 
-        if ($token && $token['type'] === 'copy') {
-            $tokens[$index]['value'] = '©';
-            $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        if (!$token || $token['type'] !== 'copy') {
+            return;
         }
+
+        $tokens[$index]['value'] = '©';
+        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
     }
 }

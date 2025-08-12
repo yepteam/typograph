@@ -3,8 +3,7 @@
 namespace Yepteam\Typograph\Rules\Special;
 
 /**
- * Заменяет 'x' или 'х' между числами на знак умножения '×'.
- * Обрабатывает слипшиеся и раздельные случаи, включая десятичные дроби.
+ * Заменяет x между числами на знак умножения '×'
  */
 class ReplaceTimes
 {
@@ -77,7 +76,7 @@ class ReplaceTimes
         $nextToken = $tokens[$index + 1] ?? null;
         $nextNextToken = $tokens[$index + 2] ?? null;
 
-        // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: проверяем space ИЛИ nbsp, чтобы избежать конфликта правил.
+        // проверяем space или nbsp, чтобы избежать конфликта правил.
         $isPrevNumber = (
             $prevPrevToken && $prevPrevToken['type'] === 'number' &&
             $prevToken && in_array($prevToken['type'], ['space', 'nbsp'])
@@ -88,18 +87,20 @@ class ReplaceTimes
             $nextToken && in_array($nextToken['type'], ['space', 'nbsp'])
         );
 
-        if ($isPrevNumber && $isNextNumber) {
-            $tokens[$index]['type'] = 'punctuation';
-            $tokens[$index]['name'] = 'times';
-            $tokens[$index]['value'] = '×';
-            $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
-
-            // Удаляем окружающие пробелы/nbsp
-            $tokens[$index - 1]['type'] = 'empty';
-            $tokens[$index - 1]['value'] = '';
-
-            $tokens[$index + 1]['type'] = 'empty';
-            $tokens[$index + 1]['value'] = '';
+        if (!$isPrevNumber || !$isNextNumber) {
+            return;
         }
+
+        $tokens[$index]['type'] = 'punctuation';
+        $tokens[$index]['name'] = 'times';
+        $tokens[$index]['value'] = '×';
+        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+
+        // Удаляем окружающие пробелы/nbsp
+        $tokens[$index - 1]['type'] = 'empty';
+        $tokens[$index - 1]['value'] = '';
+
+        $tokens[$index + 1]['type'] = 'empty';
+        $tokens[$index + 1]['value'] = '';
     }
 }

@@ -103,6 +103,11 @@ class Tokenizer
             'pattern' => '/\([R|r]\)/',
         ],
         [
+            'type' => 'trade',
+            'name' => 'trade',
+            'pattern' => '/\(tm\)/i',
+        ],
+        [
             'type' => 'word',
             'name' => 'word',
             'pattern' => '/\b[\p{L}\p{M}\p{Nd}\'‘’ʼ]+(?:-(?!\d)[\p{L}\p{M}\p{Nd}\'‘’ʼ]+)*\b/u',
