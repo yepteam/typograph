@@ -6,6 +6,17 @@ use Yepteam\Typograph\Rules\{Dash, Formatting, Nbsp, Punctuation, Quotes, Specia
 
 class Typograph
 {
+    private array $metrics = [
+        'originalContentLength' => 0,
+        'resultContentLength' => 0,
+        'tokenizationTime' => 0.0,
+        'processingTime' => 0.0,
+        'memoryUsage' => 0.0,
+        'totalTime' => 0.0,
+    ];
+
+    private Tokenizer $tokenizer;
+
     /**
      * @param array{
      *     // Режим кодирования
@@ -61,6 +72,8 @@ class Typograph
     public function __construct(array|bool $options = [])
     {
         $this->setOptions($options);
+
+        $this->tokenizer = new Tokenizer();
     }
 
     /**
@@ -138,6 +151,16 @@ class Typograph
      */
     public function format(string $text): string
     {
+        // Обнуляем метрики
+        $this->metrics['tokenizationTime'] = 0.0;
+        $this->metrics['processingTime'] = 0.0;
+        $this->metrics['totalTime'] = 0.0;
+        $this->metrics['memoryUsage'] = 0.0;
+
+        $this->metrics['originalContentLength'] = mb_strlen($text);
+
+        $memory = memory_get_usage();
+
         $text = trim($text);
 
         if (!mb_strlen($text)) {
@@ -149,15 +172,18 @@ class Typograph
             return $text;
         }
 
-        $tokenizer = new Tokenizer();
-
         // Преобразование текста в массив токенов
-        $this->tokens = $tokenizer->tokenize($text);
+        $this->tokens = $this->tokenizer->tokenize($text);
 
-        // Если токенизация не удалась вернуть текст без дальнейшей обработки
-        if (empty($tokenizer->countOfLines)) {
+        $this->metrics['tokenizationTime'] = $this->tokenizer->getMetrics()['tokenizationTime'];
+
+        // Если токенизация не удалась, вернуть текст без дальнейшей обработки
+        if (empty($this->tokenizer->getMetrics()['countOfLines'])) {
+            $this->metrics['resultContentLength'] = mb_strlen($text);
             return $text;
         }
+
+        $processingStart = microtime(true);
 
         // Если обработка кавычек включена
         if (!empty($this->options['quotes'])) {
@@ -284,17 +310,39 @@ class Typograph
         // Преобразование символов
         Formatting\HtmlEntities::applyToAll($this->tokens, $this->options['entities']);
 
-        return $tokenizer->toString($this->tokens);
+        $text = $this->tokenizer->toString($this->tokens);
+
+        $this->metrics['resultContentLength'] = mb_strlen($text);
+        $this->metrics['processingTime'] = microtime(true) - $processingStart;
+        $this->metrics['totalTime'] = $this->metrics['tokenizationTime'] + $this->metrics['processingTime'];
+        $this->metrics['memoryUsage'] = memory_get_usage() - $memory;
+
+        return $text;
     }
 
     /**
      * Возвращает массив токенов после обработки
      *
+     * @param int|null $limit
      * @return array Массив токенов
      */
-    public function getTokens(): array
+    public function getTokens(?int $limit = null): array
     {
+        if ($limit !== null) {
+            return array_slice($this->tokens, 0, $limit);
+        }
+
         return $this->tokens;
+    }
+
+    /**
+     * Возвращает массив метрик типографа
+     *
+     * @return array|float[]
+     */
+    public function getMetrics(): array
+    {
+        return $this->metrics;
     }
 
 }

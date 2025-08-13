@@ -5,7 +5,7 @@ use Yepteam\Typograph\Typograph;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-final class WpShortcodeTest extends TestCase
+final class ShortcodeTest extends TestCase
 {
     /**
      * @see https://codex.wordpress.org/Audio_Shortcode

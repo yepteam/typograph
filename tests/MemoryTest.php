@@ -13,10 +13,6 @@ use Yepteam\Typograph\Typograph;
 
 final class MemoryTest extends TestCase
 {
-    /**
-     * Использование памяти: ~26M
-     * Время выполнения: ~00:00.048
-     */
     public function test64()
     {
         $typograph = new Typograph([
@@ -34,12 +30,10 @@ final class MemoryTest extends TestCase
 
         // Проверяем результат
         $this->assertSame($longExpected, $typograph->format($longText));
+        $this->assertLessThan(0.08, $typograph->getMetrics()['totalTime']);
+        $this->assertLessThan(1.0 * 1024 * 1024, $typograph->getMetrics()['memoryUsage']);
     }
 
-    /**
-     * Использование памяти: ~38M
-     * Время выполнения: ~00:00.450
-     */
     public function test1024()
     {
         $typograph = new Typograph([
@@ -57,14 +51,10 @@ final class MemoryTest extends TestCase
 
         // Проверяем результат
         $this->assertSame($longExpected, $typograph->format($longText));
-
-
+        $this->assertLessThan(0.7, $typograph->getMetrics()['totalTime']);
+        $this->assertLessThan(12.0 * 1024 * 1024, $typograph->getMetrics()['memoryUsage']);
     }
 
-    /**
-     * Использование памяти: ~36M
-     * Время выполнения: ~00:00.350
-     */
     public function testTags1024()
     {
         $typograph = new Typograph([
@@ -82,5 +72,7 @@ final class MemoryTest extends TestCase
 
         // Проверяем результат
         $this->assertSame($longExpected, $typograph->format($longText));
+        $this->assertLessThan(0.7, $typograph->getMetrics()['totalTime']);
+        $this->assertLessThan(11.0 * 1024 * 1024, $typograph->getMetrics()['memoryUsage']);
     }
 }

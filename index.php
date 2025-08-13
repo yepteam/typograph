@@ -15,6 +15,8 @@ $entity_format_options = HtmlEntities::$formats;
 
 $entity_format = $_POST['format'] ?? 'named';
 
+$typograph = new Typograph(['entities' => (string)$entity_format]);
+
 // Обработка POST-запроса
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $original = $_POST['text'] ?? $default;
@@ -23,21 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $entity_format = 'named';
     }
 
-    $typograph = new Typograph(['entities' => (string)$entity_format]);
-
+    // Отформатированный текст
     $text = $typograph->format($original);
 
-    $tokens = $typograph->getTokens();
+    // Токены для отладки для отладки
+    $tokens = $typograph->getTokens(128);
 
-    if (mb_strlen($text) > 4096) {
-        $tokens = [];
-    }
+    $metrics = $typograph->getMetrics();
 
     // Сохраняем данные в сессии
     session_start();
     $_SESSION['original'] = $original;
     $_SESSION['text'] = $text;
     $_SESSION['tokens'] = $tokens;
+    $_SESSION['metrics'] = $metrics;
     $_SESSION['format'] = $entity_format;
 
     // Перенаправляем на эту же страницу методом GET
@@ -51,6 +52,7 @@ session_regenerate_id(true);
 $original = $_SESSION['original'] ?? $default;
 $text = $_SESSION['text'] ?? '';
 $tokens = $_SESSION['tokens'] ?? [];
+$metrics = $_SESSION['metrics'] ?? [];
 $entity_format = $_SESSION['format'] ?? 'named';
 
 // Очищаем сессию
@@ -131,8 +133,8 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                             </button>
                             <button type="button"
                                     class="tab-button py-4 px-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                    data-target="tokens">
-                                Токенизация
+                                    data-target="debug">
+                                Отладка
                             </button>
                         </nav>
                     </div>
@@ -141,14 +143,24 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                             <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
-                                    readonly><?= htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></textarea>
+                                    readonly><?php
+
+                                echo htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+                                ?></textarea>
                             </label>
                         </div>
-                        <div id="tokens" class="tab-content h-full hidden">
+                        <div id="debug" class="tab-content h-full hidden">
                             <label class="h-full">
                             <textarea
                                     class="w-full h-full p-4 resize-none border border-gray-200 rounded-b-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 bg-white text-gray-800"
-                                    readonly><?= htmlspecialchars(json_encode($tokens, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) ?></textarea>
+                                    readonly><?php
+
+                                echo json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                                echo str_repeat(PHP_EOL, 2);
+                                echo htmlspecialchars(json_encode($tokens, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+
+                                ?></textarea>
                             </label>
                         </div>
                     </div>

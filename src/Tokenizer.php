@@ -7,9 +7,14 @@ use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 
 class Tokenizer
 {
-    public int $contentLength = 0;
-
-    public int $countOfLines = 0;
+    /**
+     * @var array Массив метрик токенизатора
+     */
+    private array $metrics = [
+        'countOfLines' => 0,
+        'countOfTokens' => 0,
+        'tokenizationTime' => 0.0
+    ];
 
     /**
      * @var array[] Шаблоны для распознавания токенов
@@ -269,7 +274,10 @@ class Tokenizer
      */
     public function tokenize(string $input): array
     {
-        $this->contentLength = mb_strlen($input);
+        // Обнуляем метрики
+        $this->metrics['tokenizationTime'] = 0.0;
+
+        $tokenizationStart = microtime(true);
 
         $input = trim($input);
 
@@ -284,11 +292,11 @@ class Tokenizer
 
         $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
 
-        // Приводим все к \n
+        // Приводим все CR|LF к \n
         $input = preg_replace('/\r\n|\r/', "\n", $input);
         $lines = explode("\n", $input);
 
-        $this->countOfLines = count($lines);
+        $this->metrics['countOfLines'] = count($lines);
 
         $all_tokens = [];
 
@@ -304,6 +312,9 @@ class Tokenizer
                 $all_tokens[] = $token;
             }
         }
+
+        $this->metrics['countOfTokens'] = count($all_tokens);
+        $this->metrics['tokenizationTime'] = microtime(true) - $tokenizationStart;
 
         return $all_tokens;
     }
@@ -455,37 +466,46 @@ class Tokenizer
     }
 
     /**
-     * Сохраняет специальные теги (script, style, pre).
-     * Заменяет их на временные метки в тексте.
+     * Заменяет специальные теги на временные метки в тексте.
      *
      * @param string $input
      * @return string
      */
     private function preserveSpecialTags(string $input): string
     {
-        if (!preg_match('/<(?:!DOCTYPE|script|style|pre|!--)/i', $input)) {
-            return $input; // Быстрый выход если нет специальных тегов
+        if (!str_contains($input, '<')) {
+            return $input;
         }
 
         $this->specialTags = [];
 
-        $patterns = [
-            'doctype' => '/<!DOCTYPE\s[^>]+>/i',
-            'comment' => '/<!--.*?-->/s',
-            'script' => '/<script\b[^>]*>[\s\S]*?<\/script>/is',
-            'style' => '/<style\b[^>]*>[\s\S]*?<\/style>/is',
-            'pre' => '/<pre\b[^>]*>[\s\S]*?<\/pre>/is',
+        // Вспомогательная функция для создания временной метки
+        $createPlaceholder = function (array $matches, string $tagType): string {
+            $id = count($this->specialTags);
+            $placeholder = $tagType . ":" . $id;
+            $this->specialTags[$placeholder] = $matches[0];
+            return "[SPECIAL_TAG:{$placeholder}]";
+        };
+
+        $patternsAndCallbacks = [
+            '/<!DOCTYPE\s[^>]+>/i' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'doctype');
+            },
+            '/<!--.*?-->/s' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'comment');
+            },
+            '/<script\b[^>]*>[\s\S]*?<\/script>/is' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'script');
+            },
+            '/<style\b[^>]*>[\s\S]*?<\/style>/is' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'style');
+            },
+            '/<pre\b[^>]*>[\s\S]*?<\/pre>/is' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'pre');
+            },
         ];
 
-        foreach ($patterns as $tagType => $pattern) {
-            $input = preg_replace_callback($pattern, function ($matches) use ($tagType) {
-                $id = count($this->specialTags);
-                $this->specialTags["{$tagType}:{$id}"] = $matches[0];
-                return "[SPECIAL_TAG:{$tagType}:{$id}]";
-            }, $input);
-        }
-
-        return $input;
+        return preg_replace_callback_array($patternsAndCallbacks, $input);
     }
 
     /**
@@ -499,5 +519,13 @@ class Tokenizer
     {
         $key = "$tagType:$tagId";
         return $this->specialTags[$key] ?? '';
+    }
+
+    /**
+     * @return array Массив метрик токенизатора
+     */
+    public function getMetrics(): array
+    {
+        return $this->metrics;
     }
 }
