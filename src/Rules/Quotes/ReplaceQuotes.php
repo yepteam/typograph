@@ -2,7 +2,6 @@
 
 namespace Yepteam\Typograph\Rules\Quotes;
 
-use PhpParser\Token;
 use Yepteam\Typograph\Helpers\TokenHelper;
 
 /**
@@ -116,7 +115,7 @@ class ReplaceQuotes
             }
 
             // Заменяем символ кавычки для текущего уровня
-            $current['value'] = self::getClosingQuote(self::$quoteLevel, self::$isQuoteOpenArr, $tokens, $index);
+            $current['value'] = self::getClosingQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
             $current['level'] = self::$quoteLevel;
             // Отмечаем, что кавычка на этом уровне закрыта
