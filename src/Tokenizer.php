@@ -463,6 +463,10 @@ class Tokenizer
      */
     private function preserveSpecialTags(string $input): string
     {
+        if (!preg_match('/<(?:!DOCTYPE|script|style|pre|!--)/i', $input)) {
+            return $input; // Быстрый выход если нет специальных тегов
+        }
+
         $this->specialTags = [];
 
         $patterns = [
