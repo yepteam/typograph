@@ -7,6 +7,9 @@ namespace Yepteam\Typograph\Rules\Formatting;
  */
 class HtmlEntities
 {
+    /**
+     * @var array|string[]
+     */
     public static array $formats = [
         'named',   // Преобразование в именованные мнемоники
         'numeric', // Десятичными кодами
