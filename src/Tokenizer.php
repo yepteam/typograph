@@ -279,7 +279,7 @@ class Tokenizer
 
         $tokenizationStart = microtime(true);
 
-        $input = trim($input);
+        $input = trim($input, " \n\r\v\0");
 
         // Сначала выделяем специальные теги (script, style, pre) с их содержимым
         $input = $this->preserveSpecialTags($input);
@@ -300,14 +300,19 @@ class Tokenizer
 
         $all_tokens = [];
 
-        foreach ($lines as $index => $line) {
-            $tokens = self::tokenizeLine($line);
-            if ($index > 0) {
-                $all_tokens[] = [
-                    'type' => 'new-line',
-                    'value' => PHP_EOL,
-                ];
-            }
+        // Обрабатываем первую строку отдельно
+        $tokens = self::tokenizeLine($lines[0]);
+        foreach ($tokens as $token) {
+            $all_tokens[] = $token;
+        }
+
+        // Обрабатываем остальные строки с добавлением токена новой строки
+        for ($i = 1; $i < count($lines); $i++) {
+            $all_tokens[] = [
+                'type' => 'new-line',
+                'value' => PHP_EOL,
+            ];
+            $tokens = self::tokenizeLine($lines[$i]);
             foreach ($tokens as $token) {
                 $all_tokens[] = $token;
             }
@@ -334,7 +339,7 @@ class Tokenizer
 
         $tokens = [];
 
-        $lines = explode(PHP_EOL, $input);
+        $lines = explode('\n', $input);
 
         $lines = array_map(function ($line) {
             if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
@@ -348,13 +353,13 @@ class Tokenizer
             // Выделяем ведущие табуляции
             if (preg_match('/^(\t+)(.*)/u', $line, $matches)) {
                 $leadingTabs = $matches[1];
-                $restOfLine = $matches[2];
+                $restOfLine = trim($matches[2]);
             }
 
             // Заменяем все пробелы и табуляции в оставшейся части на один пробел
-            $restProcessed = preg_replace('/[\s\t]+/u', ' ', trim($restOfLine));
+            $restOfLine = preg_replace('/[\s\t]+/u', ' ', trim($restOfLine));
 
-            return $leadingTabs . $restProcessed;
+            return $leadingTabs . $restOfLine;
         }, $lines);
 
         $processedInput = implode(PHP_EOL, $lines);
@@ -369,7 +374,7 @@ class Tokenizer
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
 
             // Проверяем, не начинается ли подстрока с сохраненного специального тега
-            if (preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {
+            if (str_contains($substr, 'SPECIAL_TAG') && preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {
                 $tagType = $tagMatches[1];
                 $tagId = $tagMatches[2];
                 $tagContent = $this->restoreSpecialTag($tagType, $tagId);

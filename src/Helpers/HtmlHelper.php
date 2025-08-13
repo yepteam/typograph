@@ -26,6 +26,10 @@ class HtmlHelper
      */
     public static function replaceNewlinesInTags(string $html): string
     {
+        if (!str_contains($html, '<')) {
+            return $html;
+        }
+
         // Сначала обрабатываем специальные теги (script, style, pre)
         $html = preg_replace_callback(
             '/(<(script|style|pre)\b[^>]*>)(.*?)(<\/\2>)/is',

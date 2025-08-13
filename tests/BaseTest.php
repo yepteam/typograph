@@ -25,7 +25,16 @@ final class BaseTest extends TestCase
         $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
         $this->assertSame(
             'В этом тексте лишние пробелы и табуляции',
-            $typograph->format('В     этом    тексте  лишние   пробелы  и     табуляции')
+            $typograph->format("В    этом    тексте  лишние   пробелы  и    \t табуляции")
+        );
+    }
+
+    public function testLeadingTabs()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $this->assertSame(
+            "\t\t\tТабуляции в начале строки не трогаем",
+            $typograph->format("\t\t\tТабуляции в начале строки не\t трогаем")
         );
     }
 

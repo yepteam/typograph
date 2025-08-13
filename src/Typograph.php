@@ -161,8 +161,6 @@ class Typograph
 
         $memory = memory_get_usage();
 
-        $text = trim($text);
-
         if (!mb_strlen($text)) {
             return $text;
         }
