@@ -154,6 +154,11 @@ class Typograph
         // Преобразование текста в массив токенов
         $this->tokens = $tokenizer->tokenize($text);
 
+        // Если токенизация не удалась вернуть текст без дальнейшей обработки
+        if (empty($tokenizer->countOfLines)) {
+            return $text;
+        }
+
         // Если обработка кавычек включена
         if (!empty($this->options['quotes'])) {
 

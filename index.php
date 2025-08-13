@@ -1,5 +1,8 @@
 <?php
 
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+
 use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 use Yepteam\Typograph\Typograph;
 
@@ -20,11 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $entity_format = 'named';
     }
 
-    $typograph = new Typograph([
-        'entities' => $entity_format
-    ]);
+    $typograph = new Typograph(['entities' => (string)$entity_format]);
 
     $text = $typograph->format($original);
+
     $tokens = $typograph->getTokens();
 
     if (mb_strlen($text) > 4096) {
@@ -97,13 +99,15 @@ unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['
                         <div class="flex flex-wrap gap-4 items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <?php foreach ($entity_format_options as $entity_format_option): ?>
-                                <div class="flex items-center">
-                                    <input id="encoding_<?= $entity_format_option ?>" name="format" type="radio" value="<?= $entity_format_option ?>"
-                                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                        <?= $entity_format === $entity_format_option ? 'checked' : '' ?>>
-                                    <label for="encoding_<?= $entity_format_option ?>" class="ml-2 text-sm text-gray-700">
-                                        <?= $entity_format_option ?></label>
-                                </div>
+                                    <div class="flex items-center">
+                                        <input id="encoding_<?= $entity_format_option ?>" name="format" type="radio"
+                                               value="<?= $entity_format_option ?>"
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                <?= $entity_format === $entity_format_option ? 'checked' : '' ?>>
+                                        <label for="encoding_<?= $entity_format_option ?>"
+                                               class="ml-2 text-sm text-gray-700">
+                                            <?= $entity_format_option ?></label>
+                                    </div>
                                 <?php endforeach; ?>
                             </div>
                             <button type="submit"

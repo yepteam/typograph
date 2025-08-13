@@ -7,6 +7,10 @@ use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 
 class Tokenizer
 {
+    public int $contentLength = 0;
+
+    public int $countOfLines = 0;
+
     /**
      * @var array[] Шаблоны для распознавания токенов
      * @psalm-var array<array{type: string, name: string, pattern: string}>
@@ -265,6 +269,8 @@ class Tokenizer
      */
     public function tokenize(string $input): array
     {
+        $this->contentLength = mb_strlen($input);
+
         $input = trim($input);
 
         // Сначала выделяем специальные теги (script, style, pre) с их содержимым
@@ -278,7 +284,11 @@ class Tokenizer
 
         $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
 
-        $lines = explode(PHP_EOL, $input);
+        // Приводим все к \n
+        $input = preg_replace('/\r\n|\r/', "\n", $input);
+        $lines = explode("\n", $input);
+
+        $this->countOfLines = count($lines);
 
         $all_tokens = [];
 
@@ -445,7 +455,7 @@ class Tokenizer
     }
 
     /**
-     * Сохраняет специальные теги (script, style, pre) и блочные шорткоды с их содержимым.
+     * Сохраняет специальные теги (script, style, pre).
      * Заменяет их на временные метки в тексте.
      *
      * @param string $input
@@ -455,21 +465,6 @@ class Tokenizer
     {
         $this->specialTags = [];
 
-        // 1. Сначала обрабатываем блочные шорткоды [tag]...[/tag]
-        // Это более надежный паттерн, который правильно обработает даже вложенные шорткоды.
-        // Он ищет открывающий тег, затем лениво ищет любое содержимое до тех пор,
-        // пока не встретит соответствующий ему закрывающий тег.
-        $shortcodeBlockPattern = '/\[([a-z0-9_-]+)\b[^]]*]((?:(?!\[\/])[\s\S])*)\[\/]/is';
-
-        $input = preg_replace_callback($shortcodeBlockPattern, function ($matches) {
-            // Используем имя шорткода (например, 'embed') в качестве типа тега
-            $tagType = strtolower($matches[1]);
-            $id = count($this->specialTags);
-            $this->specialTags["$tagType:$id"] = $matches[0];
-            return "[SPECIAL_TAG:$tagType:$id]";
-        }, $input);
-
-        // 2. Затем обрабатываем остальные специальные HTML теги как и раньше
         $patterns = [
             'doctype' => '/<!DOCTYPE\s[^>]+>/i',
             'comment' => '/<!--.*?-->/s',
