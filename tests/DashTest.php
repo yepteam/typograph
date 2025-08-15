@@ -87,4 +87,24 @@ final class DashTest extends TestCase
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testDashNotChange()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'nbsp' => [],
+            'dash' => [
+                'hyphen-to-nbhy' => false
+            ]
+        ]);
+
+        $original = '-';
+        $this->assertSame($original, $typograph->format($original));
+
+        $original = '-5';
+        $this->assertSame($original, $typograph->format($original));
+
+        $original = 'Олимпиада-80';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
 }

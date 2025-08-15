@@ -185,7 +185,8 @@ final class NbhyTest extends TestCase
         $typograph = new Typograph([
             'entities' => 'numeric',
             'dash' => [
-                'hyphen-to-nbhy' => 2
+                'hyphen-to-mdash' => false,
+                'hyphen-to-nbhy' => true
             ],
             'nbsp' => [],
         ]);

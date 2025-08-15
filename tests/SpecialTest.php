@@ -164,4 +164,12 @@ final class SpecialTest extends TestCase
         $this->assertSame($original, $typographRaw->format($original));
     }
 
+    public function testDisabled()
+    {
+        $typograph = new Typograph(['entities' => 'named', 'nbsp' => [], 'special' => false]);
+
+        $original = 'Copyright (c) 2025 Trademark(tm) 2 x 2 = 4 +-1';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
 }

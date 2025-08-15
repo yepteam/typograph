@@ -47,7 +47,7 @@ class Typograph
      *         'mdash-to-ndash'?: bool, // mdash на ndash
      *         'ndash-to-mdash'?: bool, // ndash на mdash
      *         'hyphen-to-nbhy'?: bool|int, // неразрывный дефис
-     *     },
+     *     }|false|false[]|int[]|null,
      *
      *     // Правила расстановки неразрывных пробелов
      *     nbsp?: array{
@@ -55,7 +55,7 @@ class Typograph
      *         'mdash'?: bool, // до и после тире
      *         'number'?: bool, // до и после числа
      *         'short-word'?: bool|int, // до и после короткого слова
-     *     },
+     *     }|false|false[]|int[]|null,
      *
      *     // Правила для специальных символов
      *     special?: array{
@@ -64,7 +64,7 @@ class Typograph
      *         'reg-mark'?: bool,  // (R) -> ® (&reg;)
      *         'times'?: bool, // замена x на × (&times;) — между числами
      *         'trade'?: bool, // замена (tm) на ™
-     *     }
+     *     }|false|false[]|null
      *  }|bool $options Массив опций или флаг замены буквенных кодов на готовые символы
      *  true - Форматирование готовыми символами
      *  false - Форматирование буквенными кодами
@@ -98,7 +98,33 @@ class Typograph
             ];
         }
 
+        // Сначала мержим все опции с дефолтными значениями
         $this->options = array_merge($this->defaultOptions, $options);
+
+        // Затем для опциональных массивов применяем особую логику:
+        $optionalArrays = ['dash', 'nbsp', 'special'];
+        foreach ($optionalArrays as $key) {
+            if (array_key_exists($key, $options)) {
+                // Проверяем на явное отключение (null, false или пустой массив)
+                if ($options[$key] === null || $options[$key] === false || $options[$key] === []) {
+                    $this->options[$key] = [];
+                } elseif (is_array($options[$key])) {
+                    // Мержим с дефолтными значениями
+                    $this->options[$key] = array_merge($this->defaultOptions[$key], $options[$key]);
+                }
+            }
+            // Если ключ не указан - дефолтные значения уже установлены в array_merge выше
+        }
+    }
+
+    public function getDefaultOptions(): array
+    {
+        return $this->defaultOptions;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**
