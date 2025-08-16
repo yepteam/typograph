@@ -107,4 +107,32 @@ final class DashTest extends TestCase
         $this->assertSame($original, $typograph->format($original));
     }
 
+    public function testMdashNoRepeat()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'nbsp' => []
+        ]);
+
+        $original = '- - -';
+        $expected = '&mdash; - -';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '- - - -';
+        $expected = '&mdash; - - -';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
+    public function testMdashAfterShortcode()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'nbsp' => []
+        ]);
+
+        $original = '[shortcode-like] - sample';
+        $expected = '[shortcode-like] &mdash; sample';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
 }

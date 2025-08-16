@@ -41,17 +41,45 @@ class HyphenToMdash
         }
 
         // Дефис находится между пробелами (игнорируя теги)
-        if (TokenHelper::isSurroundedBySpaces($tokens, $index)) {
-            // Замена токена на mdash
-            $tokens[$index] = [
-                'type' => 'mdash',
-                'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
-            ];
+        if (!TokenHelper::isSurroundedBySpaces($tokens, $index)) {
+            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }
 
-        $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        $prev_token_index = TokenHelper::findPrevToken($tokens, $index, ['space', 'nbsp']);
+
+        // Проверяем токен перед пробелом
+        $before_space_index = TokenHelper::findPrevToken($tokens, $prev_token_index, [], function ($token) {
+
+            // Не учитываем теги, но шорткоды пропускаем
+            if ($token['type'] === 'tag' && $token['name'] !== 'shortcode') {
+                return true;
+            }
+
+            // Не учитываем черточки и пробелы
+            if (in_array($token['type'], ['hyphen', 'ndash', 'mdash', 'space', 'nbsp'])) {
+                return true;
+            }
+
+            // Не учитываем некоторые символы
+            if (in_array($token['value'], TokenHelper::$prev_token_seek_ignore_symbols)) {
+                return true;
+            }
+
+            return false;
+        });
+
+        if ($before_space_index === false) {
+            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
+        // Замена токена на mdash
+        $tokens[$index] = [
+            'type' => 'mdash',
+            'value' => '—',
+            'rule' => __CLASS__ . ':' . __LINE__,
+        ];
     }
 
 }

@@ -27,6 +27,17 @@ class TokenHelper
         '}',
     ];
 
+    public static array $prev_token_seek_ignore_symbols = [
+        '*',
+        '\\',
+        '/',
+        ')',
+        ']',
+        '}',
+        '»',
+        '"'
+    ];
+
     /**
      * Находит индекс ближайшего предыдущего токена, который не является тегом
      * @param array $tokens

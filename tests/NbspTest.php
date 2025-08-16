@@ -56,6 +56,14 @@ final class NbspTest extends TestCase
         $original = 'слева, - справа';
         $expected = 'слева,&nbsp;';
         $this->assertStringStartsWith($expected, $typograph->format($original));
+
+        $original = '[слева] - справа';
+        $expected = '[слева]&nbsp;';
+        $this->assertStringStartsWith($expected, $typograph->format($original));
+
+        $original = '[left] - right';
+        $expected = '[left]&nbsp;';
+        $this->assertStringStartsWith($expected, $typograph->format($original));
     }
 
     public function testNotBeforeMdash()

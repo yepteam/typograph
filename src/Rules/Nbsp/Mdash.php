@@ -46,17 +46,18 @@ class Mdash
 
         // Перед пробелом ищем токен, игнорируя некоторые символы
         $prev_index = TokenHelper::findPrevToken($tokens, $space_index, [], function ($token) {
-            return $token['type'] === 'tag' ||
-                in_array($token['value'], [
-                    '*',
-                    '\\',
-                    '/',
-                    ')',
-                    ']',
-                    '}',
-                    '»',
-                    '"',
-                ]);
+
+            // Не учитываем теги, но шорткоды пропускаем
+            if ($token['type'] === 'tag' && $token['name'] !== 'shortcode') {
+                return true;
+            }
+
+            // Не учитываем некоторые символы
+            if (in_array($token['value'], TokenHelper::$prev_token_seek_ignore_symbols)) {
+                return true;
+            }
+
+            return false;
         });
 
         if ($prev_index === false) {
@@ -68,7 +69,7 @@ class Mdash
 
         // Перед пробелом значение, оканчивающееся символом доллара?
         if (preg_match('/\$$/u', $prev_value) === 1) {
-            // Заменяем mdash на nbsp
+            // Заменяем пробел на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
@@ -79,7 +80,7 @@ class Mdash
 
         // Перед пробелом значение, оканчивающееся цифрой или буквой?
         if (StringHelper::isEndsWithAlphaNumeric($prev_value)) {
-            // Заменяем mdash на nbsp
+            // Заменяем пробел на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
@@ -90,7 +91,18 @@ class Mdash
 
         // Перед пробелом запятая?
         if ($prev_value === ',') {
-            // Заменяем mdash на nbsp
+            // Заменяем пробел на nbsp
+            $tokens[$space_index] = [
+                'type' => 'nbsp',
+                'value' => ' ',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+            return;
+        }
+
+        // Перед пробелом шорткод?
+        if ($tokens[$prev_index]['type'] === 'tag' && $tokens[$prev_index]['name'] === 'shortcode') {
+            // Заменяем пробел на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
