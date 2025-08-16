@@ -95,6 +95,23 @@ class ShortWord
             return;
         }
 
+        // Если токен — амперсанд и перед пробелом точка
+        if ($tokens[$index]['value'] === '&' && $tokens[$before_space_index]['value'] === '.') {
+
+            $before_dot_token = TokenHelper::findPrevToken($tokens, $before_space_index);
+
+            // Если перед точкой слово
+            if ($tokens[$before_dot_token]['type'] === 'word') {
+                // Заменить пробел перед коротким словом на nbsp
+                $tokens[$space_index] = [
+                    'type' => 'nbsp',
+                    'value' => ' ',
+                    'rule' => __CLASS__ . ':' . __LINE__,
+                ];
+                return;
+            }
+        }
+
         // Если значение перед пробелом является наречием
         if (in_array($tokens[$before_space_index]['value'], self::$adverbs)) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
@@ -138,24 +155,6 @@ class ShortWord
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
-        }
-
-        // Если перед пробелом точка
-        if ($tokens[$before_space_index]['value'] === '.') {
-
-            $before_dot_token = TokenHelper::findPrevToken($tokens, $before_space_index);
-
-            // Если перед точкой слово
-            if ($tokens[$before_dot_token]['type'] === 'word') {
-                // Заменить пробел перед коротким словом на nbsp
-                $tokens[$space_index] = [
-                    'type' => 'nbsp',
-                    'value' => ' ',
-                    'rule' => __CLASS__ . ':' . __LINE__,
-                ];
-                return;
-            }
-
         }
 
         // Предыдущий токен должен заканчивается одним из:
