@@ -57,7 +57,7 @@ class HyphenToMdash
             }
 
             // Не учитываем черточки и пробелы
-            if (in_array($token['type'], ['hyphen', 'ndash', 'mdash', 'space', 'nbsp'])) {
+            if (in_array($token['type'], ['space', 'nbsp'])) {
                 return true;
             }
 
@@ -70,6 +70,11 @@ class HyphenToMdash
         });
 
         if ($before_space_index === false) {
+            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            return;
+        }
+
+        if(in_array($tokens[$before_space_index]['type'], ['hyphen', 'ndash', 'mdash', ])){
             $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }

@@ -121,6 +121,10 @@ final class DashTest extends TestCase
         $original = '- - - -';
         $expected = '&mdash; - - -';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Слева - - справа';
+        $expected = 'Слева &mdash; - справа';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testMdashAfterShortcode()
