@@ -373,6 +373,16 @@ class ShortWord
             return;
         }
 
+        // Предыдущий токен кавычка?
+        if ($tokens[$prev_token_index]['type'] === 'quote') {
+            // Заменить пробел после короткого слова на nbsp
+            $tokens[$space_index] = [
+                'type' => 'nbsp',
+                'value' => ' ',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+        }
+
         $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
     }
 }

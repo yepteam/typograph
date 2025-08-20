@@ -153,7 +153,8 @@ final class NbspTest extends TestCase
     public function testAfterShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => 'named',
+            'quotes' => []
         ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
@@ -191,6 +192,10 @@ final class NbspTest extends TestCase
 
         $original = 'бесполезности. А ещё некоторые';
         $expected = 'бесполезности. А&nbsp;ещё некоторые';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'предупредил: «Не пытайтесь повторить это дома».';
+        $expected = 'предупредил: &laquo;Не&nbsp;пытайтесь повторить это дома&raquo;.';
         $this->assertSame($expected, $typograph->format($original));
     }
 
