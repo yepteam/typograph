@@ -197,6 +197,12 @@ final class NbspTest extends TestCase
         $original = 'предупредил: «Не пытайтесь повторить это дома».';
         $expected = 'предупредил: &laquo;Не&nbsp;пытайтесь повторить это дома&raquo;.';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = "<p>Исполнители:</p>
+<p><strong>В программе:</strong></p>";
+        $expected = "<p>Исполнители:</p>
+<p><strong>В&nbsp;программе:</strong></p>";
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testNotAfterShortWord()
