@@ -38,7 +38,7 @@ class Typograph
      *     //   ['«', '»'], // Кавычки 1 уровня
      *     //   ['„', '“'], // Кавычки 2 уровня
      *     // ]
-     *     quotes?: array<int, array{string, string}>|false,
+     *     quotes?: array<int, array{string, string}>|false|false[]|int[]|null,
      *
      *     // Правила замены знаков минус/дефис/тире
      *     dash?: array{

@@ -153,8 +153,7 @@ final class NbspTest extends TestCase
     public function testAfterShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'quotes' => []
+            'entities' => 'named'
         ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
@@ -196,6 +195,38 @@ final class NbspTest extends TestCase
 
         $original = 'предупредил: «Не пытайтесь повторить это дома».';
         $expected = 'предупредил: &laquo;Не&nbsp;пытайтесь повторить это дома&raquo;.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно (не пытайтесь повторить это дома).';
+        $expected = 'Опасно (не&nbsp;пытайтесь повторить это дома).';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно [не пытайтесь повторить это дома].';
+        $expected = 'Опасно [не&nbsp;пытайтесь повторить это дома].';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно {не пытайтесь повторить это дома}.';
+        $expected = 'Опасно {не&nbsp;пытайтесь повторить это дома}.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно <не пытайтесь повторить это дома>.';
+        $expected = 'Опасно &lt;не&nbsp;пытайтесь повторить это дома&gt;.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно &lt;не пытайтесь повторить это дома&gt;.';
+        $expected = 'Опасно &lt;не&nbsp;пытайтесь повторить это дома&gt;.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно //не пытайтесь повторить это дома.';
+        $expected = 'Опасно //не&nbsp;пытайтесь повторить это дома.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно **не пытайтесь повторить это дома**.';
+        $expected = 'Опасно **не&nbsp;пытайтесь повторить это дома**.';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Опасно \'не пытайтесь повторить это дома\'.';
+        $expected = 'Опасно &rsquo;не&nbsp;пытайтесь повторить это дома&rsquo;.';
         $this->assertSame($expected, $typograph->format($original));
 
         $original = "<p>Исполнители:</p>

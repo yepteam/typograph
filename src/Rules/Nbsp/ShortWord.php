@@ -373,8 +373,18 @@ class ShortWord
             return;
         }
 
+        // Проверяем разрешенные символы слева
+        if (in_array($tokens[$prev_token_index]['value'], ['(', '[', '{', '<', '&lt;', '/', '*'])) {
+            // Заменить пробел после короткого слова на nbsp
+            $tokens[$space_index] = [
+                'type' => 'nbsp',
+                'value' => ' ',
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+        }
+
         // Предыдущий токен кавычка?
-        if ($tokens[$prev_token_index]['type'] === 'quote') {
+        if (in_array($tokens[$prev_token_index]['type'], ['quote', 'rsquo'])) {
             // Заменить пробел после короткого слова на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
