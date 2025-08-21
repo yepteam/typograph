@@ -307,7 +307,7 @@ class ShortWord
         }
 
         // Если после пробела один из символов
-        if ($after_space_index !== false && preg_match('/[.,!?;:+\-=<>|^*\/)\[\]{}—–]/u', $tokens[$after_space_index]['value'])) {
+        if ($after_space_index !== false && preg_match('/^[.,!?;:+\-=<>|^*\/)\[\]{}—–]/u', $tokens[$after_space_index]['value'])) {
             $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
             return;
         }

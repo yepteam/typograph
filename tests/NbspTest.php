@@ -148,6 +148,10 @@ final class NbspTest extends TestCase
         $original = 'Что ж мне делать?';
         $expected = 'Что&nbsp;ж мне делать?';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Проверяем, человек ли вы. Это может занять несколько секунд.';
+        $expected = 'Проверяем, человек&nbsp;ли вы. Это может занять несколько секунд.';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testAfterShortWord()
@@ -241,6 +245,10 @@ final class NbspTest extends TestCase
 
         $original = 'и (не всегда) успешно';
         $expected = 'и&nbsp;(не&nbsp;всегда) успешно';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'Картина была представлена в Санкт-Петербурге, а затем в Москве.';
+        $expected = 'Картина была представлена в&nbsp;Санкт-Петербурге, а&nbsp;затем в&nbsp;Москве.';
         $this->assertSame($expected, $typograph->format($original));
     }
 
