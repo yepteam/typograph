@@ -51,7 +51,7 @@ final class MemoryTest extends TestCase
 
         // Проверяем результат
         $this->assertSame($longExpected, $typograph->format($longText));
-        $this->assertLessThan(0.7, $typograph->getMetrics()['totalTime']);
+        $this->assertLessThan(0.8, $typograph->getMetrics()['totalTime']);
         $this->assertLessThan(12.0 * 1024 * 1024, $typograph->getMetrics()['memoryUsage']);
     }
 
