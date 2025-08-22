@@ -77,8 +77,6 @@ class Typograph
     {
         $this->setOptions($options);
 
-        define('TYPOGRAPH_DEBUG', !empty($this->options['debug'] ?? false));
-
         $this->tokenizer = new Tokenizer();
     }
 

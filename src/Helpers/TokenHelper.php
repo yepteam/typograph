@@ -305,10 +305,6 @@ class TokenHelper
      */
     public static function logRule(array &$token, string $rule, bool $applied = true): void
     {
-        if (!defined('TYPOGRAPH_DEBUG') || !constant('TYPOGRAPH_DEBUG')) {
-            return;
-        }
-
         if (!isset($token['rules'])) {
             $token['rules'] = [];
         }
