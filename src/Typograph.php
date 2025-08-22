@@ -2,7 +2,8 @@
 
 namespace Yepteam\Typograph;
 
-use Yepteam\Typograph\Rules\{Dash, Formatting, Nbsp, Punctuation, Quotes, Special};
+use Yepteam\Typograph\Helpers\HtmlEntityHelper;
+use Yepteam\Typograph\Rules\{BaseRule, Dash, Nbsp, Punctuation, Quotes, Special};
 
 class Typograph
 {
@@ -120,6 +121,9 @@ class Typograph
             }
             // Если ключ не указан - дефолтные значения уже установлены в array_merge выше
         }
+
+        // После установки всех опций, инициализируем правила
+        $this->initializeRules();
     }
 
     public function getDefaultOptions(): array
@@ -141,6 +145,8 @@ class Typograph
      * @var array Массив для хранения токенов текста
      */
     private array $tokens = [];
+
+    private array $rules = [];
 
     /**
      * @var array Параметры по умолчанию
@@ -174,6 +180,42 @@ class Typograph
         ],
         'debug' => false,
     ];
+
+    /**
+     * Инициализирует и регистрирует все необходимые правила на основе текущих опций.
+     */
+    private function initializeRules(): void
+    {
+        $this->rules = array_keys(array_filter([
+            // Правила для специальных символов
+            Special\ReplaceCopyright::class => !empty($this->options['special']['copyright']),
+            Special\ReplacePlusMinus::class => !empty($this->options['special']['plus-minus']),
+            Special\ReplaceRegMark::class => !empty($this->options['special']['reg-mark']),
+            Special\ReplaceTimes::class => !empty($this->options['special']['times']),
+            Special\ReplaceTrademark::class => !empty($this->options['special']['trade']),
+
+            // Правила замены знаков минус/дефис/тире
+            Dash\HyphenToMinus::class => !empty($this->options['dash']['hyphen-to-minus']),
+            Dash\HyphenToMdash::class => !empty($this->options['dash']['hyphen-to-mdash']),
+            Dash\NdashToMdash::class => !empty($this->options['dash']['ndash-to-mdash']),
+            Dash\MdashToNdash::class => !empty($this->options['dash']['mdash-to-ndash']),
+            Dash\NonBreakingHyphen::class => !empty($this->options['dash']['hyphen-to-nbhy']),
+
+            // Правила расстановки неразрывных пробелов
+            Nbsp\Number::class => !empty($this->options['nbsp']['number']),
+            Nbsp\Mdash::class => !empty($this->options['nbsp']['mdash']),
+            Nbsp\Initial::class => !empty($this->options['nbsp']['initial']),
+            Nbsp\ShortWord::class => !empty($this->options['nbsp']['short-word']),
+
+            // Правила для многоточий
+            Punctuation\ThreeDotsToHellip::class => ($this->options['ellipsis'] ?? null) === 'hellip',
+            Punctuation\HellipToThreeDots::class => ($this->options['ellipsis'] ?? null) === 'dots',
+
+            // Правила для кавычек
+            Quotes\ReplaceApos::class => !empty($this->options['quotes']),
+            Quotes\ReplaceQuotes::class => !empty($this->options['quotes']),
+        ]));
+    }
 
     /**
      * Форматирует текст с применением типографских правил
@@ -227,118 +269,26 @@ class Typograph
 
         $tokens_count = count($this->tokens);
 
-        for ($index = 0; $index < $tokens_count; $index++) {
+        $options = $this->getOptions();
 
-            // Если текущий токен — HTML тег, ничего в нём не трогаем (чтобы не ломать имена/атрибуты)
+        for ($index = 0; $index < $tokens_count; $index++) {
             $tokenType = $this->tokens[$index]['type'] ?? null;
+
+            // Пропускаем HTML-теги
             if ($tokenType === 'tag') {
                 continue;
             }
 
-            // Правила для специальных символов
-            if (isset($this->options['special'])) {
-
-                if (!empty($this->options['special']['copyright'])) {
-                    // замена (c) → © (&copy;)
-                    Special\ReplaceCopyright::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['special']['plus-minus'])) {
-                    // замена +- на ±
-                    Special\ReplacePlusMinus::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['special']['reg-mark'])) {
-                    // замена (r) → ® (&reg;)
-                    Special\ReplaceRegMark::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['special']['times'])) {
-                    // замена x на × между числами
-                    Special\ReplaceTimes::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['special']['trade'])) {
-                    // замена (tm) на ™
-                    Special\ReplaceTrademark::apply($index, $this->tokens);
-                }
-            }
-
-            // Правила замены знаков минус/дефис/тире
-            if (isset($this->options['dash'])) {
-
-                if (!empty($this->options['dash']['hyphen-to-minus'])) {
-                    // Замена дефиса на минус
-                    Dash\HyphenToMinus::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['dash']['hyphen-to-mdash'])) {
-                    // Замена дефиса на mdash
-                    Dash\HyphenToMdash::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['dash']['ndash-to-mdash'])) {
-                    // Замена ndash на mdash
-                    Dash\NdashToMdash::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['dash']['mdash-to-ndash'])) {
-                    // Замена mdash на ndash
-                    Dash\MdashToNdash::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['dash']['hyphen-to-nbhy'])) {
-                    // Замена обычного дефиса на неразрывный
-                    Dash\NonBreakingHyphen::apply($index, $this->tokens, $this->options['dash']['hyphen-to-nbhy']);
-                }
-            }
-
-            // Правила расстановки неразрывных пробелов
-            if (isset($this->options['nbsp'])) {
-
-                if (!empty($max_length = $this->options['nbsp']['short-word'])) {
-                    // Замена пробела на nbsp до или после короткого слова
-                    Nbsp\ShortWord::apply($index, $this->tokens, $max_length);
-                }
-
-                if (!empty($this->options['nbsp']['number'])) {
-                    // Замена пробела на nbsp до или после числа
-                    Nbsp\Number::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['nbsp']['mdash'])) {
-                    // Замена пробела на nbsp до или после mdash
-                    Nbsp\Mdash::apply($index, $this->tokens);
-                }
-
-                if (!empty($this->options['nbsp']['initial'])) {
-                    // Замена пробела на nbsp до или после инициала
-                    Nbsp\Initial::apply($index, $this->tokens);
-                }
-            }
-
-            if ($this->options['ellipsis'] === 'hellip') {
-                // Замена трёх точек на многоточие
-                Punctuation\ThreeDotsToHellip::apply($index, $this->tokens);
-            }
-
-            if ($this->options['ellipsis'] === 'dots') {
-                // Замена многоточия на три точки
-                Punctuation\HellipToThreeDots::apply($index, $this->tokens);
-            }
-
-            if (!empty($this->options['quotes'])) {
-
-                // Замена апострофа
-                Quotes\ReplaceApos::apply($index, $this->tokens);
-
-                // Замена кавычек
-                Quotes\ReplaceQuotes::apply($index, $this->tokens);
+            /**
+             * @var $ruleClass BaseRule
+             */
+            foreach ($this->rules as $ruleClass) {
+                $ruleClass::apply($index, $this->tokens, $options);
             }
         }
 
         // Преобразование символов
-        Formatting\HtmlEntities::applyToAll($this->tokens, $this->options['entities']);
+        HtmlEntityHelper::format($this->tokens, $this->options['entities']);
 
         $text = $this->tokenizer->toString($this->tokens);
 

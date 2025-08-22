@@ -2,18 +2,30 @@
 
 namespace Yepteam\Typograph\Rules\Dash;
 
+use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
-use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
+use Yepteam\Typograph\Rules\BaseRule;
 
-/**
- * Замена дефиса до или после числа на неразрывный пробел
- */
-class NonBreakingHyphen
+class NonBreakingHyphen extends BaseRule
 {
-    public static function apply(int $index, array &$tokens, int|bool $max_length = 2): void
+    /**
+     * Замена дефиса до или после числа на неразрывный пробел
+     *
+     * @param int $index Индекс токена
+     * @param array $tokens Массив всех токенов
+     * @param array $options Массив настроек типографа
+     * @return void
+     */
+    public static function apply(int $index, array &$tokens, array $options): void
     {
+        $max_length = $options['dash']['hyphen-to-nbhy'] ?? 0;
+
         if ($max_length === true) {
             $max_length = 2;
+        }
+
+        if (empty($max_length) || $max_length <= 0) {
+            return;
         }
 
         // Токен должен быть дефисом
@@ -30,23 +42,23 @@ class NonBreakingHyphen
 
         $before_hyphen_index = TokenHelper::findPrevIgnoringTokens($tokens, $index);
         if ($before_hyphen_index === false) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $after_hyphen_index = TokenHelper::findNextToken($tokens, $index);
         if ($after_hyphen_index === false) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!in_array($tokens[$before_hyphen_index]['type'], ['word', 'number'])) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!in_array($tokens[$after_hyphen_index]['type'], ['word', 'number'])) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -63,17 +75,17 @@ class NonBreakingHyphen
         }
 
         if (!$shouldReplaceHyphen) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Заменяем токен hyphen на nbhy
         $tokens[$index] = [
             'type' => 'nbhy',
-            'value' => HtmlEntities::decodeEntity('&#8209;'),
+            'value' => HtmlEntityHelper::decodeEntity('&#8209;'),
             'rule' => __CLASS__ . ':' . __LINE__,
         ];
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
     public static function applyToWord(int $index, array &$tokens, int $max_length): void
@@ -81,7 +93,7 @@ class NonBreakingHyphen
         $hyphen_count = substr_count($tokens[$index]['value'], '-');
 
         if ($hyphen_count !== 1) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -97,16 +109,16 @@ class NonBreakingHyphen
         }
 
         if (!$shouldReplaceHyphen) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $tokens[$index]['value'] = str_replace(
             '-',
-            HtmlEntities::decodeEntity('&#8209;'),
+            HtmlEntityHelper::decodeEntity('&#8209;'),
             $tokens[$index]['value']
         );
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
 }

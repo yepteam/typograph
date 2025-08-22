@@ -4,10 +4,11 @@ namespace Yepteam\Typograph\Rules\Nbsp;
 
 use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
-class Initial
+class Initial extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         if ($tokens[$index]['type'] !== 'initial') {
             return;
@@ -36,7 +37,7 @@ class Initial
 
         // Если перед пробелом ничего нет, выходим
         if ($before_space_index === false) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -46,19 +47,19 @@ class Initial
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если перед пробелом нет слова
         if ($tokens[$before_space_index]['type'] !== 'word') {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если перед пробелом нет слова с большой буквы
         if (!StringHelper::isUcFirstValue($tokens[$before_space_index]['value'])) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -70,13 +71,13 @@ class Initial
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если токен справа является словом с большой буквы
         if (StringHelper::isUcFirstValue($tokens[$right_token]['value'])) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -85,7 +86,7 @@ class Initial
             'type' => 'nbsp',
             'value' => ' ',
         ];
-        TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
     }
 
     /**
@@ -102,7 +103,7 @@ class Initial
         // Если после пробела ничего нет, выходим
         $after_space_index = TokenHelper::findNextToken($tokens, $space_index);
         if ($after_space_index === false) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -112,7 +113,7 @@ class Initial
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -129,21 +130,21 @@ class Initial
                     'type' => 'nbsp',
                     'value' => ' ',
                 ];
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
             // Является ли токен слева словом с большой буквы
             $isCapitalWord = $tokens[$left_token]['type'] === 'word' && StringHelper::isUcFirstValue($tokens[$left_token]['value']);
             if ($isCapitalWord) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             // Заканчивается ли токен слева цифрой
             $isNumber = StringHelper::isEndsWithNumber($tokens[$left_token]['value']);
             if ($isNumber) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -152,7 +153,7 @@ class Initial
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
         }
     }
 

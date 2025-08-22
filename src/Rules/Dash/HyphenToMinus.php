@@ -3,13 +3,14 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет дефис на mdash (игнорируя теги)
  */
-class HyphenToMinus
+class HyphenToMinus extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к дефису
         if (!in_array($tokens[$index]['type'], ['hyphen', 'nbhy'])) {
@@ -23,11 +24,11 @@ class HyphenToMinus
                 'type' => 'minus',
                 'value' => '&minus;',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 
     /**

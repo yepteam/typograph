@@ -3,15 +3,16 @@
 namespace Yepteam\Typograph\Rules\Special;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет x между числами на знак умножения '×'
  */
-class ReplaceTimes
+class ReplaceTimes extends BaseRule
 {
     const NUMBER_PATTERN = '\d+([.,]\d+)?';
 
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         self::handleConcatenatedCase($index, $tokens);
         self::handleSpacedCase($index, $tokens);
@@ -59,7 +60,7 @@ class ReplaceTimes
 
             $tokens[$index]['type'] = 'empty';
             $tokens[$index]['value'] = '';
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         }
     }
 
@@ -97,15 +98,15 @@ class ReplaceTimes
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'times';
         $tokens[$index]['value'] = '×';
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // Удаляем окружающие пробелы/nbsp
         $tokens[$index - 1]['type'] = 'empty';
         $tokens[$index - 1]['value'] = '';
-        TokenHelper::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
 
         $tokens[$index + 1]['type'] = 'empty';
         $tokens[$index + 1]['value'] = '';
-        TokenHelper::logRule($tokens[$index + 1], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index + 1], __CLASS__ . ':' . __LINE__);
     }
 }

@@ -3,7 +3,7 @@
 //error_reporting(E_ALL);
 //ini_set('display_errors', 1);
 
-use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
+use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Typograph;
 
 require __DIR__ . '/vendor/autoload.php';
@@ -11,7 +11,7 @@ require __DIR__ . '/vendor/autoload.php';
 $default = '';
 $tokens = [];
 
-$entity_format_options = HtmlEntities::$formats;
+$entity_format_options = HtmlEntityHelper::$formats;
 
 $entity_format = $_POST['format'] ?? 'named';
 

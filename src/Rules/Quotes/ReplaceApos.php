@@ -3,13 +3,14 @@
 namespace Yepteam\Typograph\Rules\Quotes;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Замена апострофа
  */
-class ReplaceApos
+class ReplaceApos extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к токенам apos и word
         if (!in_array($tokens[$index]['type'], ['apos', 'word'])) {
@@ -24,7 +25,7 @@ class ReplaceApos
         // Замена апострофа в слове
         if ($tokens[$index]['type'] === 'word') {
             $tokens[$index]['value'] = str_replace("'", '’', $tokens[$index]['value']);
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -36,7 +37,7 @@ class ReplaceApos
                 'type' => 'rsquo',
                 'value' => '’',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -45,7 +46,7 @@ class ReplaceApos
                 'type' => 'prime',
                 'value' => '′',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -53,6 +54,6 @@ class ReplaceApos
             'type' => 'rsquo',
             'value' => '’',
         ];
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

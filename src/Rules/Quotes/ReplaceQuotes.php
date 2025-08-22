@@ -3,11 +3,12 @@
 namespace Yepteam\Typograph\Rules\Quotes;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет кавычки
  */
-class ReplaceQuotes
+class ReplaceQuotes extends BaseRule
 {
     /**
      * @var int Текущий уровень кавычек
@@ -51,7 +52,7 @@ class ReplaceQuotes
         }
     }
 
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Не обрабатывать кавычки при пустом массиве
         if (empty(self::$quoteMarks)) {
@@ -67,7 +68,7 @@ class ReplaceQuotes
         if (self::shouldBeReplacedWithPrime($tokens, $index)) {
             $tokens[$index]['type'] = 'Prime'; // &Prime;
             $tokens[$index]['value'] = '″'; // &Prime;
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -85,7 +86,7 @@ class ReplaceQuotes
                 $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
                 // Указываем уровень кавычки для отладки
                 $tokens[$index]['level'] = self::$quoteLevel;
-                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
                 // Выходим, не меняя уровень вложенности
                 return;
             }
@@ -98,14 +99,14 @@ class ReplaceQuotes
             $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
             $tokens[$index]['level'] = self::$quoteLevel;
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         } else {
             // Проверяем, есть ли соответствующая открывающая кавычка
             $openingIndex = self::findMatchingOpeningQuote($tokens, $index);
 
             // Не нашли открывающую кавычку — оставляем как есть
             if ($openingIndex === null) {
-                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -113,7 +114,7 @@ class ReplaceQuotes
             $tokens[$index]['value'] = self::getClosingQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
             $tokens[$index]['level'] = self::$quoteLevel;
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             // Отмечаем, что кавычка на этом уровне закрыта
             self::$isQuoteOpenArr[self::$quoteLevel] = false;
             // Понижаем уровень кавычек

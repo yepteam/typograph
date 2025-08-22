@@ -2,8 +2,8 @@
 
 namespace Yepteam\Typograph;
 
+use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Helpers\HtmlHelper;
-use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
 
 class Tokenizer
 {
@@ -288,7 +288,7 @@ class Tokenizer
         $input = str_replace([' ', ' ', '&nbsp;'], ' ', $input);
 
         // Заменяем все неразрывные дефисы на обычные
-        $input = str_replace([HtmlEntities::decodeEntity('&#8209;')], '-', $input);
+        $input = str_replace([HtmlEntityHelper::decodeEntity('&#8209;')], '-', $input);
 
         $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
 

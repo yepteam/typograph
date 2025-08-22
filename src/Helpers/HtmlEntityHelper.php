@@ -1,11 +1,11 @@
 <?php
 
-namespace Yepteam\Typograph\Rules\Formatting;
+namespace Yepteam\Typograph\Helpers;
 
 /**
  * Преобразование специальных символов в HTML-сущности согласно заданному формату
  */
-class HtmlEntities
+class HtmlEntityHelper
 {
     /**
      * @var array|string[]
@@ -17,7 +17,7 @@ class HtmlEntities
         'raw',     // Готовыми символами
     ];
 
-    public static function applyToAll(array &$tokens, string $format = 'named'): void
+    public static function format(array &$tokens, string $format = 'named'): void
     {
         if (!in_array($format, self::$formats)) {
             $format = 'named';

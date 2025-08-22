@@ -3,13 +3,14 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет mdash на ndash
  */
-class MdashToNdash
+class MdashToNdash extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к токену mdash
         if ($tokens[$index]['type'] !== 'mdash') {
@@ -23,10 +24,10 @@ class MdashToNdash
                 'type' => 'ndash',
                 'value' => '–',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 }

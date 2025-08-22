@@ -3,13 +3,14 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет дефис на mdash (игнорируя теги)
  */
-class HyphenToMdash
+class HyphenToMdash extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к дефису
         if (!in_array($tokens[$index]['type'], ['hyphen', 'double-hyphen', 'nbhy'])) {
@@ -23,7 +24,7 @@ class HyphenToMdash
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -34,13 +35,13 @@ class HyphenToMdash
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Дефис находится между пробелами (игнорируя теги)
         if (!TokenHelper::isSurroundedBySpaces($tokens, $index)) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -68,12 +69,12 @@ class HyphenToMdash
         });
 
         if ($before_space_index === false) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (in_array($tokens[$before_space_index]['type'], ['hyphen', 'ndash', 'mdash',])) {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -82,7 +83,7 @@ class HyphenToMdash
             'type' => 'mdash',
             'value' => '—',
         ];
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
 }

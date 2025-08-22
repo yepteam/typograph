@@ -5,13 +5,14 @@ namespace Yepteam\Typograph\Rules\Nbsp;
 use Yepteam\Typograph\Helpers\HtmlHelper;
 use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Замена пробела перед mdash на nbsp
  */
-class Mdash
+class Mdash extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         if (!in_array($tokens[$index]['type'], ['mdash', 'hyphen'])) {
             return;
@@ -36,11 +37,11 @@ class Mdash
         $before_space_tag_index = TokenHelper::findPrevToken($tokens, $space_index, 'tag');
 
         if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
         if ($before_space_tag_index !== false && in_array($tokens[$before_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -61,7 +62,7 @@ class Mdash
         });
 
         if ($prev_index === false) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -73,8 +74,8 @@ class Mdash
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -84,8 +85,8 @@ class Mdash
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -95,8 +96,8 @@ class Mdash
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -106,12 +107,12 @@ class Mdash
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 
     public static function applyAfter(int $index, array &$tokens): void
@@ -122,18 +123,18 @@ class Mdash
         }
 
         // Находим индекс следующего токена без учета тегов
-        $next_index = TokenHelper::findNextToken($tokens, $index, 'space');
+        $space_index = TokenHelper::findNextToken($tokens, $index, 'space');
 
         // Следующий токен должен быть пробелом
-        if ($next_index === false) {
+        if ($space_index === false) {
             return;
         }
 
         // Заменяем пробел на неразрывный
-        $tokens[$next_index] = [
+        $tokens[$space_index] = [
             'type' => 'nbsp',
             'value' => ' ',
-            'rule' => __CLASS__ . ':' . __LINE__,
         ];
+        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }

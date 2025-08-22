@@ -3,6 +3,7 @@
 namespace Yepteam\Typograph\Rules\Punctuation;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 use Yepteam\Typograph\Tokenizer;
 
 /**
@@ -12,9 +13,9 @@ use Yepteam\Typograph\Tokenizer;
  * @see https://habr.com/ru/articles/26384/
  * @see https://www.artlebedev.ru/kovodstvo/sections/164/
  */
-class ThreeDotsToHellip
+class ThreeDotsToHellip extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к токену «три точки подряд»
         if ($tokens[$index]['type'] !== 'three-dots') {
@@ -26,6 +27,6 @@ class ThreeDotsToHellip
             'type' => 'hellip',
             'value' => '…',
         ];
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

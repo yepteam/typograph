@@ -3,13 +3,14 @@
 namespace Yepteam\Typograph\Rules\Dash;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет дефис на длинное тире (игнорируя теги)
  */
-class NdashToMdash
+class NdashToMdash extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только к токену ndash
         if ($tokens[$index]['type'] !== 'ndash') {
@@ -23,7 +24,7 @@ class NdashToMdash
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -33,7 +34,7 @@ class NdashToMdash
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -44,11 +45,11 @@ class NdashToMdash
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 
 }

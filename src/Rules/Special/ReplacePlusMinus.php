@@ -3,11 +3,12 @@
 namespace Yepteam\Typograph\Rules\Special;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Заменяет последовательность "+-" на "±".
  */
-class ReplacePlusMinus
+class ReplacePlusMinus extends BaseRule
 {
     /**
      * Правило применяется к токену "+".
@@ -15,7 +16,7 @@ class ReplacePlusMinus
      * @param int   $index  Индекс текущего токена.
      * @param array &$tokens Массив токенов.
      */
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Правило должно срабатывать только на токене "+"
         if ($tokens[$index]['type'] !== 'plus') {
@@ -25,7 +26,7 @@ class ReplacePlusMinus
         // Ищем следующий токен, который должен быть "-"
         $nextTokenIndex = $index + 1;
         if (!isset($tokens[$nextTokenIndex]) || $tokens[$nextTokenIndex]['type'] !== 'hyphen') {
-            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -34,7 +35,7 @@ class ReplacePlusMinus
         if (isset($tokens[$prevTokenIndex])) {
             $prevToken = $tokens[$prevTokenIndex];
             if (in_array($prevToken['value'], ['+', ':', '='])) {
-                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -43,11 +44,11 @@ class ReplacePlusMinus
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'plusmn';
         $tokens[$index]['value'] = '±';
-        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // 2. "Удаляем" следующий токен "-", помечая его как пустой
         $tokens[$nextTokenIndex]['type'] = 'empty';
         $tokens[$nextTokenIndex]['value'] = '';
-        TokenHelper::logRule($tokens[$nextTokenIndex], __CLASS__ . ':' . __LINE__);
+        self::logRule($tokens[$nextTokenIndex], __CLASS__ . ':' . __LINE__);
     }
 }

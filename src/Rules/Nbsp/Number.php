@@ -2,16 +2,17 @@
 
 namespace Yepteam\Typograph\Rules\Nbsp;
 
+use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
-use Yepteam\Typograph\Rules\Formatting\HtmlEntities;
+use Yepteam\Typograph\Rules\BaseRule;
 
 /**
  * Замена пробела до или после числа на неразрывный пробел
  */
-class Number
+class Number extends BaseRule
 {
-    public static function apply(int $index, array &$tokens): void
+    public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только для числа
         if ($tokens[$index]['type'] !== 'number') {
@@ -33,14 +34,14 @@ class Number
 
         $before_space_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($before_space_index === false) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если перед пробелом entity
         if ($tokens[$before_space_index]['type'] === 'entity') {
             // То nbsp слева не ставим
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -52,7 +53,7 @@ class Number
         // - hyphen/ndash/mdash
         if (preg_match('/[+−=*\-–—]$/u', $tokens[$before_space_index]['value']) === 1) {
             // То nbsp слева не ставим
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -67,7 +68,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -78,7 +79,7 @@ class Number
         if ($tokens[$next_index]['type'] === 'word') {
             // Если слово в верхнем или в нижнем регистре
             if (StringHelper::isLowerCase($tokens[$next_index]['value']) || StringHelper::isUpperCase($tokens[$next_index]['value'])) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -96,7 +97,7 @@ class Number
                     // Заменяем пробел на неразрывный
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                        'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                     return;
@@ -106,7 +107,7 @@ class Number
                     // Заменяем пробел на неразрывный
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                        'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                     return;
@@ -121,26 +122,26 @@ class Number
 
             // Перед точкой должно быть слово
             if ($left_word_index === false) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             // Слово должно заканчиваться строчной буквой
             if (!preg_match('/^\p{Ll}/u', $tokens[$left_word_index]['value'])) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             $next_dash_index = TokenHelper::findNextToken($tokens, $index, ['hyphen', 'nbhy', 'ndash', 'mdash']);
             if ($next_dash_index !== false) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -155,7 +156,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -164,7 +165,7 @@ class Number
 
         $prev_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($prev_index === false) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -175,7 +176,7 @@ class Number
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
         }
@@ -186,19 +187,19 @@ class Number
             $prev_prev_index = TokenHelper::findPrevToken($tokens, $prev_index);
             if (!empty($prev_prev_index) && $tokens[$prev_prev_index]['type'] === 'nbsp') {
                 // Ничего не делаем
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
         }
 
-        TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 
     public static function applyAfter(int $index, array &$tokens): void
@@ -211,7 +212,7 @@ class Number
 
         $next_index = TokenHelper::findNextToken($tokens, $space_index);
         if ($next_index === false) {
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
         
@@ -224,7 +225,7 @@ class Number
             // - пунктуация
             // - одиночный символ
             if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'nbhy', 'ndash', 'mdash', 'punctuation', 'char'])) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -246,7 +247,7 @@ class Number
                 if ($number_after_space_index !== false) {
                     // Мы нашли конструкцию "число короткое-слово число".
                     // В этом случае пробел после первого числа не должен быть неразрывным.
-                    TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                    self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                     return;
                 }
             }
@@ -254,9 +255,9 @@ class Number
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;')
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;')
             ];
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -268,7 +269,7 @@ class Number
         // - entity
         if (in_array($tokens[$next_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash', 'entity'])) {
             // Ничего не делаем
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -278,14 +279,14 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;')
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;')
                 ];
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             }
 
             // Все буквы кроме первой маленькие?
             if (StringHelper::isLowerCaseExceptFirst($tokens[$next_index]['value'])) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -303,7 +304,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -313,7 +314,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -321,7 +322,7 @@ class Number
 
             // Перед числом дефис?
             if (in_array($tokens[$prev_index]['type'], ['hyphen', 'nbhy'])) {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -330,7 +331,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -340,13 +341,13 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
             }
 
-            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -364,7 +365,7 @@ class Number
                     // Заменяем пробел на неразрывный
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                        'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                 }
@@ -378,7 +379,7 @@ class Number
                     // Заменяем пробел на неразрывный
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
-                        'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                        'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                         'rule' => __CLASS__ . ':' . __LINE__,
                     ];
                 }
@@ -392,7 +393,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -403,7 +404,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
@@ -415,7 +416,7 @@ class Number
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -431,7 +432,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -442,7 +443,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -453,7 +454,7 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
                 return;
@@ -464,14 +465,14 @@ class Number
                 // Заменяем пробел на неразрывный
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
-                    'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                     'rule' => __CLASS__ . ':' . __LINE__,
                 ];
             }
 
             // После текста нет точки
             if ($next_value !== '.') {
-                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -482,7 +483,7 @@ class Number
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
@@ -493,12 +494,12 @@ class Number
             // Заменяем пробел на неразрывный
             $tokens[$space_index] = [
                 'type' => 'nbsp',
-                'value' => HtmlEntities::decodeEntity('&nbsp;'),
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
                 'rule' => __CLASS__ . ':' . __LINE__,
             ];
             return;
         }
 
-        TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }
