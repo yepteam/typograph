@@ -2,24 +2,24 @@
 
 namespace Yepteam\Typograph\Rules\Special;
 
+use Yepteam\Typograph\Helpers\TokenHelper;
+
 /**
  * Заменяет (C) на символ ©.
  */
 class ReplaceCopyright
 {
     /**
-     * @param int   $index  Индекс текущего токена.
+     * @param int $index Индекс текущего токена.
      * @param array &$tokens Массив токенов.
      */
     public static function apply(int $index, array &$tokens): void
     {
-        $token = $tokens[$index] ?? null;
-
-        if (!$token || $token['type'] !== 'copy') {
+        if ($tokens[$index]['type'] !== 'copy') {
             return;
         }
 
         $tokens[$index]['value'] = '©';
-        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

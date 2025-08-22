@@ -129,7 +129,7 @@ class Mdash
             return;
         }
 
-        // Заменяем токен space на nbsp
+        // Заменяем пробел на неразрывный
         $tokens[$next_index] = [
             'type' => 'nbsp',
             'value' => ' ',

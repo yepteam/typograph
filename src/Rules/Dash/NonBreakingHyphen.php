@@ -30,23 +30,23 @@ class NonBreakingHyphen
 
         $before_hyphen_index = TokenHelper::findPrevIgnoringTokens($tokens, $index);
         if ($before_hyphen_index === false) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $after_hyphen_index = TokenHelper::findNextToken($tokens, $index);
         if ($after_hyphen_index === false) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!in_array($tokens[$before_hyphen_index]['type'], ['word', 'number'])) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!in_array($tokens[$after_hyphen_index]['type'], ['word', 'number'])) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -63,7 +63,7 @@ class NonBreakingHyphen
         }
 
         if (!$shouldReplaceHyphen) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -73,6 +73,7 @@ class NonBreakingHyphen
             'value' => HtmlEntities::decodeEntity('&#8209;'),
             'rule' => __CLASS__ . ':' . __LINE__,
         ];
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
     public static function applyToWord(int $index, array &$tokens, int $max_length): void
@@ -80,7 +81,7 @@ class NonBreakingHyphen
         $hyphen_count = substr_count($tokens[$index]['value'], '-');
 
         if ($hyphen_count !== 1) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -96,7 +97,7 @@ class NonBreakingHyphen
         }
 
         if (!$shouldReplaceHyphen) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -105,7 +106,7 @@ class NonBreakingHyphen
             HtmlEntities::decodeEntity('&#8209;'),
             $tokens[$index]['value']
         );
-        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
 }

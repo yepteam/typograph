@@ -58,25 +58,22 @@ class ReplaceQuotes
             return;
         }
 
-        $current = $tokens[$index];
-
         // Применимо только к токену quote
-        if ($current['type'] !== 'quote') {
+        if ($tokens[$index]['type'] !== 'quote') {
             return;
         }
 
         // Нужно ли заменить кавычку на Prime
         if (self::shouldBeReplacedWithPrime($tokens, $index)) {
-            $current['type'] = 'Prime'; // &Prime;
-            $current['value'] = '″'; // &Prime;
-            $current['rule'] = __CLASS__ . ':' . __LINE__;
-            $tokens[$index] = $current;
+            $tokens[$index]['type'] = 'Prime'; // &Prime;
+            $tokens[$index]['value'] = '″'; // &Prime;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Является ли текущая кавычка открывающей
         $isOpeningQuote = self::isOpeningQuote($tokens, $index);
-        $current['isOpeningQuote'] = $isOpeningQuote;
+        $tokens[$index]['isOpeningQuote'] = $isOpeningQuote;
 
         // Для открывающей кавычки ищем соответствующую закрывающую
         if ($isOpeningQuote) {
@@ -84,15 +81,11 @@ class ReplaceQuotes
 
             // Не нашли закрывающую кавычку?
             if ($closingIndex === null) {
-                $current['rule'] = __CLASS__ . ':' . __LINE__;
-
                 // Заменяем символ кавычки для этого уровня
-                $current['value'] = self::getOpeningQuote(self::$quoteLevel);
+                $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
                 // Указываем уровень кавычки для отладки
-                $current['level'] = self::$quoteLevel;
-
-                $tokens[$index] = $current;
-
+                $tokens[$index]['level'] = self::$quoteLevel;
+                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
                 // Выходим, не меняя уровень вложенности
                 return;
             }
@@ -102,31 +95,32 @@ class ReplaceQuotes
             // Отмечаем, что кавычка на этом уровне открыта
             self::$isQuoteOpenArr[self::$quoteLevel] = true;
             // Заменяем символ кавычки для этого уровня
-            $current['value'] = self::getOpeningQuote(self::$quoteLevel);
+            $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
-            $current['level'] = self::$quoteLevel;
+            $tokens[$index]['level'] = self::$quoteLevel;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         } else {
             // Проверяем, есть ли соответствующая открывающая кавычка
             $openingIndex = self::findMatchingOpeningQuote($tokens, $index);
+
+            // Не нашли открывающую кавычку — оставляем как есть
             if ($openingIndex === null) {
-                $current['negative_rule'] = __CLASS__ . ':' . __LINE__;
-                $tokens[$index] = $current;
-                return; // Не нашли открывающую кавычку - оставляем как есть
+                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+                return;
             }
 
             // Заменяем символ кавычки для текущего уровня
-            $current['value'] = self::getClosingQuote(self::$quoteLevel);
+            $tokens[$index]['value'] = self::getClosingQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
-            $current['level'] = self::$quoteLevel;
+            $tokens[$index]['level'] = self::$quoteLevel;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             // Отмечаем, что кавычка на этом уровне закрыта
             self::$isQuoteOpenArr[self::$quoteLevel] = false;
             // Понижаем уровень кавычек
             self::$quoteLevel = max(-1, self::$quoteLevel - 1);
         }
 
-        $current['rule'] = basename(__CLASS__);
-        $current['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
-        $tokens[$index] = $current;
+        $tokens[$index]['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
     }
 
     public static function shouldBeReplacedWithPrime(array $tokens, int $index): bool

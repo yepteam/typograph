@@ -739,4 +739,11 @@ final class NbspTest extends TestCase
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testNotInRange(){
+        $typograph = new Typograph(['entities' => 'named']);
+        $original = 'По данным ЮНЕП, ежегодно в озёра, реки и моря поступает от 19 до 23 млн тонн пластиковых отходов.';
+        $expected = 'от&nbsp;19 до&nbsp;23&nbsp;млн';
+        $this->assertStringContainsString($expected, $typograph->format($original));
+    }
+
 }

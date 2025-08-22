@@ -90,14 +90,21 @@ class ShortWord
 
         $before_space_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($before_space_index === false) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            return;
+        }
+
+        $next_index = TokenHelper::findNextToken($tokens, $index);
+
+        $is_number_before_space = $tokens[$before_space_index]['type'] === 'number';
+        if ($is_number_before_space) {
+            // За расстановку NBSP рядом с числами отвечает правило Nbsp\Number
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если токен — амперсанд и перед пробелом точка
         if ($tokens[$index]['value'] === '&' && $tokens[$before_space_index]['value'] === '.') {
-
             $before_dot_token = TokenHelper::findPrevToken($tokens, $before_space_index);
 
             // Если перед точкой слово
@@ -106,15 +113,15 @@ class ShortWord
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => ' ',
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
         }
 
         // Если значение перед пробелом является наречием
         if (in_array($tokens[$before_space_index]['value'], self::$adverbs)) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -124,36 +131,35 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если перед пробелом частица
         if (in_array($tokens[$before_space_index]['value'], self::$particles)) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если перед пробелом слово в верхнем регистре
         if (preg_match('/.*[\p{L}\d]$/u', $tokens[$before_space_index]['value'])
             && StringHelper::isUpperCase($tokens[$before_space_index]['value'])) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
-        // Значение перед пробелом — число или слово?
-        if (preg_match('/.*[\p{L}\d]$/u', $tokens[$before_space_index]['value'])
-            && mb_strlen($tokens[$before_space_index]['value']) <= $max_length) {
+        $is_word_before_space = $tokens[$before_space_index]['type'] === 'word';
+        $is_short_word_before_space = $is_word_before_space && mb_strlen($tokens[$before_space_index]['value']) <= $max_length;
 
+        // Значение перед пробелом — короткое слово?
+        if ($is_short_word_before_space) {
             // Заменить пробел перед коротким словом на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -163,16 +169,12 @@ class ShortWord
         // - точка
         // - амперсанд
         if (!preg_match('/.*[\p{L}\d.]$/u', $tokens[$before_space_index]['value'])) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
-
             // Исключение для амперсанда (FAMILY & CO)
             if ($tokens[$before_space_index]['value'] !== '&amp;') {
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
-
-        $next_index = TokenHelper::findNextToken($tokens, $index);
 
         // Если короткое слово стоит в конце или в конце предложения
         if ($next_index === false || in_array($tokens[$next_index]['value'], TokenHelper::$end_of_sentence_marks)) {
@@ -181,8 +183,8 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -192,8 +194,8 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -203,53 +205,46 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если после короткого слова пробел
         if ($tokens[$next_index]['type'] !== 'space') {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $after_space_index = TokenHelper::findNextToken($tokens, $next_index);
 
         if ($after_space_index === false) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if ($tokens[$after_space_index]['type'] === 'number') {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (in_array($tokens[$after_space_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash'])) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (mb_strlen($tokens[$before_space_index]['value']) <= $max_length) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!StringHelper::isUpperCase($tokens[$index]['value'])) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (mb_strlen($tokens[$index]['value']) >= $max_length) {
-            // Ничего не делаем
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -257,8 +252,8 @@ class ShortWord
         $tokens[$space_index] = [
             'type' => 'nbsp',
             'value' => ' ',
-            'rule' => __CLASS__ . ':' . __LINE__,
         ];
+        TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
     }
 
     /**
@@ -281,12 +276,12 @@ class ShortWord
         $after_space_tag_index = TokenHelper::findNextToken($tokens, $space_index, 'tag');
 
         if ($tag_index !== false && in_array($tokens[$tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -294,7 +289,7 @@ class ShortWord
 
         // После пробела нет ничего кроме тегов?
         if ($after_space_non_tag_index === false) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -302,46 +297,43 @@ class ShortWord
 
         // Если после пробела entity
         if ($after_space_index !== false && $tokens[$after_space_index]['type'] === 'entity') {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если после пробела один из символов
         if ($after_space_index !== false && preg_match('/^[.,!?;:+\-=<>|^*\/)\[\]{}—–]/u', $tokens[$after_space_index]['value'])) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если значение является частицей или наречием
         if (in_array($tokens[$index]['value'], array_merge(self::$particles, self::$adverbs))) {
-
             // Проверяем, есть ли nbsp перед частицей или наречием
             $prev_space_index = TokenHelper::findPrevToken($tokens, $index, 'nbsp');
 
             // Если есть nbsp перед частицей — выходим
             if ($prev_space_index !== false) {
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
 
         $prev_dash_token_index = TokenHelper::findPrevToken($tokens, $index, ['hyphen', 'ndash', 'mdash']);
         if ($prev_dash_token_index !== false) {
-            $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
-
         // Если перед коротким словом нет токена
         if (!$prev_token_index) {
-
             // Заменить пробел после короткого слова на nbsp
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -351,16 +343,14 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
         }
 
         // Предыдущий токен nbsp?
         if ($tokens[$prev_token_index]['type'] === 'nbsp') {
-
             if (StringHelper::isUpperCase($tokens[$index]['value'])) {
-                // Ничего не делаем
-                $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -368,8 +358,8 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -379,8 +369,9 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            return;
         }
 
         // Предыдущий токен кавычка?
@@ -389,8 +380,9 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            return;
         }
 
         // Предыдущий токен перенос строки?
@@ -399,10 +391,11 @@ class ShortWord
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => ' ',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            return;
         }
 
-        $tokens[$space_index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }

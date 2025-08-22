@@ -64,7 +64,10 @@ class Typograph
      *         'reg-mark'?: bool,  // (R) -> ® (&reg;)
      *         'times'?: bool, // замена x на × (&times;) — между числами
      *         'trade'?: bool, // замена (tm) на ™
-     *     }|false|false[]|null
+     *     }|false|false[]|null,
+     *
+     *     // Режим отладки
+     *     debug?: bool
      *  }|bool $options Массив опций или флаг замены буквенных кодов на готовые символы
      *  true - Форматирование готовыми символами
      *  false - Форматирование буквенными кодами
@@ -72,6 +75,8 @@ class Typograph
     public function __construct(array|bool $options = [])
     {
         $this->setOptions($options);
+
+        define('TYPOGRAPH_DEBUG', !empty($this->options['debug'] ?? false));
 
         $this->tokenizer = new Tokenizer();
     }
@@ -167,6 +172,7 @@ class Typograph
             'times' => true,
             'trade' => true,
         ],
+        'debug' => false,
     ];
 
     /**

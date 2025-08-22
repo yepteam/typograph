@@ -15,7 +15,10 @@ $entity_format_options = HtmlEntities::$formats;
 
 $entity_format = $_POST['format'] ?? 'named';
 
-$typograph = new Typograph(['entities' => (string)$entity_format]);
+$typograph = new Typograph([
+        'entities' => (string)$entity_format,
+        'debug' => true
+]);
 
 // Обработка POST-запроса
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

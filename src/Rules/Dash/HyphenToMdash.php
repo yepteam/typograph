@@ -11,21 +11,19 @@ class HyphenToMdash
 {
     public static function apply(int $index, array &$tokens): void
     {
-        $current = $tokens[$index];
-
         // Применимо только к дефису
-        if (!in_array($current['type'], ['hyphen', 'double-hyphen', 'nbhy'])) {
+        if (!in_array($tokens[$index]['type'], ['hyphen', 'double-hyphen', 'nbhy'])) {
             return;
         }
 
-        // Токен представляет собой последовательность из двух дефисов
+        // Токен представляет собой последовательность из двух дефисов?
         if ($tokens[$index]['type'] === 'double-hyphen') {
             // Замена токена на mdash
             $tokens[$index] = [
                 'type' => 'mdash',
                 'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -35,14 +33,14 @@ class HyphenToMdash
             $tokens[$index] = [
                 'type' => 'mdash',
                 'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Дефис находится между пробелами (игнорируя теги)
         if (!TokenHelper::isSurroundedBySpaces($tokens, $index)) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -70,12 +68,12 @@ class HyphenToMdash
         });
 
         if ($before_space_index === false) {
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
-        if(in_array($tokens[$before_space_index]['type'], ['hyphen', 'ndash', 'mdash', ])){
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        if (in_array($tokens[$before_space_index]['type'], ['hyphen', 'ndash', 'mdash',])) {
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -83,8 +81,8 @@ class HyphenToMdash
         $tokens[$index] = [
             'type' => 'mdash',
             'value' => '—',
-            'rule' => __CLASS__ . ':' . __LINE__,
         ];
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
 }

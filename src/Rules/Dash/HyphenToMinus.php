@@ -11,10 +11,8 @@ class HyphenToMinus
 {
     public static function apply(int $index, array &$tokens): void
     {
-        $current = $tokens[$index];
-
         // Применимо только к дефису
-        if (!in_array($current['type'], ['hyphen', 'nbhy'])) {
+        if (!in_array($tokens[$index]['type'], ['hyphen', 'nbhy'])) {
             return;
         }
 
@@ -24,12 +22,12 @@ class HyphenToMinus
             $tokens[$index] = [
                 'type' => 'minus',
                 'value' => '&minus;',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 
     /**

@@ -15,25 +15,23 @@ class ReplaceTrademark
      */
     public static function apply(int $index, array &$tokens): void
     {
-        $token = $tokens[$index] ?? null;
-
-        if (!$token || $token['type'] !== 'trade') {
+        if ($tokens[$index]['type'] !== 'trade') {
             return;
         }
 
         $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
 
         if($prev_token_index === false){
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if(in_array($tokens[$prev_token_index]['type'], ['space', 'nbsp']) ){
-            $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $tokens[$index]['value'] = '™';
-        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Yepteam\Typograph\Rules\Special;
 
+use Yepteam\Typograph\Helpers\TokenHelper;
+
 /**
  * Заменяет последовательность "+-" на "±".
  */
@@ -16,13 +18,14 @@ class ReplacePlusMinus
     public static function apply(int $index, array &$tokens): void
     {
         // Правило должно срабатывать только на токене "+"
-        if (!isset($tokens[$index]) || $tokens[$index]['type'] !== 'plus') {
+        if ($tokens[$index]['type'] !== 'plus') {
             return;
         }
 
         // Ищем следующий токен, который должен быть "-"
         $nextTokenIndex = $index + 1;
         if (!isset($tokens[$nextTokenIndex]) || $tokens[$nextTokenIndex]['type'] !== 'hyphen') {
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -31,7 +34,7 @@ class ReplacePlusMinus
         if (isset($tokens[$prevTokenIndex])) {
             $prevToken = $tokens[$prevTokenIndex];
             if (in_array($prevToken['value'], ['+', ':', '='])) {
-                $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+                TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -40,11 +43,11 @@ class ReplacePlusMinus
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'plusmn';
         $tokens[$index]['value'] = '±';
-        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // 2. "Удаляем" следующий токен "-", помечая его как пустой
         $tokens[$nextTokenIndex]['type'] = 'empty';
         $tokens[$nextTokenIndex]['value'] = '';
-        $tokens[$nextTokenIndex]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$nextTokenIndex], __CLASS__ . ':' . __LINE__);
     }
 }

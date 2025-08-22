@@ -25,7 +25,7 @@ class HellipToThreeDots
         $tokens[$index] = [
             'type' => 'three-dots',
             'value' => '...',
-            'rule' => __CLASS__ . ':' . __LINE__,
         ];
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

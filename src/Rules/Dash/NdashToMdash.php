@@ -11,9 +11,8 @@ class NdashToMdash
 {
     public static function apply(int $index, array &$tokens): void
     {
-        $current = $tokens[$index];
-
-        if ($current['type'] !== 'ndash') {
+        // Применимо только к токену ndash
+        if ($tokens[$index]['type'] !== 'ndash') {
             return;
         }
 
@@ -23,8 +22,8 @@ class NdashToMdash
             $tokens[$index] = [
                 'type' => 'mdash',
                 'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -33,8 +32,8 @@ class NdashToMdash
             $tokens[$index] = [
                 'type' => 'mdash',
                 'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -44,12 +43,12 @@ class NdashToMdash
             $tokens[$index] = [
                 'type' => 'mdash',
                 'value' => '—',
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        $tokens[$index]['negative_rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 
 }

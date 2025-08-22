@@ -83,6 +83,9 @@ $typograph = new Typograph([
         'times'      => true, // x на × между числами
         'trade'      => true, // (rm) на ™
     ],
+    
+    // Режим отладки правил
+    'debug' => false,
 ]);
 ```
 

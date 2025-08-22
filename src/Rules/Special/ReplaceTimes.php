@@ -2,6 +2,8 @@
 
 namespace Yepteam\Typograph\Rules\Special;
 
+use Yepteam\Typograph\Helpers\TokenHelper;
+
 /**
  * Заменяет x между числами на знак умножения '×'
  */
@@ -57,6 +59,7 @@ class ReplaceTimes
 
             $tokens[$index]['type'] = 'empty';
             $tokens[$index]['value'] = '';
+            TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         }
     }
 
@@ -94,13 +97,15 @@ class ReplaceTimes
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'times';
         $tokens[$index]['value'] = '×';
-        $tokens[$index]['rule'] = __CLASS__ . ':' . __LINE__;
+        TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // Удаляем окружающие пробелы/nbsp
         $tokens[$index - 1]['type'] = 'empty';
         $tokens[$index - 1]['value'] = '';
+        TokenHelper::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
 
         $tokens[$index + 1]['type'] = 'empty';
         $tokens[$index + 1]['value'] = '';
+        TokenHelper::logRule($tokens[$index + 1], __CLASS__ . ':' . __LINE__);
     }
 }

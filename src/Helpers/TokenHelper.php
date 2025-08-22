@@ -295,4 +295,25 @@ class TokenHelper
         );
     }
 
+    /**
+     * Добавляет правило к токену для отладки
+     *
+     * @param array $token Токен
+     * @param string $rule Название класса и номер строки
+     * @param bool $applied Флаг успешного применения правила
+     * @return void
+     */
+    public static function logRule(array &$token, string $rule, bool $applied = true): void
+    {
+        if (!defined('TYPOGRAPH_DEBUG') || !constant('TYPOGRAPH_DEBUG')) {
+            return;
+        }
+
+        if (!isset($token['rules'])) {
+            $token['rules'] = [];
+        }
+
+        $token['rules'][$rule] = $applied;
+    }
+
 }
