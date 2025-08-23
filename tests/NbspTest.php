@@ -213,13 +213,11 @@ final class NbspTest extends TestCase
         $expected = 'Опасно {не&nbsp;пытайтесь повторить это дома}.';
         $this->assertSame($expected, $typograph->format($original));
 
-        $original = 'Опасно <не пытайтесь повторить это дома>.';
+        $original1 = 'Опасно <не пытайтесь повторить это дома>.';
+        $original2 = 'Опасно &lt;не пытайтесь повторить это дома&gt;.';
         $expected = 'Опасно &lt;не&nbsp;пытайтесь повторить это дома&gt;.';
-        $this->assertSame($expected, $typograph->format($original));
-
-        $original = 'Опасно &lt;не пытайтесь повторить это дома&gt;.';
-        $expected = 'Опасно &lt;не&nbsp;пытайтесь повторить это дома&gt;.';
-        $this->assertSame($expected, $typograph->format($original));
+        $this->assertSame($expected, $typograph->format($original1));
+        $this->assertSame($expected, $typograph->format($original2));
 
         $original = 'Опасно //не пытайтесь повторить это дома.';
         $expected = 'Опасно //не&nbsp;пытайтесь повторить это дома.';

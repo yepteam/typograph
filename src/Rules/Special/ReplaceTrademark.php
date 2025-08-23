@@ -23,16 +23,16 @@ class ReplaceTrademark extends BaseRule
         $prev_token_index = TokenHelper::findPrevToken($tokens, $index);
 
         if ($prev_token_index === false) {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (in_array($tokens[$prev_token_index]['type'], ['space', 'nbsp'])) {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $tokens[$index]['value'] = '™';
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

@@ -70,9 +70,11 @@ class ShortWord extends BaseRule
             return;
         }
 
-        self::applyBefore($index, $tokens, $max_length);
+        // Обрабатывает пробел перед коротким словом
+        self::applyBefore($index, $tokens, $options, $max_length);
 
-        self::applyAfter($index, $tokens);
+        // Обрабатывает пробел после короткого слова
+        self::applyAfter($index, $tokens, $options);
     }
 
     /**
@@ -80,10 +82,11 @@ class ShortWord extends BaseRule
      *
      * @param int $index
      * @param array $tokens
+     * @param array $options
      * @param int $max_length
      * @return void
      */
-    public static function applyBefore(int $index, array &$tokens, int $max_length): void
+    public static function applyBefore(int $index, array &$tokens, array $options, int $max_length): void
     {
         $space_index = TokenHelper::findPrevToken($tokens, $index, 'space');
 
@@ -94,7 +97,7 @@ class ShortWord extends BaseRule
 
         $before_space_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($before_space_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -103,7 +106,7 @@ class ShortWord extends BaseRule
         $is_number_before_space = $tokens[$before_space_index]['type'] === 'number';
         if ($is_number_before_space) {
             // За расстановку NBSP рядом с числами отвечает правило Nbsp\Number
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -118,14 +121,14 @@ class ShortWord extends BaseRule
                     'type' => 'nbsp',
                     'value' => ' ',
                 ];
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
         }
 
         // Если значение перед пробелом является наречием
         if (in_array($tokens[$before_space_index]['value'], self::$adverbs)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -136,20 +139,20 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если перед пробелом частица
         if (in_array($tokens[$before_space_index]['value'], self::$particles)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если перед пробелом слово в верхнем регистре
         if (preg_match('/.*[\p{L}\d]$/u', $tokens[$before_space_index]['value'])
             && StringHelper::isUpperCase($tokens[$before_space_index]['value'])) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -163,7 +166,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -175,7 +178,7 @@ class ShortWord extends BaseRule
         if (!preg_match('/.*[\p{L}\d.]$/u', $tokens[$before_space_index]['value'])) {
             // Исключение для амперсанда (FAMILY & CO)
             if ($tokens[$before_space_index]['value'] !== '&amp;') {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -188,7 +191,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -199,7 +202,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -210,45 +213,45 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Если после короткого слова пробел
         if ($tokens[$next_index]['type'] !== 'space') {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         $after_space_index = TokenHelper::findNextToken($tokens, $next_index);
 
         if ($after_space_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if ($tokens[$after_space_index]['type'] === 'number') {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (in_array($tokens[$after_space_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash'])) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (mb_strlen($tokens[$before_space_index]['value']) <= $max_length) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (!StringHelper::isUpperCase($tokens[$index]['value'])) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (mb_strlen($tokens[$index]['value']) >= $max_length) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -257,7 +260,7 @@ class ShortWord extends BaseRule
             'type' => 'nbsp',
             'value' => ' ',
         ];
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
     }
 
     /**
@@ -265,9 +268,10 @@ class ShortWord extends BaseRule
      *
      * @param int $index
      * @param array $tokens
+     * @param array $options
      * @return void
      */
-    public static function applyAfter(int $index, array &$tokens): void
+    public static function applyAfter(int $index, array &$tokens, array $options): void
     {
         $space_index = TokenHelper::findNextToken($tokens, $index, 'space');
 
@@ -280,12 +284,12 @@ class ShortWord extends BaseRule
         $after_space_tag_index = TokenHelper::findNextToken($tokens, $space_index, 'tag');
 
         if ($tag_index !== false && in_array($tokens[$tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -293,7 +297,7 @@ class ShortWord extends BaseRule
 
         // После пробела нет ничего кроме тегов?
         if ($after_space_non_tag_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -301,13 +305,13 @@ class ShortWord extends BaseRule
 
         // Если после пробела entity
         if ($after_space_index !== false && $tokens[$after_space_index]['type'] === 'entity') {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если после пробела один из символов
         if ($after_space_index !== false && preg_match('/^[.,!?;:+\-=<>|^*\/)\[\]{}—–]/u', $tokens[$after_space_index]['value'])) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -318,14 +322,14 @@ class ShortWord extends BaseRule
 
             // Если есть nbsp перед частицей — выходим
             if ($prev_space_index !== false) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
 
         $prev_dash_token_index = TokenHelper::findPrevToken($tokens, $index, ['hyphen', 'ndash', 'mdash']);
         if ($prev_dash_token_index !== false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -337,7 +341,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -348,13 +352,13 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
         }
 
         // Предыдущий токен nbsp?
         if ($tokens[$prev_token_index]['type'] === 'nbsp') {
             if (StringHelper::isUpperCase($tokens[$index]['value'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -363,7 +367,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -374,7 +378,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -385,7 +389,7 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -396,10 +400,10 @@ class ShortWord extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }

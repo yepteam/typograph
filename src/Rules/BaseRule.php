@@ -11,13 +11,4 @@ class BaseRule {
 
     }
 
-    public static function logRule(array &$token, string $rule, bool $applied = true): void
-    {
-        if(empty($options['debug'])){
-            return;
-        }
-
-        TokenHelper::logRule($token, $rule, $applied);
-    }
-
 }

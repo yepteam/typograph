@@ -25,7 +25,7 @@ class ReplaceApos extends BaseRule
         // Замена апострофа в слове
         if ($tokens[$index]['type'] === 'word') {
             $tokens[$index]['value'] = str_replace("'", '’', $tokens[$index]['value']);
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -37,7 +37,7 @@ class ReplaceApos extends BaseRule
                 'type' => 'rsquo',
                 'value' => '’',
             ];
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -46,7 +46,7 @@ class ReplaceApos extends BaseRule
                 'type' => 'prime',
                 'value' => '′',
             ];
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -54,6 +54,6 @@ class ReplaceApos extends BaseRule
             'type' => 'rsquo',
             'value' => '’',
         ];
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

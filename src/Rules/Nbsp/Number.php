@@ -19,12 +19,14 @@ class Number extends BaseRule
             return;
         }
 
-        self::applyBefore($index, $tokens);
+        // Обрабатывает пробел перед числом
+        self::applyBefore($index, $tokens, $options);
 
-        self::applyAfter($index, $tokens);
+        // Обрабатывает пробел после числа
+        self::applyAfter($index, $tokens, $options);
     }
 
-    public static function applyBefore(int $index, array &$tokens): void
+    public static function applyBefore(int $index, array &$tokens, array $options): void
     {
         // Предыдущий токен должен быть пробелом
         $space_index = TokenHelper::findPrevToken($tokens, $index, 'space');
@@ -34,14 +36,14 @@ class Number extends BaseRule
 
         $before_space_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($before_space_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         // Если перед пробелом entity
         if ($tokens[$before_space_index]['type'] === 'entity') {
             // То nbsp слева не ставим
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -53,7 +55,7 @@ class Number extends BaseRule
         // - hyphen/ndash/mdash
         if (preg_match('/[+−=*\-–—]$/u', $tokens[$before_space_index]['value']) === 1) {
             // То nbsp слева не ставим
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -79,7 +81,7 @@ class Number extends BaseRule
         if ($tokens[$next_index]['type'] === 'word') {
             // Если слово в верхнем или в нижнем регистре
             if (StringHelper::isLowerCase($tokens[$next_index]['value']) || StringHelper::isUpperCase($tokens[$next_index]['value'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -122,19 +124,19 @@ class Number extends BaseRule
 
             // Перед точкой должно быть слово
             if ($left_word_index === false) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             // Слово должно заканчиваться строчной буквой
             if (!preg_match('/^\p{Ll}/u', $tokens[$left_word_index]['value'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
             $next_dash_index = TokenHelper::findNextToken($tokens, $index, ['hyphen', 'nbhy', 'ndash', 'mdash']);
             if ($next_dash_index !== false) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -165,7 +167,7 @@ class Number extends BaseRule
 
         $prev_index = TokenHelper::findPrevToken($tokens, $space_index);
         if ($prev_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -187,7 +189,7 @@ class Number extends BaseRule
             $prev_prev_index = TokenHelper::findPrevToken($tokens, $prev_index);
             if (!empty($prev_prev_index) && $tokens[$prev_prev_index]['type'] === 'nbsp') {
                 // Ничего не делаем
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -199,10 +201,10 @@ class Number extends BaseRule
             ];
         }
 
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 
-    public static function applyAfter(int $index, array &$tokens): void
+    public static function applyAfter(int $index, array &$tokens, array $options): void
     {
         // После числа должен быть пробел
         $space_index = TokenHelper::findNextToken($tokens, $index, 'space');
@@ -212,7 +214,7 @@ class Number extends BaseRule
 
         $next_index = TokenHelper::findNextToken($tokens, $space_index);
         if ($next_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
         
@@ -225,7 +227,7 @@ class Number extends BaseRule
             // - пунктуация
             // - одиночный символ
             if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'nbhy', 'ndash', 'mdash', 'punctuation', 'char'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -247,7 +249,7 @@ class Number extends BaseRule
                 if ($number_after_space_index !== false) {
                     // Мы нашли конструкцию "число короткое-слово число".
                     // В этом случае пробел после первого числа не должен быть неразрывным.
-                    self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                     return;
                 }
             }
@@ -257,7 +259,7 @@ class Number extends BaseRule
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;')
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -269,7 +271,7 @@ class Number extends BaseRule
         // - entity
         if (in_array($tokens[$next_index]['type'], ['hyphen', 'nbhy', 'ndash', 'mdash', 'entity'])) {
             // Ничего не делаем
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -281,12 +283,12 @@ class Number extends BaseRule
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;')
                 ];
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             }
 
             // Все буквы кроме первой маленькие?
             if (StringHelper::isLowerCaseExceptFirst($tokens[$next_index]['value'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -322,7 +324,7 @@ class Number extends BaseRule
 
             // Перед числом дефис?
             if (in_array($tokens[$prev_index]['type'], ['hyphen', 'nbhy'])) {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -347,7 +349,7 @@ class Number extends BaseRule
                 return;
             }
 
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -472,7 +474,7 @@ class Number extends BaseRule
 
             // После текста нет точки
             if ($next_value !== '.') {
-                self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -500,6 +502,6 @@ class Number extends BaseRule
             return;
         }
 
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }

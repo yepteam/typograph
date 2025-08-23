@@ -44,4 +44,33 @@ final class BaseTest extends TestCase
         $str = 's:11:"Привет, мир";';
         $this->assertSame($str, $typograph->format($str));
     }
+
+    public function testDebugTrue()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'debug' => true
+        ]);
+
+        $typograph->format('И так далее');
+        $tokens = $typograph->getTokens();
+
+        $nbsp_rules = json_encode($tokens[1]['rules'] ?? '');
+        $this->assertStringContainsString("ShortWord", $nbsp_rules);
+    }
+
+    public function testDebugFalse()
+    {
+        $typograph = new Typograph([
+            'entities' => 'named',
+            'debug' => false
+        ]);
+
+        $typograph->format('И так далее');
+        $tokens = $typograph->getTokens();
+
+        $nbsp_rules = json_encode($tokens[1]['rules'] ?? '');
+        $this->assertStringNotContainsString("ShortWord", $nbsp_rules);
+    }
+
 }

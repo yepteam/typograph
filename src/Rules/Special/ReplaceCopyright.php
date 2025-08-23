@@ -21,6 +21,6 @@ class ReplaceCopyright extends BaseRule
         }
 
         $tokens[$index]['value'] = '©';
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

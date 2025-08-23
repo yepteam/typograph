@@ -26,7 +26,7 @@ class ReplacePlusMinus extends BaseRule
         // Ищем следующий токен, который должен быть "-"
         $nextTokenIndex = $index + 1;
         if (!isset($tokens[$nextTokenIndex]) || $tokens[$nextTokenIndex]['type'] !== 'hyphen') {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -35,7 +35,7 @@ class ReplacePlusMinus extends BaseRule
         if (isset($tokens[$prevTokenIndex])) {
             $prevToken = $tokens[$prevTokenIndex];
             if (in_array($prevToken['value'], ['+', ':', '='])) {
-                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
         }
@@ -44,11 +44,11 @@ class ReplacePlusMinus extends BaseRule
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'plusmn';
         $tokens[$index]['value'] = '±';
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // 2. "Удаляем" следующий токен "-", помечая его как пустой
         $tokens[$nextTokenIndex]['type'] = 'empty';
         $tokens[$nextTokenIndex]['value'] = '';
-        self::logRule($tokens[$nextTokenIndex], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$nextTokenIndex], __CLASS__ . ':' . __LINE__);
     }
 }

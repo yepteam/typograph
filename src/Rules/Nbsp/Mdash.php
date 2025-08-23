@@ -18,12 +18,14 @@ class Mdash extends BaseRule
             return;
         }
 
-        self::applyBefore($index, $tokens);
+        // Обрабатывает пробел перед символом черты
+        self::applyBefore($index, $tokens, $options);
 
-        self::applyAfter($index, $tokens);
+        // Обрабатывает пробел после символа черты
+        self::applyAfter($index, $tokens, $options);
     }
 
-    public static function applyBefore(int $index, array &$tokens): void
+    public static function applyBefore(int $index, array &$tokens, array $options): void
     {
         // Ищем предыдущий индекс без учета тегов
         $space_index = TokenHelper::findPrevToken($tokens, $index, 'space');
@@ -37,11 +39,11 @@ class Mdash extends BaseRule
         $before_space_tag_index = TokenHelper::findPrevToken($tokens, $space_index, 'tag');
 
         if ($after_space_tag_index !== false && in_array($tokens[$after_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
         if ($before_space_tag_index !== false && in_array($tokens[$before_space_tag_index]['name'], HtmlHelper::$new_line_tags)) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -62,7 +64,7 @@ class Mdash extends BaseRule
         });
 
         if ($prev_index === false) {
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -75,7 +77,7 @@ class Mdash extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -86,7 +88,7 @@ class Mdash extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -97,7 +99,7 @@ class Mdash extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -108,14 +110,14 @@ class Mdash extends BaseRule
                 'type' => 'nbsp',
                 'value' => ' ',
             ];
-            self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 
-    public static function applyAfter(int $index, array &$tokens): void
+    public static function applyAfter(int $index, array &$tokens, array $options): void
     {
         // Токен mdash должен быть в начале строки
         if (!TokenHelper::isAtStartOfSentence($tokens, $index)) {
@@ -135,6 +137,6 @@ class Mdash extends BaseRule
             'type' => 'nbsp',
             'value' => ' ',
         ];
-        self::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
 }

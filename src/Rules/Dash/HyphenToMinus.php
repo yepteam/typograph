@@ -24,11 +24,11 @@ class HyphenToMinus extends BaseRule
                 'type' => 'minus',
                 'value' => '&minus;',
             ];
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
     }
 
     /**

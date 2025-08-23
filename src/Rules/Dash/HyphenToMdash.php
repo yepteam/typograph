@@ -24,7 +24,7 @@ class HyphenToMdash extends BaseRule
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -35,13 +35,13 @@ class HyphenToMdash extends BaseRule
                 'type' => 'mdash',
                 'value' => '—',
             ];
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
         // Дефис находится между пробелами (игнорируя теги)
         if (!TokenHelper::isSurroundedBySpaces($tokens, $index)) {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -69,12 +69,12 @@ class HyphenToMdash extends BaseRule
         });
 
         if ($before_space_index === false) {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
         if (in_array($tokens[$before_space_index]['type'], ['hyphen', 'ndash', 'mdash',])) {
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
 
@@ -83,7 +83,7 @@ class HyphenToMdash extends BaseRule
             'type' => 'mdash',
             'value' => '—',
         ];
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
 }

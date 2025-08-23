@@ -23,6 +23,6 @@ class ReplaceRegMark extends BaseRule
         $tokens[$index]['type'] = 'char';
         $tokens[$index]['name'] = 'reg-mark';
         $tokens[$index]['value'] = '®';
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }

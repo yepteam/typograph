@@ -68,7 +68,7 @@ class ReplaceQuotes extends BaseRule
         if (self::shouldBeReplacedWithPrime($tokens, $index)) {
             $tokens[$index]['type'] = 'Prime'; // &Prime;
             $tokens[$index]['value'] = '″'; // &Prime;
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -86,7 +86,7 @@ class ReplaceQuotes extends BaseRule
                 $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
                 // Указываем уровень кавычки для отладки
                 $tokens[$index]['level'] = self::$quoteLevel;
-                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
                 // Выходим, не меняя уровень вложенности
                 return;
             }
@@ -99,14 +99,14 @@ class ReplaceQuotes extends BaseRule
             $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
             $tokens[$index]['level'] = self::$quoteLevel;
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         } else {
             // Проверяем, есть ли соответствующая открывающая кавычка
             $openingIndex = self::findMatchingOpeningQuote($tokens, $index);
 
             // Не нашли открывающую кавычку — оставляем как есть
             if ($openingIndex === null) {
-                self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__, false);
                 return;
             }
 
@@ -114,7 +114,7 @@ class ReplaceQuotes extends BaseRule
             $tokens[$index]['value'] = self::getClosingQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
             $tokens[$index]['level'] = self::$quoteLevel;
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             // Отмечаем, что кавычка на этом уровне закрыта
             self::$isQuoteOpenArr[self::$quoteLevel] = false;
             // Понижаем уровень кавычек
@@ -124,6 +124,13 @@ class ReplaceQuotes extends BaseRule
         $tokens[$index]['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
     }
 
+    /**
+     * Должен ли токен быть заменен на Prime
+     *
+     * @param array $tokens Массив всех токенов
+     * @param int $index Идентификатор токена в массиве
+     * @return bool
+     */
     public static function shouldBeReplacedWithPrime(array $tokens, int $index): bool
     {
         if ($tokens[$index]['type'] !== 'quote') {
@@ -190,18 +197,32 @@ class ReplaceQuotes extends BaseRule
     private static function findMatchingOpeningQuote(array $tokens, int $closingIndex): ?int
     {
         $balance = 1;
+
+        // Обход токенов справа налево
         for ($i = $closingIndex - 1; $i >= 0; $i--) {
-            if ($tokens[$i]['type'] === 'quote') {
-                if (self::isOpeningQuote($tokens, $i)) {
-                    $balance--;
-                    if ($balance === 0) {
-                        return $i;
-                    }
-                } else {
-                    $balance++;
+
+            // Пропускаем токены, не являющиеся кавычкой
+            if ($tokens[$i]['type'] !== 'quote') {
+                continue;
+            }
+
+            // Найденная кавычка является открывающей?
+            if (self::isOpeningQuote($tokens, $i)) {
+
+                // Уменьшаем уровень вложенности кавычек
+                $balance--;
+
+                // Кавычка с таким же уровнем вложенности найдена?
+                if ($balance === 0) {
+                    // Возвращаем индекс найденного токена с кавычкой
+                    return $i;
                 }
+            } else {
+                // Увеличиваем уровень вложенности кавычек
+                $balance++;
             }
         }
+
         return null;
     }
 

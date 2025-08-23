@@ -60,7 +60,7 @@ class ReplaceTimes extends BaseRule
 
             $tokens[$index]['type'] = 'empty';
             $tokens[$index]['value'] = '';
-            self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         }
     }
 
@@ -98,15 +98,15 @@ class ReplaceTimes extends BaseRule
         $tokens[$index]['type'] = 'punctuation';
         $tokens[$index]['name'] = 'times';
         $tokens[$index]['value'] = '×';
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
 
         // Удаляем окружающие пробелы/nbsp
         $tokens[$index - 1]['type'] = 'empty';
         $tokens[$index - 1]['value'] = '';
-        self::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
 
         $tokens[$index + 1]['type'] = 'empty';
         $tokens[$index + 1]['value'] = '';
-        self::logRule($tokens[$index + 1], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index + 1], __CLASS__ . ':' . __LINE__);
     }
 }

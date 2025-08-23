@@ -4,7 +4,6 @@ namespace Yepteam\Typograph\Rules\Punctuation;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
-use Yepteam\Typograph\Tokenizer;
 
 /**
  * Замена трёх точек на многоточие
@@ -27,6 +26,6 @@ class ThreeDotsToHellip extends BaseRule
             'type' => 'hellip',
             'value' => '…',
         ];
-        self::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
+        !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 }
