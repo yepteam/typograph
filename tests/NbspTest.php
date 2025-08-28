@@ -299,6 +299,10 @@ final class NbspTest extends TestCase
         $original = 'гл. 4, стр. 5, рис. 7, илл. 9, ст. 6, п. 9';
         $expected = 'гл.&nbsp;4, стр.&nbsp;5, рис.&nbsp;7, илл.&nbsp;9, ст.&nbsp;6, п.&nbsp;9';
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = 'кредитный договор № 123456 от 29.08.2025';
+        $expected = 'кредитный договор &#8470;&nbsp;123456 от&nbsp;29.08.2025';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testNotBeforeNumber()

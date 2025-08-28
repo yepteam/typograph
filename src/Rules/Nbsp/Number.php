@@ -59,6 +59,17 @@ class Number extends BaseRule
             return;
         }
 
+        // Если перед пробелом знак номера
+        if (in_array($tokens[$before_space_index]['value'], ['№', '&#8470;'])) {
+            // Заменяем пробел на неразрывный
+            $tokens[$space_index] = [
+                'type' => 'nbsp',
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+            return;
+        }
+
         $next_index = TokenHelper::findNextIgnoringTokens($tokens, $index, ['tag', 'space']);
 
         // После числа нет токенов или после числа есть признак конца строки
@@ -217,7 +228,7 @@ class Number extends BaseRule
             !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
             return;
         }
-        
+
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
         if ($prev_index !== false) {
             // Перед числом нет одного из:
