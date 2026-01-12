@@ -192,35 +192,87 @@ class Typograph
      */
     private function initializeRules(): void
     {
-        $this->rules = array_keys(array_filter([
-            // Правила для специальных символов
+        $rules = [];
+        $rules = array_merge($rules, $this->getSpecialRules());
+        $rules = array_merge($rules, $this->getDashRules());
+        $rules = array_merge($rules, $this->getNbspRules());
+        $rules = array_merge($rules, $this->getPunctuationRules());
+        $rules = array_merge($rules, $this->getQuotesRules());
+
+        $this->rules = array_keys(array_filter($rules));
+    }
+
+    /**
+     * Правила для специальных символов
+     *
+     * @return bool[]
+     */
+    private function getSpecialRules(): array
+    {
+        return [
             Special\ReplaceCopyright::class => !empty($this->options['special']['copyright']),
             Special\ReplacePlusMinus::class => !empty($this->options['special']['plus-minus']),
             Special\ReplaceRegMark::class => !empty($this->options['special']['reg-mark']),
             Special\ReplaceTimes::class => !empty($this->options['special']['times']),
             Special\ReplaceTrademark::class => !empty($this->options['special']['trade']),
+        ];
+    }
 
-            // Правила замены знаков минус/дефис/тире
+    /**
+     * Правила замены знаков минус/дефис/тире
+     *
+     * @return bool[]
+     */
+    private function getDashRules(): array
+    {
+        return [
             Dash\HyphenToMinus::class => !empty($this->options['dash']['hyphen-to-minus']),
             Dash\HyphenToMdash::class => !empty($this->options['dash']['hyphen-to-mdash']),
             Dash\NdashToMdash::class => !empty($this->options['dash']['ndash-to-mdash']),
             Dash\MdashToNdash::class => !empty($this->options['dash']['mdash-to-ndash']),
             Dash\NonBreakingHyphen::class => !empty($this->options['dash']['hyphen-to-nbhy']),
+        ];
+    }
 
-            // Правила расстановки неразрывных пробелов
+    /**
+     * Правила расстановки неразрывных пробелов
+     *
+     * @return bool[]
+     */
+    private function getNbspRules(): array
+    {
+        return [
             Nbsp\Number::class => !empty($this->options['nbsp']['number']),
             Nbsp\Mdash::class => !empty($this->options['nbsp']['mdash']),
             Nbsp\Initial::class => !empty($this->options['nbsp']['initial']),
             Nbsp\ShortWord::class => !empty($this->options['nbsp']['short-word']),
+        ];
+    }
 
-            // Правила для многоточий
+    /**
+     * Правила пунктуации
+     *
+     * @return bool[]
+     */
+    private function getPunctuationRules(): array
+    {
+        return [
             Punctuation\ThreeDotsToHellip::class => ($this->options['ellipsis'] ?? null) === Typograph::ELLIPSIS_HELLIP,
             Punctuation\HellipToThreeDots::class => ($this->options['ellipsis'] ?? null) === Typograph::ELLIPSIS_DOTS,
+        ];
+    }
 
-            // Правила для кавычек
+    /**
+     * Правила для кавычек
+     *
+     * @return bool[]
+     */
+    private function getQuotesRules(): array
+    {
+        return [
             Quotes\ReplaceApos::class => !empty($this->options['quotes']),
             Quotes\ReplaceQuotes::class => !empty($this->options['quotes']),
-        ]));
+        ];
     }
 
     /**
