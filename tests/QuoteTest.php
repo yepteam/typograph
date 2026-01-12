@@ -10,7 +10,7 @@ final class QuoteTest extends TestCase
     public function testLevel1()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -34,7 +34,7 @@ final class QuoteTest extends TestCase
     public function testLevel2()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'dash' => [],
             'nbsp' => [],
         ]);
@@ -51,7 +51,7 @@ final class QuoteTest extends TestCase
     public function testAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -71,7 +71,7 @@ final class QuoteTest extends TestCase
     public function testNoSpace()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -83,12 +83,12 @@ final class QuoteTest extends TestCase
     public function testCustomQuotes()
     {
         $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
             'quotes' => [
                 ['‹ ', ' ›'],
                 ['›', '‹'],
             ],
             'dash' => [],
-            'entities' => 'raw',
         ]);
 
         $original = '"Часы "Электроника ЧН-54" в корпусе из нержавеющей стали"';
@@ -99,14 +99,14 @@ final class QuoteTest extends TestCase
     public function testDeep()
     {
         $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
             'quotes' => [
                 ['«', '»'],
                 ['„', '“'],
                 ['‘', '’'],
                 ['“', '”'],
             ],
-            'entities' => 'raw',
-            'nbsp' => []
+            'nbsp' => [],
         ]);
 
         $original = 'Он вздохнул и сказал: "Мне вчера пришло письмо со словами: "Вот что написал автор: "Этот символ — "золотой ключ" — нельзя терять", а потом добавил кое-что ещё". Я даже не знал, как на это реагировать".';
@@ -117,7 +117,7 @@ final class QuoteTest extends TestCase
     public function testOdd()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -129,7 +129,7 @@ final class QuoteTest extends TestCase
     public function testMultiline()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -143,7 +143,7 @@ final class QuoteTest extends TestCase
     public function testApos()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -173,7 +173,7 @@ EOF
     public function testPrime()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
         ]);
 
@@ -189,7 +189,7 @@ EOF
     public function testReversed()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -205,7 +205,7 @@ EOF
     public function testQuotesInHtml()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
             'dash' => [],
         ]);
@@ -217,8 +217,17 @@ EOF
 
     public function testEncodedQuotes()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => [], 'dash' => []]);
-        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => [], 'dash' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+            'dash' => [],
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+            'dash' => [],
+        ]);
 
         $original = 'Такие кавычки &quot;quot&quot; конвертируются.';
         $expected = 'Такие кавычки &laquo;quot&raquo; конвертируются.';

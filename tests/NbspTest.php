@@ -10,7 +10,7 @@ final class NbspTest extends TestCase
     public function testRemoveWrongNbsp()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'И так&nbsp;далее';
@@ -21,7 +21,7 @@ final class NbspTest extends TestCase
     public function testBeforeMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
@@ -69,7 +69,7 @@ final class NbspTest extends TestCase
     public function testNotBeforeMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '* — справа';
@@ -92,7 +92,7 @@ final class NbspTest extends TestCase
     public function testAfterMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'Вы всё ещё кипятите? — Тогда мы идём к вам!';
@@ -103,7 +103,7 @@ final class NbspTest extends TestCase
     public function testNotAfterMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'см. 3.2 — 3.31.';
@@ -114,7 +114,7 @@ final class NbspTest extends TestCase
     public function testBeforeShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '15 мм';
@@ -157,7 +157,7 @@ final class NbspTest extends TestCase
     public function testAfterShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // https://www.artlebedev.ru/kovodstvo/sections/62/
@@ -253,7 +253,7 @@ final class NbspTest extends TestCase
     public function testNotAfterShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'dash' => [],
         ]);
 
@@ -277,7 +277,7 @@ final class NbspTest extends TestCase
     public function testBeforeNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'Начинается текст подраздела 1…';
@@ -308,7 +308,7 @@ final class NbspTest extends TestCase
     public function testNotBeforeNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '+ 2';
@@ -327,7 +327,7 @@ final class NbspTest extends TestCase
     public function testAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'dash' => [],
         ]);
 
@@ -427,7 +427,7 @@ final class NbspTest extends TestCase
     public function testPhoneNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'dash' => [],
         ]);
 
@@ -440,7 +440,7 @@ final class NbspTest extends TestCase
     public function testNotAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'dash' => [],
         ]);
 
@@ -492,7 +492,7 @@ final class NbspTest extends TestCase
     public function testBeforeParticleWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'Съешь же ещё этих мягких французских булок';
@@ -515,7 +515,7 @@ final class NbspTest extends TestCase
     public function testBeforeYear()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '1941–1945 гг.';
@@ -526,8 +526,8 @@ final class NbspTest extends TestCase
     public function testNotBeforeShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'dash' => []
+            'entities' => Typograph::ENTITIES_NAMED,
+            'dash' => [],
         ]);
 
         $original = 'Было дело, да';
@@ -555,7 +555,7 @@ final class NbspTest extends TestCase
     public function testInitial()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '(подраздел Ф. М. Достоевского)';
@@ -606,7 +606,7 @@ final class NbspTest extends TestCase
     public function testTags()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED
         ]);
 
         $original = 'Согласен с <strong>условиями</strong> пользовательского соглашения';
@@ -625,7 +625,7 @@ final class NbspTest extends TestCase
     public function testBeforeSingleCharacter()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED
         ]);
 
         $original = 'миллионов ₽.';
@@ -636,7 +636,7 @@ final class NbspTest extends TestCase
     public function testNoNbspNearTags()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED
         ]);
 
         $original = '<p>Текст в</p> <p>Новой строке</p>';
@@ -663,7 +663,7 @@ final class NbspTest extends TestCase
     public function testNoNbspNearEmoji()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'Привет 😀';
@@ -694,7 +694,7 @@ final class NbspTest extends TestCase
     public function testNbspNearAmp()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = 'FAMILY &amp; CO';
@@ -713,7 +713,7 @@ final class NbspTest extends TestCase
     public function testNoNbspNearEntities()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // Nbsp/Number
@@ -735,14 +735,21 @@ final class NbspTest extends TestCase
 
     public function testNoNbspNearSpecialCharacters()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $original = '↑ ↓ ± ≈ ≠ 😊';
         $expected = '&uarr; &darr; &plusmn; &asymp; &ne; 😊';
         $this->assertSame($expected, $typograph->format($original));
     }
 
-    public function testNotInRange(){
-        $typograph = new Typograph(['entities' => 'named']);
+    public function testNotInRange()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $original = 'По данным ЮНЕП, ежегодно в озёра, реки и моря поступает от 19 до 23 млн тонн пластиковых отходов.';
         $expected = 'от&nbsp;19 до&nbsp;23&nbsp;млн';
         $this->assertStringContainsString($expected, $typograph->format($original));

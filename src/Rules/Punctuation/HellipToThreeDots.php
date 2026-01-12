@@ -4,7 +4,6 @@ namespace Yepteam\Typograph\Rules\Punctuation;
 
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
-use Yepteam\Typograph\Tokenizer;
 
 /**
  * Замена многоточия на три точки

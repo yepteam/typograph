@@ -10,6 +10,7 @@ final class OptionTest extends TestCase
     public function testDefaultOptions()
     {
         $typograph = new Typograph();
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
         $this->assertEquals($options, $defaultOptions);
@@ -18,9 +19,10 @@ final class OptionTest extends TestCase
     public function testFalse()
     {
         $typograph = new Typograph(false);
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
-        $defaultOptions['entities'] = 'named';
+        $defaultOptions['entities'] = Typograph::ENTITIES_NAMED;
         $this->assertEquals($options, $defaultOptions);
     }
 
@@ -29,25 +31,34 @@ final class OptionTest extends TestCase
         $typograph = new Typograph(true);
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
-        $defaultOptions['entities'] = 'raw';
+        $defaultOptions['entities'] = Typograph::ENTITIES_RAW;
         $this->assertEquals($options, $defaultOptions);
     }
 
     public function testDisabledOptions()
     {
-        $typograph = new Typograph([ 'dash' => false ]);
+        $typograph = new Typograph([
+            'dash' => false,
+        ]);
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
         $defaultOptions['dash'] = [];
         $this->assertEquals($options, $defaultOptions);
 
-        $typograph = new Typograph([ 'nbsp' => false ]);
+        $typograph = new Typograph([
+            'nbsp' => false,
+        ]);
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
         $defaultOptions['nbsp'] = [];
         $this->assertEquals($options, $defaultOptions);
 
-        $typograph = new Typograph([ 'special' => false ]);
+        $typograph = new Typograph([
+            'special' => false,
+        ]);
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
         $defaultOptions['special'] = [];
@@ -56,9 +67,12 @@ final class OptionTest extends TestCase
 
     public function testPartiallyChangedOptions()
     {
-        $typograph = new Typograph([ 'dash' => [
-            'hyphen-to-mdash' => false
-        ] ]);
+        $typograph = new Typograph([
+            'dash' => [
+                'hyphen-to-mdash' => false
+            ]
+        ]);
+
         $options = $typograph->getOptions();
         $defaultOptions = $typograph->getDefaultOptions();
         $defaultOptions['dash']['hyphen-to-mdash'] = false;

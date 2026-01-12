@@ -10,7 +10,7 @@ final class DashTest extends TestCase
     public function testDoubleDashToNdash()
     {
         $typograph = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'nbsp' => [],
         ]);
 
@@ -30,7 +30,7 @@ final class DashTest extends TestCase
     public function testMdashToNdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
         ]);
 
@@ -46,7 +46,7 @@ final class DashTest extends TestCase
     public function testNdashToMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
         ]);
 
@@ -62,7 +62,7 @@ final class DashTest extends TestCase
     public function testHyphenToMdash()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
         ]);
 
@@ -78,7 +78,7 @@ final class DashTest extends TestCase
     public function testHyphenToMinus()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
         ]);
 
@@ -90,11 +90,11 @@ final class DashTest extends TestCase
     public function testDashNotChange()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'nbsp' => [],
             'dash' => [
                 'hyphen-to-nbhy' => false
-            ]
+            ],
         ]);
 
         $original = '-';
@@ -110,8 +110,8 @@ final class DashTest extends TestCase
     public function testMdashNoRepeat()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'nbsp' => []
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
         ]);
 
         $original = '- - -';
@@ -130,8 +130,8 @@ final class DashTest extends TestCase
     public function testMdashAfterShortcode()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'nbsp' => []
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
         ]);
 
         $original = '[shortcode-like] - sample';

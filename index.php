@@ -13,7 +13,7 @@ $tokens = [];
 
 $entity_format_options = HtmlEntityHelper::$formats;
 
-$entity_format = $_POST['format'] ?? 'named';
+$entity_format = $_POST['format'] ?? '';
 
 $typograph = new Typograph([
         'entities' => (string)$entity_format,
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $original = $_POST['text'] ?? $default;
 
     if (!in_array($entity_format, $entity_format_options, true)) {
-        $entity_format = 'named';
+        $entity_format = $typograph::ENTITIES_NAMED;
     }
 
     // Отформатированный текст
@@ -56,7 +56,7 @@ $original = $_SESSION['original'] ?? $default;
 $text = $_SESSION['text'] ?? '';
 $tokens = $_SESSION['tokens'] ?? [];
 $metrics = $_SESSION['metrics'] ?? [];
-$entity_format = $_SESSION['format'] ?? 'named';
+$entity_format = $_SESSION['format'] ?? '';
 
 // Очищаем сессию
 unset($_SESSION['original'], $_SESSION['text'], $_SESSION['tokens'], $_SESSION['encoding']);

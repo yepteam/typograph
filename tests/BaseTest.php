@@ -9,20 +9,30 @@ final class BaseTest extends TestCase
 {
     public function testEmptyString()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $this->assertSame('', $typograph->format(''));
     }
 
     public function testEmptySpaces()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $this->assertSame('', $typograph->format(' '));
         $this->assertSame('', $typograph->format('   '));
     }
 
     public function testExtraSpaces()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+        ]);
+
         $this->assertSame(
             'В этом тексте лишние пробелы и табуляции',
             $typograph->format("В    этом    тексте  лишние   пробелы  и    \t табуляции")
@@ -31,7 +41,11 @@ final class BaseTest extends TestCase
 
     public function testLeadingTabs()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => []
+        ]);
+
         $this->assertSame(
             "\t\t\tТабуляции в начале строки не трогаем",
             $typograph->format("\t\t\tТабуляции в начале строки не\t трогаем")
@@ -40,7 +54,10 @@ final class BaseTest extends TestCase
 
     public function testSerializedStr()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $str = 's:11:"Привет, мир";';
         $this->assertSame($str, $typograph->format($str));
     }
@@ -48,8 +65,8 @@ final class BaseTest extends TestCase
     public function testDebugTrue()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'debug' => true
+            'entities' => Typograph::ENTITIES_NAMED,
+            'debug' => true,
         ]);
 
         $typograph->format('И так далее');
@@ -62,8 +79,8 @@ final class BaseTest extends TestCase
     public function testDebugFalse()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
-            'debug' => false
+            'entities' => Typograph::ENTITIES_NAMED,
+            'debug' => false,
         ]);
 
         $typograph->format('И так далее');

@@ -10,7 +10,7 @@ final class HtmlTagTest extends TestCase
     public function testTag()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<b>Текст</b>';
@@ -21,7 +21,7 @@ final class HtmlTagTest extends TestCase
     public function testTagEntitiesRaw()
     {
         $typograph = new Typograph([
-            'entities' => 'raw'
+            'entities' => Typograph::ENTITIES_RAW,
         ]);
 
         // Стандартный HTML-тег остаётся нетронутым
@@ -53,7 +53,7 @@ final class HtmlTagTest extends TestCase
     public function testEntitiesNamed()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // Стандартный HTML-тег сохраняется
@@ -85,7 +85,7 @@ final class HtmlTagTest extends TestCase
     public function testTagMultiline()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         /** @noinspection GrazieInspection */
@@ -103,7 +103,7 @@ final class HtmlTagTest extends TestCase
     public function testTagScript()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<script>console.log("Hello World!");</script>';
@@ -114,7 +114,7 @@ final class HtmlTagTest extends TestCase
     public function testTagStyle()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<style>body { font-family: "sans-serif" }</style>';
@@ -125,7 +125,7 @@ final class HtmlTagTest extends TestCase
     public function testTagPre()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<pre>
@@ -142,7 +142,7 @@ final class HtmlTagTest extends TestCase
     public function testTagWithAttribute()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = "<form data-default='{\"br\":\"<br>\"}'>Текст в форме</form>";
@@ -153,7 +153,7 @@ final class HtmlTagTest extends TestCase
     public function testDoctype()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<!DOCTYPE html>';
@@ -174,7 +174,7 @@ final class HtmlTagTest extends TestCase
     public function testComment()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         $original = '<!-- Комментарий в коде -->';
@@ -188,7 +188,10 @@ final class HtmlTagTest extends TestCase
 
     public function testOnlyHtml()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $html = '<div><p></p></div>';
         $this->assertSame($html, $typograph->format($html));
     }
@@ -196,14 +199,15 @@ final class HtmlTagTest extends TestCase
     public function testXmlDeclaration()
     {
         $typograph = new Typograph([
-            'entities' => 'named',
+            'entities' => Typograph::ENTITIES_NAMED,
             'dash' => [],
-            'quotes' => false
+            'quotes' => false,
         ]);
+
         $typographRaw = new Typograph([
-            'entities' => 'raw',
+            'entities' => Typograph::ENTITIES_RAW,
             'dash' => [],
-            'quotes' => false
+            'quotes' => false,
         ]);
 
         $original = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -219,7 +223,9 @@ final class HtmlTagTest extends TestCase
      */
     public function testScript()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
 
         $original = '<!-- Yandex.Metrika counter -->
 <script type="text/javascript" >

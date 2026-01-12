@@ -16,7 +16,7 @@ final class MemoryTest extends TestCase
     public function test64()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // Строка 64 символа
@@ -37,7 +37,7 @@ final class MemoryTest extends TestCase
     public function test1024()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // Строка 64 символа
@@ -58,7 +58,7 @@ final class MemoryTest extends TestCase
     public function testTags1024()
     {
         $typograph = new Typograph([
-            'entities' => 'named'
+            'entities' => Typograph::ENTITIES_NAMED,
         ]);
 
         // Строка 64 символа
@@ -75,4 +75,5 @@ final class MemoryTest extends TestCase
         $this->assertLessThan(0.7, $typograph->getMetrics()['totalTime']);
         $this->assertLessThan(12.0 * 1024 * 1024, $typograph->getMetrics()['memoryUsage']);
     }
+
 }

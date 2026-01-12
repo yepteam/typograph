@@ -43,13 +43,13 @@ $typograph = new Typograph([
     // numeric - числовыми кодами
     // hex - шестнадцатеричными кодами
     // raw - готовыми символами
-    'entities' => 'named',
+    'entities' => Typograph::ENTITIES_RAW,
     
     // Многоточия
     // hellip - замена трех точек на символ многоточия
     // dots - замена символа многоточия на три точки
     // none - не обрабатывать многоточия
-    'ellipsis' => 'hellip',
+    'ellipsis' => Typograph::ELLIPSIS_HELLIP,
     
     // Массив кавычек по каждому уровню
     // При пустом массиве обработка кавычек будет отключена

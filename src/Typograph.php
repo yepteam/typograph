@@ -7,6 +7,14 @@ use Yepteam\Typograph\Rules\{BaseRule, Dash, Nbsp, Punctuation, Quotes, Special}
 
 class Typograph
 {
+    public const ENTITIES_NAMED = 'named';
+    public const ENTITIES_NUMERIC = 'numeric';
+    public const ENTITIES_HEX = 'hex';
+    public const ENTITIES_RAW = 'raw';
+
+    public const ELLIPSIS_HELLIP = 'hellip';
+    public const ELLIPSIS_DOTS = 'dots';
+
     private array $metrics = [
         'originalContentLength' => 0,
         'resultContentLength' => 0,
@@ -91,14 +99,14 @@ class Typograph
         // Форматирование буквенными кодами
         if ($options === false) {
             $options = [
-                'entities' => 'named'
+                'entities' => Typograph::ENTITIES_NAMED
             ];
         }
 
         // Форматирование готовыми символами
         if ($options === true) {
             $options = [
-                'entities' => 'raw'
+                'entities' => Typograph::ENTITIES_RAW
             ];
         }
 
@@ -150,8 +158,8 @@ class Typograph
      * @var array Параметры по умолчанию
      */
     private array $defaultOptions = [
-        'entities' => 'raw',
-        'ellipsis' => 'hellip',
+        'entities' => Typograph::ENTITIES_RAW,
+        'ellipsis' => Typograph::ELLIPSIS_HELLIP,
         'quotes' => [
             ['«', '»'],
             ['„', '“'],
@@ -206,8 +214,8 @@ class Typograph
             Nbsp\ShortWord::class => !empty($this->options['nbsp']['short-word']),
 
             // Правила для многоточий
-            Punctuation\ThreeDotsToHellip::class => ($this->options['ellipsis'] ?? null) === 'hellip',
-            Punctuation\HellipToThreeDots::class => ($this->options['ellipsis'] ?? null) === 'dots',
+            Punctuation\ThreeDotsToHellip::class => ($this->options['ellipsis'] ?? null) === Typograph::ELLIPSIS_HELLIP,
+            Punctuation\HellipToThreeDots::class => ($this->options['ellipsis'] ?? null) === Typograph::ELLIPSIS_DOTS,
 
             // Правила для кавычек
             Quotes\ReplaceApos::class => !empty($this->options['quotes']),

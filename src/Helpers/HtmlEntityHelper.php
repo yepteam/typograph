@@ -2,6 +2,8 @@
 
 namespace Yepteam\Typograph\Helpers;
 
+use Yepteam\Typograph\Typograph;
+
 /**
  * Преобразование специальных символов в HTML-сущности согласно заданному формату
  */
@@ -11,19 +13,19 @@ class HtmlEntityHelper
      * @var array|string[]
      */
     public static array $formats = [
-        'named',   // Преобразование в именованные мнемоники
-        'numeric', // Десятичными кодами
-        'hex',     // Шестнадцатеричными кодами
-        'raw',     // Готовыми символами
+        Typograph::ENTITIES_NAMED, // Преобразование в именованные мнемоники
+        Typograph::ENTITIES_NUMERIC, // Десятичными кодами
+        Typograph::ENTITIES_HEX, // Шестнадцатеричными кодами
+        Typograph::ENTITIES_RAW, // Готовыми символами
     ];
 
-    public static function format(array &$tokens, string $format = 'named'): void
+    public static function format(array &$tokens, string $format = Typograph::ENTITIES_NAMED): void
     {
         if (!in_array($format, self::$formats)) {
-            $format = 'named';
+            $format = Typograph::ENTITIES_NAMED;
         }
 
-        if ($format === 'raw') {
+        if ($format === Typograph::ENTITIES_RAW) {
             return;
         }
 
@@ -62,8 +64,8 @@ class HtmlEntityHelper
             // комбинируемый знак ударения
             if ($ord === 769) {
                 $result .= match ($format) {
-                    'named', 'numeric' => "&#$ord;",
-                    'hex' => "&#x" . dechex($ord) . ";",
+                    Typograph::ENTITIES_NAMED, Typograph::ENTITIES_NUMERIC => "&#$ord;",
+                    Typograph::ENTITIES_HEX => "&#x" . dechex($ord) . ";",
                     default => $char
                 };
                 continue;
@@ -72,8 +74,8 @@ class HtmlEntityHelper
             // Неразрывный дефис
             if ($ord === 8209) {
                 $result .= match ($format) {
-                    'named', 'numeric' => "&#$ord;",
-                    'hex' => "&#x" . dechex($ord) . ";",
+                    Typograph::ENTITIES_NAMED, Typograph::ENTITIES_NUMERIC => "&#$ord;",
+                    Typograph::ENTITIES_HEX => "&#x" . dechex($ord) . ";",
                     default => $char
                 };
                 continue;
@@ -82,8 +84,8 @@ class HtmlEntityHelper
             // Знак рубля (нет мнемоники в HTML)
             if ($ord === 8381) {
                 $result .= match ($format) {
-                    'numeric' => "&#$ord;",
-                    'hex' => "&#x" . dechex($ord) . ";",
+                    Typograph::ENTITIES_NUMERIC => "&#$ord;",
+                    Typograph::ENTITIES_HEX => "&#x" . dechex($ord) . ";",
                     default => $char
                 };
                 continue;
@@ -92,8 +94,8 @@ class HtmlEntityHelper
             // Знак номера (появился в HTML5)
             if ($ord === 8470) {
                 $result .= match ($format) {
-                    'named', 'numeric' => "&#$ord;",
-                    'hex' => "&#x" . dechex($ord) . ";",
+                    Typograph::ENTITIES_NAMED, Typograph::ENTITIES_NUMERIC => "&#$ord;",
+                    Typograph::ENTITIES_HEX => "&#x" . dechex($ord) . ";",
                     default => $char
                 };
                 continue;
@@ -108,9 +110,9 @@ class HtmlEntityHelper
 
             // Преобразуем в выбранный формат
             $result .= match ($format) {
-                'named' => $entity,
-                'numeric' => "&#$ord;",
-                'hex' => "&#x" . dechex($ord) . ";",
+                Typograph::ENTITIES_NAMED => $entity,
+                Typograph::ENTITIES_NUMERIC => "&#$ord;",
+                Typograph::ENTITIES_HEX => "&#x" . dechex($ord) . ";",
                 default => $char
             };
         }

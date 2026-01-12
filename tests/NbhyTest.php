@@ -11,7 +11,7 @@ final class NbhyTest extends TestCase
     public function testAfterNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -46,7 +46,7 @@ final class NbhyTest extends TestCase
     public function testBeforeNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -65,7 +65,7 @@ final class NbhyTest extends TestCase
     public function testPhoneNumber()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -84,7 +84,7 @@ final class NbhyTest extends TestCase
     public function testIsbn()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -99,7 +99,7 @@ final class NbhyTest extends TestCase
     public function testShortWord()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -114,7 +114,7 @@ final class NbhyTest extends TestCase
     public function testParticle()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -133,7 +133,7 @@ final class NbhyTest extends TestCase
     public function testNegative()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -145,7 +145,7 @@ final class NbhyTest extends TestCase
         $this->assertSame($expected, $typograph->format($original));
 
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -168,7 +168,7 @@ final class NbhyTest extends TestCase
     public function testNegativeUrl()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-nbhy' => 2
             ],
@@ -183,7 +183,7 @@ final class NbhyTest extends TestCase
     public function testNegativeListMarker()
     {
         $typograph = new Typograph([
-            'entities' => 'numeric',
+            'entities' => Typograph::ENTITIES_NUMERIC,
             'dash' => [
                 'hyphen-to-mdash' => false,
                 'hyphen-to-nbhy' => true

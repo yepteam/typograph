@@ -9,8 +9,15 @@ final class SpecialTest extends TestCase
 {
     public function testReplaceCopyright()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
-        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
 
         $c_letters = [
             'c', // Latin Lower
@@ -32,8 +39,13 @@ final class SpecialTest extends TestCase
 
     public function testReplacePlusMinus()
     {
-        $typograph = new Typograph(['entities' => 'named']);
-        $typographRaw = new Typograph(['entities' => 'raw']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+        ]);
 
         // Базовый тест
         $this->assertSame('&plusmn;', $typograph->format('+-'));
@@ -54,8 +66,15 @@ final class SpecialTest extends TestCase
 
     public function testReplaceRegMark()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
-        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
 
         $latin_letters = [
             'r', // Latin Lower
@@ -76,8 +95,13 @@ final class SpecialTest extends TestCase
 
     public function testReplaceTimes()
     {
-        $typograph = new Typograph(['entities' => 'named']);
-        $typographRaw = new Typograph(['entities' => 'raw']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+        ]);
 
         $x_letters = [
             'x', // Latin Lower
@@ -150,8 +174,15 @@ final class SpecialTest extends TestCase
 
     public function testReplaceTrademark()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => []]);
-        $typographRaw = new Typograph(['entities' => 'raw', 'nbsp' => []]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+        ]);
+
+        $typographRaw = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
 
         // Срабатывает слитно
         $original = 'Trademark(tm)';
@@ -166,7 +197,11 @@ final class SpecialTest extends TestCase
 
     public function testDisabled()
     {
-        $typograph = new Typograph(['entities' => 'named', 'nbsp' => [], 'special' => false]);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+            'nbsp' => [],
+            'special' => false,
+        ]);
 
         $original = 'Copyright (c) 2025 Trademark(tm) 2 x 2 = 4 +-1';
         $this->assertSame($original, $typograph->format($original));

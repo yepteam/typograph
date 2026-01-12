@@ -12,7 +12,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpAudioShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $audio1 = '[audio src="audio-source.mp3"]';
         $audio2 = '[audio mp3="source.mp3" ogg="source.ogg" wav="source.wav"]';
         $this->assertSame($audio1, $typograph->format($audio1));
@@ -24,7 +27,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpCaptionShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $caption = '[caption id="attachment_6" align="alignright" width="300"]<img src="http://localhost/wp-content/uploads/2010/07/800px-Great_Wave_off_Kanagawa2-300x205.jpg" alt="Kanagawa" title="The Great Wave" width="300" height="205" class="size-medium wp-image-6" /> The Great Wave[/caption]';
         $this->assertSame($caption, $typograph->format($caption));
     }
@@ -34,7 +40,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpEmbedShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $embed1 = '[embed]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/embed]';
         $embed2 = '[embed width="640" height="360"]https://www.youtube.com/watch?v=dQw4w9WgXcQ[/embed]';
         $this->assertSame($embed1, $typograph->format($embed1));
@@ -46,7 +55,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpGalleryShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $gallery1 = '[gallery]';
         $gallery2 = '[gallery ids="729,732,731,720"]';
         $gallery3 = '[gallery order="DESC" orderby="ID"]';
@@ -60,7 +72,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpPlaylistShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $playlist1 = '[playlist]';
         $playlist2 = '[playlist type="video" ids="123,456,789" style="dark"]';
         $this->assertSame($playlist1, $typograph->format($playlist1));
@@ -72,7 +87,10 @@ final class ShortcodeTest extends TestCase
      */
     public function testWpVideoShortcode()
     {
-        $typograph = new Typograph(['entities' => 'named']);
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
         $video1 = '[video]';
         $video2 = '[video mp4="source.mp4" ogv="source.ogv" webm="source.webm"]';
         $this->assertSame($video1, $typograph->format($video1));
