@@ -5,7 +5,7 @@ namespace Yepteam\Typograph\Rules\Special;
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
 
-class ReplaceRegMark extends BaseRule
+final class ReplaceRegMark extends BaseRule
 {
     /**
      * Заменяет токен типа 'reg', созданный токенизатором из (R) или (r),

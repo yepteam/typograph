@@ -6,7 +6,7 @@ use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
 
-class NonBreakingHyphen extends BaseRule
+final class NonBreakingHyphen extends BaseRule
 {
     /**
      * Замена дефиса до или после числа на неразрывный пробел

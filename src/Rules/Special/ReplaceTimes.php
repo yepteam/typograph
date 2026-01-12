@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет x между числами на знак умножения '×'
  */
-class ReplaceTimes extends BaseRule
+final class ReplaceTimes extends BaseRule
 {
     const NUMBER_PATTERN = '\d+([.,]\d+)?';
 

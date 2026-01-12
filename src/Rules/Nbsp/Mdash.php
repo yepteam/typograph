@@ -10,7 +10,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Замена пробела перед mdash на nbsp
  */
-class Mdash extends BaseRule
+final class Mdash extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

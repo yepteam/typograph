@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет дефис на mdash (игнорируя теги)
  */
-class HyphenToMinus extends BaseRule
+final class HyphenToMinus extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

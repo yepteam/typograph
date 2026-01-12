@@ -2,7 +2,7 @@
 
 namespace Yepteam\Typograph\Helpers;
 
-class TokenHelper
+final class TokenHelper
 {
     /**
      * @var array|string[] Маркеры конца предложения

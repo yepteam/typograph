@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет mdash на ndash
  */
-class MdashToNdash extends BaseRule
+final class MdashToNdash extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

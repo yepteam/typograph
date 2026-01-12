@@ -7,7 +7,7 @@ use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
 
-class ShortWord extends BaseRule
+final class ShortWord extends BaseRule
 {
     /**
      * Частицы

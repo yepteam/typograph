@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет (C) на символ ©.
  */
-class ReplaceTrademark extends BaseRule
+final class ReplaceTrademark extends BaseRule
 {
     /**
      * @param int $index Индекс текущего токена.

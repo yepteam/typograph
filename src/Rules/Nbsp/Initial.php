@@ -6,7 +6,7 @@ use Yepteam\Typograph\Helpers\StringHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
 
-class Initial extends BaseRule
+final class Initial extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет кавычки
  */
-class ReplaceQuotes extends BaseRule
+final class ReplaceQuotes extends BaseRule
 {
     /**
      * @var int Текущий уровень кавычек

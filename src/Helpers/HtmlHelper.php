@@ -2,7 +2,7 @@
 
 namespace Yepteam\Typograph\Helpers;
 
-class HtmlHelper
+final class HtmlHelper
 {
 
     /**

@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет дефис на длинное тире (игнорируя теги)
  */
-class NdashToMdash extends BaseRule
+final class NdashToMdash extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

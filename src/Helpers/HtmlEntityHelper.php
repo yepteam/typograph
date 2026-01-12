@@ -7,7 +7,7 @@ use Yepteam\Typograph\Typograph;
 /**
  * Преобразование специальных символов в HTML-сущности согласно заданному формату
  */
-class HtmlEntityHelper
+final class HtmlEntityHelper
 {
     /**
      * @var array|string[]

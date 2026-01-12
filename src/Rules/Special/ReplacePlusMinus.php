@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Заменяет последовательность "+-" на "±".
  */
-class ReplacePlusMinus extends BaseRule
+final class ReplacePlusMinus extends BaseRule
 {
     /**
      * Правило применяется к токену "+".

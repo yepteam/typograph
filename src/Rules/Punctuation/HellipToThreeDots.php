@@ -12,7 +12,7 @@ use Yepteam\Typograph\Rules\BaseRule;
  * @see https://habr.com/ru/articles/26384/
  * @see https://www.artlebedev.ru/kovodstvo/sections/164/
  */
-class HellipToThreeDots extends BaseRule
+final class HellipToThreeDots extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

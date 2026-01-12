@@ -2,7 +2,7 @@
 
 namespace Yepteam\Typograph\Helpers;
 
-class StringHelper
+final class StringHelper
 {
     /**
      * Знаки валют

@@ -5,7 +5,7 @@ namespace Yepteam\Typograph;
 use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Rules\{BaseRule, Dash, Nbsp, Punctuation, Quotes, Special};
 
-class Typograph
+final class Typograph
 {
     public const ENTITIES_NAMED = 'named';
     public const ENTITIES_NUMERIC = 'numeric';

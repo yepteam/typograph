@@ -10,7 +10,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Замена пробела до или после числа на неразрывный пробел
  */
-class Number extends BaseRule
+final class Number extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

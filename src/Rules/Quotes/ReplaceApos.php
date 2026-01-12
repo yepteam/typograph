@@ -8,7 +8,7 @@ use Yepteam\Typograph\Rules\BaseRule;
 /**
  * Замена апострофа
  */
-class ReplaceApos extends BaseRule
+final class ReplaceApos extends BaseRule
 {
     public static function apply(int $index, array &$tokens, array $options): void
     {

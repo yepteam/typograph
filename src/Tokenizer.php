@@ -5,7 +5,7 @@ namespace Yepteam\Typograph;
 use Yepteam\Typograph\Helpers\HtmlEntityHelper;
 use Yepteam\Typograph\Helpers\HtmlHelper;
 
-class Tokenizer
+final class Tokenizer
 {
     /**
      * @var array Массив метрик токенизатора
