@@ -374,7 +374,8 @@ final class Tokenizer
             $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
 
             // Проверяем, не начинается ли подстрока с сохраненного специального тега
-            if (str_contains($substr, 'SPECIAL_TAG') && preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr, $tagMatches)) {
+            if (str_contains($substr, 'SPECIAL_TAG') && preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr,
+                    $tagMatches)) {
                 $tagType = $tagMatches[1];
                 $tagId = $tagMatches[2];
                 $tagContent = $this->restoreSpecialTag($tagType, $tagId);

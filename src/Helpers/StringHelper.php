@@ -5,6 +5,21 @@ namespace Yepteam\Typograph\Helpers;
 final class StringHelper
 {
     /**
+     * Проверяет, может ли слово быть римским числом.
+     * Слово должно быть целиком в верхнем регистре и заканчиваться на одну из букв I, V, X, L, C, D, M.
+     */
+    public static function isLikeRomanNumber(string $value): bool
+    {
+        if ($value === '' || !self::isUpperCase($value)) {
+            return false;
+        }
+
+        // Последний символ — римская цифра?
+        $lastChar = mb_substr($value, -1, 1, 'UTF-8');
+        return str_contains('IVXLCDM', $lastChar);
+    }
+
+    /**
      * Знаки валют
      */
     public static array $currency_symbols = [

@@ -15,15 +15,18 @@ final class Number extends BaseRule
     public static function apply(int $index, array &$tokens, array $options): void
     {
         // Применимо только для числа
-        if ($tokens[$index]['type'] !== 'number') {
-            return;
+        if ($tokens[$index]['type'] === 'number') {
+            // Обрабатывает пробел перед числом
+            self::applyBefore($index, $tokens, $options);
+
+            // Обрабатывает пробел после числа
+            self::applyAfter($index, $tokens, $options);
         }
 
-        // Обрабатывает пробел перед числом
-        self::applyBefore($index, $tokens, $options);
-
-        // Обрабатывает пробел после числа
-        self::applyAfter($index, $tokens, $options);
+        // Для слов, похожих на римское число — упрощённая логика
+        if ($tokens[$index]['type'] === 'word' && StringHelper::isLikeRomanNumber($tokens[$index]['value'])) {
+            self::applyRomanNumber($index, $tokens, $options);
+        }
     }
 
     public static function applyBefore(int $index, array &$tokens, array $options): void
@@ -92,7 +95,8 @@ final class Number extends BaseRule
         if ($tokens[$next_index]['type'] === 'word') {
             // Если слово в верхнем или в нижнем регистре
             if (StringHelper::isLowerCase($tokens[$next_index]['value']) || StringHelper::isUpperCase($tokens[$next_index]['value'])) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
         }
@@ -135,19 +139,22 @@ final class Number extends BaseRule
 
             // Перед точкой должно быть слово
             if ($left_word_index === false) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
 
             // Слово должно заканчиваться строчной буквой
             if (!preg_match('/^\p{Ll}/u', $tokens[$left_word_index]['value'])) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
 
             $next_dash_index = TokenHelper::findNextToken($tokens, $index, ['hyphen', 'nbhy', 'ndash', 'mdash']);
             if ($next_dash_index !== false) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
 
@@ -200,7 +207,8 @@ final class Number extends BaseRule
             $prev_prev_index = TokenHelper::findPrevToken($tokens, $prev_index);
             if (!empty($prev_prev_index) && $tokens[$prev_prev_index]['type'] === 'nbsp') {
                 // Ничего не делаем
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
 
@@ -237,8 +245,10 @@ final class Number extends BaseRule
             // - дефис
             // - пунктуация
             // - одиночный символ
-            if (!in_array($tokens[$prev_index]['type'], ['space', 'nbsp', 'hyphen', 'nbhy', 'ndash', 'mdash', 'punctuation', 'char'])) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+            if (!in_array($tokens[$prev_index]['type'],
+                ['space', 'nbsp', 'hyphen', 'nbhy', 'ndash', 'mdash', 'punctuation', 'char'])) {
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
         }
@@ -260,7 +270,8 @@ final class Number extends BaseRule
                 if ($number_after_space_index !== false) {
                     // Мы нашли конструкцию "число короткое-слово число".
                     // В этом случае пробел после первого числа не должен быть неразрывным.
-                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                        false);
                     return;
                 }
             }
@@ -299,7 +310,8 @@ final class Number extends BaseRule
 
             // Все буквы кроме первой маленькие?
             if (StringHelper::isLowerCaseExceptFirst($tokens[$next_index]['value'])) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
         }
@@ -335,7 +347,8 @@ final class Number extends BaseRule
 
             // Перед числом дефис?
             if (in_array($tokens[$prev_index]['type'], ['hyphen', 'nbhy'])) {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
 
@@ -485,7 +498,8 @@ final class Number extends BaseRule
 
             // После текста нет точки
             if ($next_value !== '.') {
-                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__,
+                    false);
                 return;
             }
         }
@@ -515,4 +529,60 @@ final class Number extends BaseRule
 
         !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
     }
+
+    /**
+     * Привязка римского числа к соседним словам через nbsp
+     */
+    private static function applyRomanNumber(int $index, array &$tokens, array $options): void
+    {
+        // Пробел ПЕРЕД римским числом → nbsp, если слева предлог/короткое слово
+        $space_before = TokenHelper::findPrevToken($tokens, $index, 'space');
+        if ($space_before !== false) {
+            $before = TokenHelper::findPrevToken($tokens, $space_before);
+            if ($before !== false
+                && $tokens[$before]['type'] === 'word'
+                && mb_strlen($tokens[$before]['value']) <= 2) {
+                $tokens[$space_before] = [
+                    'type' => 'nbsp',
+                    'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
+                    'rule' => __CLASS__ . ':roman-before',
+                ];
+            }
+        }
+
+        // Пробел ПОСЛЕ римского числа → nbsp, только если следующее слово
+        // является последним перед концом предложения (точка, запятая и т.д.)
+        $space_after = TokenHelper::findNextToken($tokens, $index, 'space');
+        if ($space_after === false) {
+            return;
+        }
+
+        $after = TokenHelper::findNextToken($tokens, $space_after);
+        if ($after === false) {
+            return;
+        }
+
+        // После пробела должно быть слово длиной до 4 символов
+        if ($tokens[$after]['type'] !== 'word' || mb_strlen($tokens[$after]['value']) > 4) {
+            return;
+        }
+
+        // Проверяем, что после этого слова — конец предложения
+        $after_word = TokenHelper::findNextToken($tokens, $after);
+
+        // Слово в конце текста
+        if ($after_word === false) {
+            return;
+        }
+
+        // Слово перед знаком конца предложения
+        if (in_array($tokens[$after_word]['value'], TokenHelper::$right_adjacent_marks)) {
+            $tokens[$space_after] = [
+                'type' => 'nbsp',
+                'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
+                'rule' => __CLASS__ . ':' . __LINE__,
+            ];
+        }
+    }
+
 }
