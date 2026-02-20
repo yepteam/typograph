@@ -148,6 +148,22 @@ final class HtmlTagTest extends TestCase
         $original = "<form data-default='{\"br\":\"<br>\"}'>Текст в форме</form>";
         $expected = "<form data-default='{\"br\":\"<br>\"}'>Текст в&nbsp;форме</form>";
         $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<button data-click="handleClick">Текст в кнопке</button>';
+        $expected = '<button data-click="handleClick">Текст в&nbsp;кнопке</button>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<button @click="handleClick()">Текст в кнопке</button>';
+        $expected = '<button @click="handleClick()">Текст в&nbsp;кнопке</button>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<button x-on:click="handleClick()">Текст в кнопке</button>';
+        $expected = '<button x-on:click="handleClick()">Текст в&nbsp;кнопке</button>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        $original = '<button v-on:click.prevent="handleClick()">Текст в кнопке</button>';
+        $expected = '<button v-on:click.prevent="handleClick()">Текст в&nbsp;кнопке</button>';
+        $this->assertSame($expected, $typograph->format($original));
     }
 
     public function testDoctype()
