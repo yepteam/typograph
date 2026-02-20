@@ -262,4 +262,54 @@ final class HtmlTagTest extends TestCase
         $this->assertSame($original, $typograph->format($original));
     }
 
+    public function testPhpTag()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
+        // Однострочный PHP-тег
+        $original = '<?php echo "Hello"; ?>';
+        $expected = '<?php echo "Hello"; ?>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        // Короткий вывод
+        $original = '<?= $variable ?>';
+        $expected = '<?= $variable ?>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        // Многострочный PHP-тег
+        $original = '<?php
+
+get_template_part( \'templates/spoiler\', null, [
+    \'caption\' => \'Подробнее\'
+] );
+
+?>';
+        $expected = '<?php
+
+get_template_part( \'templates/spoiler\', null, [
+    \'caption\' => \'Подробнее\'
+] );
+
+?>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        // PHP-тег внутри HTML — текст вокруг типографируется, PHP не трогается
+        $original = '<div>Текст в блоке <?php echo $var; ?> и ещё текст</div>';
+        $expected = '<div>Текст в&nbsp;блоке <?php echo $var; ?> и&nbsp;ещё текст</div>';
+        $this->assertSame($expected, $typograph->format($original));
+
+        // PHP-тег с WordPress-шаблоном
+        $original = '<header>
+<?php get_template_part( \'templates/header\' ); ?>
+</header>
+<main>Контент в блоке</main>';
+        $expected = '<header>
+<?php get_template_part( \'templates/header\' ); ?>
+</header>
+<main>Контент в&nbsp;блоке</main>';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
 }

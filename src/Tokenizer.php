@@ -500,6 +500,9 @@ final class Tokenizer
             '/<!--.*?-->/s' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'comment');
             },
+            '/<\?(?:php|=)?\b.*?\?>/s' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, 'php');
+            },
             '/<script\b[^>]*>[\s\S]*?<\/script>/is' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'script');
             },
