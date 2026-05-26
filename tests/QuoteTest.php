@@ -80,6 +80,18 @@ final class QuoteTest extends TestCase
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testAfterPlus()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
+
+        $original = '"Супер+".';
+        $expected = '«Супер+».';
+        $this->assertSame($expected, $typograph->format($original));
+    }
+
     public function testCustomQuotes()
     {
         $typograph = new Typograph([

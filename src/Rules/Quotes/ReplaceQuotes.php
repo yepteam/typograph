@@ -276,7 +276,8 @@ final class ReplaceQuotes extends BaseRule
         // - букву
         // - цифру
         // - знак препинания
-        if (preg_match('/.*[\p{L}\p{P}\d]$/u', $prev_value)) {
+        // - символ (+, =, ±, $, € и т.п.)
+        if (preg_match('/.*[\p{L}\p{P}\p{S}\d]$/u', $prev_value)) {
             return false;
         }
 
