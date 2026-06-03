@@ -2,6 +2,7 @@
 
 namespace Yepteam\Typograph\Rules\Quotes;
 
+use Yepteam\Typograph\Helpers\HtmlHelper;
 use Yepteam\Typograph\Helpers\TokenHelper;
 use Yepteam\Typograph\Rules\BaseRule;
 
@@ -252,10 +253,21 @@ final class ReplaceQuotes extends BaseRule
 
         $next_value = $tokens[$next_index]['value'];
 
+        // Между кавычкой и следующим токеном есть тег переноса строки (<br>, </p> и т.п.)?
+        // В этом случае кавычка фактически стоит в конце строки и не является открывающей,
+        // даже если следующий значимый токен начинается на букву или цифру.
+        $has_line_break_after = false;
+        for ($i = $index + 1; $i < $next_index; $i++) {
+            if ($tokens[$i]['type'] === 'tag' && in_array($tokens[$i]['name'], HtmlHelper::$new_line_tags)) {
+                $has_line_break_after = true;
+                break;
+            }
+        }
+
         // Если следующий токен начинается на:
         // - букву
         // - цифру
-        if (preg_match('/^[\p{L}\d].*/u', $next_value)) {
+        if (!$has_line_break_after && preg_match('/^[\p{L}\d].*/u', $next_value)) {
             return true;
         }
 
