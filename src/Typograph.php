@@ -283,42 +283,30 @@ final class Typograph
      */
     public function format(string $text): string
     {
-        // Обнуляем метрики
+        // Обнуляем метрики и токены: результаты предыдущего вызова не должны оставаться,
+        // если текст будет возвращен без обработки
+        $this->tokens = [];
+        $this->metrics['originalContentLength'] = mb_strlen($text);
+        $this->metrics['resultContentLength'] = $this->metrics['originalContentLength'];
         $this->metrics['tokenizationTime'] = 0.0;
         $this->metrics['processingTime'] = 0.0;
         $this->metrics['totalTime'] = 0.0;
         $this->metrics['memoryUsage'] = 0.0;
 
-        $this->metrics['originalContentLength'] = mb_strlen($text);
+        // Не форматировать:
+        // - пустой текст;
+        // - текст в невалидной кодировке (регулярные выражения с /u на нем не работают);
+        // - сериализованные строки
+        if ($text === '' || !mb_check_encoding($text, 'UTF-8') || self::isSerialized($text)) {
+            return $text;
+        }
 
         $memory = memory_get_usage();
-
-        if (!mb_strlen($text)) {
-            return $text;
-        }
-
-        // Не форматировать текст в невалидной кодировке (регулярные выражения с /u на нем не работают)
-        if (!mb_check_encoding($text, 'UTF-8')) {
-            $this->metrics['resultContentLength'] = $this->metrics['originalContentLength'];
-            return $text;
-        }
-
-        // Не форматировать сериализованные строки
-        if (self::isSerialized($text)) {
-            $this->metrics['resultContentLength'] = $this->metrics['originalContentLength'];
-            return $text;
-        }
 
         // Преобразование текста в массив токенов
         $this->tokens = $this->tokenizer->tokenize($text);
 
         $this->metrics['tokenizationTime'] = $this->tokenizer->getMetrics()['tokenizationTime'];
-
-        // Если токенизация не удалась, вернуть текст без дальнейшей обработки
-        if (empty($this->tokenizer->getMetrics()['countOfLines'])) {
-            $this->metrics['resultContentLength'] = mb_strlen($text);
-            return $text;
-        }
 
         $processingStart = microtime(true);
 

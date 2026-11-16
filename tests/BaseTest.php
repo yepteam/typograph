@@ -189,4 +189,32 @@ final class BaseTest extends TestCase
         }
     }
 
+    public function testStateIsResetForEmptyText()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED]);
+
+        $typograph->format('Он сказал "привет"');
+        $this->assertSame('', $typograph->format(''));
+
+        $metrics = $typograph->getMetrics();
+        $this->assertSame(0, $metrics['originalContentLength']);
+        $this->assertSame(0, $metrics['resultContentLength']);
+        $this->assertSame([], $typograph->getTokens());
+    }
+
+    public function testTokensAreResetForUnformattedText()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED]);
+
+        // Сериализованное значение и невалидный UTF-8 возвращаются без обработки
+        foreach (['s:5:"hello";', "Привет \xFF мир"] as $text) {
+            $typograph->format('Он сказал "привет"');
+            $this->assertSame($text, $typograph->format($text));
+
+            $metrics = $typograph->getMetrics();
+            $this->assertSame($metrics['originalContentLength'], $metrics['resultContentLength']);
+            $this->assertSame([], $typograph->getTokens());
+        }
+    }
+
 }
