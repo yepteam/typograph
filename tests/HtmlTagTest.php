@@ -375,4 +375,32 @@ get_template_part( \'templates/spoiler\', null, [
         $this->assertSame($original, $typograph->format($original));
     }
 
+    // ─────────────────────────────────────────────
+    // Служебная метка переноса строки в тегах не путается с текстом
+    // ─────────────────────────────────────────────
+
+    public function testNewlineMarkerTextIsPreserved()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = 'Атрибут data-typograph-new-line служебный';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
+    public function testNewlineMarkerInAttributeIsPreserved()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = '<div title="a data-typograph-new-line b">текст</div>';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
+    public function testMultilineTagWithMarkerTextIsPreserved()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = "<div\nclass=\"x\">Атрибут data-typograph-new-line служебный</div>";
+        $this->assertSame($original, $typograph->format($original));
+    }
+
 }

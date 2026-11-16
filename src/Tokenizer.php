@@ -274,6 +274,12 @@ final class Tokenizer
     private string $placeholderPrefix = '';
 
     /**
+     * @var string Уникальная метка переносов строк внутри тегов (своя для каждого вызова tokenize),
+     * чтобы не спутать ее с таким же текстом во входных данных
+     */
+    private string $newlineMarker = HtmlHelper::NEWLINE_MARKER;
+
+    /**
      * @var string Перевод строки, используемый во входном тексте (сохраняется в результате)
      */
     private string $eol = "\n";
@@ -300,6 +306,7 @@ final class Tokenizer
         // Состояние предыдущего вызова не должно влиять на текущий
         $this->specialTags = [];
         $this->placeholderPrefix = 'TYPOGRAPH_TAG_' . bin2hex(random_bytes(8));
+        $this->newlineMarker = HtmlHelper::NEWLINE_MARKER . '-' . bin2hex(random_bytes(8));
 
         // Регулярные выражения с модификатором /u не работают с невалидным UTF-8:
         // возвращаем текст одним токеном, чтобы не потерять данные
@@ -331,7 +338,7 @@ final class Tokenizer
         // Заменяем все неразрывные дефисы на обычные
         $input = str_replace([HtmlEntityHelper::decodeEntity('&#8209;')], '-', $input);
 
-        $input = Helpers\HtmlHelper::replaceNewlinesInTags($input);
+        $input = HtmlHelper::replaceNewlinesInTags($input, $this->newlineMarker);
 
         // Приводим все CR|LF к \n
         $input = preg_replace('/\r\n|\r/', "\n", $input);
@@ -380,9 +387,9 @@ final class Tokenizer
 
         $tokens = [];
 
-        $processedInput = self::normalizeLineWhitespace($input);
+        $processedInput = self::normalizeLineWhitespace($input, $this->newlineMarker);
 
-        $processedInput = HtmlHelper::restoreNewlinesInTags($processedInput, $this->eol);
+        $processedInput = HtmlHelper::restoreNewlinesInTags($processedInput, $this->eol, $this->newlineMarker);
 
         // PHP проверяет корректность UTF-8 всего остатка строки при каждом вызове preg_match с модификатором /u
         // и ненулевым смещением, если строка еще не помечена как валидная. Пометка ставится только после
@@ -503,11 +510,12 @@ final class Tokenizer
      * Строки с многострочным открывающим тегом не изменяются.
      *
      * @param string $line
+     * @param string $newlineMarker Метка переносов строк внутри тегов
      * @return string
      */
-    private static function normalizeLineWhitespace(string $line): string
+    private static function normalizeLineWhitespace(string $line, string $newlineMarker): string
     {
-        if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
+        if (HtmlHelper::isStringContainsMultilineOpeningTag($line, $newlineMarker)) {
             return $line;
         }
 
