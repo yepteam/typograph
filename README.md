@@ -58,9 +58,9 @@ $typograph = new Typograph([
     'entities' => Typograph::ENTITIES_RAW,
     
     // Многоточия
-    // hellip - замена трех точек на символ многоточия
-    // dots - замена символа многоточия на три точки
-    // none - не обрабатывать многоточия
+    // Typograph::ELLIPSIS_HELLIP (hellip) - замена трех точек на символ многоточия
+    // Typograph::ELLIPSIS_DOTS (dots) - замена символа многоточия на три точки
+    // Typograph::ELLIPSIS_NONE (none) - не обрабатывать многоточия
     'ellipsis' => Typograph::ELLIPSIS_HELLIP,
     
     // Массив кавычек по каждому уровню

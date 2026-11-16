@@ -79,4 +79,25 @@ final class OptionTest extends TestCase
         $this->assertEquals($options, $defaultOptions);
     }
 
+    public function testEllipsisOption()
+    {
+        $original = 'Итак... Ну… ладно';
+
+        $expected = [
+            Typograph::ELLIPSIS_HELLIP => 'Итак… Ну… ладно',
+            Typograph::ELLIPSIS_DOTS => 'Итак... Ну... ладно',
+            Typograph::ELLIPSIS_NONE => 'Итак... Ну… ладно',
+        ];
+
+        foreach ($expected as $ellipsis => $result) {
+            $typograph = new Typograph([
+                'entities' => Typograph::ENTITIES_RAW,
+                'nbsp' => [],
+                'ellipsis' => $ellipsis,
+            ]);
+
+            $this->assertSame($result, $typograph->format($original), "ellipsis: $ellipsis");
+        }
+    }
+
 }

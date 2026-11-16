@@ -14,6 +14,7 @@ final class Typograph
 
     public const ELLIPSIS_HELLIP = 'hellip';
     public const ELLIPSIS_DOTS = 'dots';
+    public const ELLIPSIS_NONE = 'none';
 
     private array $metrics = [
         'originalContentLength' => 0,
