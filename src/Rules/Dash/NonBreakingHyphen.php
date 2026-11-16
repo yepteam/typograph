@@ -33,7 +33,7 @@ final class NonBreakingHyphen extends BaseRule
 
             // Дефис может быть частью слова
             if ($tokens[$index]['type'] === 'word' && str_contains($tokens[$index]['value'], '-')) {
-                self::applyToWord($index, $tokens, $max_length);
+                self::applyToWord($index, $tokens, $max_length, $options);
                 return;
             }
 
@@ -83,12 +83,20 @@ final class NonBreakingHyphen extends BaseRule
         $tokens[$index] = [
             'type' => 'nbhy',
             'value' => HtmlEntityHelper::decodeEntity('&#8209;'),
-            'rule' => __CLASS__ . ':' . __LINE__,
         ];
         !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
     }
 
-    public static function applyToWord(int $index, array &$tokens, int $max_length): void
+    /**
+     * Замена дефиса внутри слова на неразрывный, если одна из частей слова короткая
+     *
+     * @param int $index Индекс токена
+     * @param array $tokens Массив всех токенов
+     * @param int $max_length Максимальная длина короткой части слова
+     * @param array $options Массив настроек типографа
+     * @return void
+     */
+    public static function applyToWord(int $index, array &$tokens, int $max_length, array $options = []): void
     {
         $hyphen_count = substr_count($tokens[$index]['value'], '-');
 

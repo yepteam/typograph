@@ -14,14 +14,14 @@ final class ReplaceTimes extends BaseRule
 
     public static function apply(int $index, array &$tokens, array $options): void
     {
-        self::handleConcatenatedCase($index, $tokens);
-        self::handleSpacedCase($index, $tokens);
+        self::handleConcatenatedCase($index, $tokens, $options);
+        self::handleSpacedCase($index, $tokens, $options);
     }
 
     /**
      * Обрабатывает слитные случаи: "150x200", "10.5x5,5x100".
      */
-    private static function handleConcatenatedCase(int $index, array &$tokens): void
+    private static function handleConcatenatedCase(int $index, array &$tokens, array $options): void
     {
         $currentToken = $tokens[$index] ?? null;
         $prevToken = $tokens[$index - 1] ?? null;
@@ -56,7 +56,7 @@ final class ReplaceTimes extends BaseRule
         if (!empty($resultSuffix)) {
             $tokens[$index - 1]['value'] .= $resultSuffix;
             $tokens[$index - 1]['type'] = 'word'; // Это уже не чистое число
-            $tokens[$index - 1]['rule'] = __CLASS__ . ':' . __LINE__;
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$index - 1], __CLASS__ . ':' . __LINE__);
 
             $tokens[$index]['type'] = 'empty';
             $tokens[$index]['value'] = '';
@@ -67,7 +67,7 @@ final class ReplaceTimes extends BaseRule
     /**
      * Обрабатывает раздельные случаи: "2 x 2", "10.5 x 5.5", "10 x 20 x 30".
      */
-    private static function handleSpacedCase(int $index, array &$tokens): void
+    private static function handleSpacedCase(int $index, array &$tokens, array $options): void
     {
         $currentToken = $tokens[$index] ?? null;
 

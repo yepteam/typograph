@@ -127,4 +127,66 @@ final class BaseTest extends TestCase
         $this->assertStringNotContainsString("ShortWord", $nbsp_rules);
     }
 
+    /**
+     * Имена правил, записанные в отладочную информацию токенов
+     */
+    private static function collectLoggedRules(array $tokens): string
+    {
+        $rules = [];
+        foreach ($tokens as $token) {
+            foreach (array_keys($token['rules'] ?? []) as $rule) {
+                $rules[] = $rule;
+            }
+        }
+
+        return implode("\n", $rules);
+    }
+
+    public function testDebugLogsTimesRule()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED, 'debug' => true]);
+
+        $typograph->format('2 x 2');
+        $this->assertStringContainsString('ReplaceTimes', self::collectLoggedRules($typograph->getTokens()));
+
+        $typograph->format('10x20');
+        $this->assertStringContainsString('ReplaceTimes', self::collectLoggedRules($typograph->getTokens()));
+    }
+
+    public function testDebugLogsNonBreakingHyphenInWordRule()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED, 'debug' => true]);
+
+        $typograph->format('из-за');
+        $this->assertStringContainsString('NonBreakingHyphen', self::collectLoggedRules($typograph->getTokens()));
+    }
+
+    public function testDebugLogsNumberRule()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED, 'debug' => true]);
+
+        $typograph->format('Дом № 5');
+        $this->assertStringContainsString('Nbsp\Number', self::collectLoggedRules($typograph->getTokens()));
+    }
+
+    public function testNoDebugKeysWithoutDebug()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_NAMED, 'debug' => false]);
+
+        $texts = [
+            'Он сказал "привет "мир"" и ушёл',
+            '2 x 2 и 10x20',
+            'из-за 5-й раз',
+            'Дом № 5, 10 000 руб., XIV век',
+        ];
+
+        foreach ($texts as $text) {
+            $typograph->format($text);
+            foreach ($typograph->getTokens() as $token) {
+                $extraKeys = array_diff(array_keys($token), ['type', 'value', 'name']);
+                $this->assertSame([], array_values($extraKeys), "text: $text");
+            }
+        }
+    }
+
 }

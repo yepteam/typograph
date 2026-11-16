@@ -68,8 +68,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -85,8 +85,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
         }
@@ -115,8 +115,8 @@ final class Number extends BaseRule
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
                         'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                        'rule' => __CLASS__ . ':' . __LINE__,
                     ];
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                     return;
                 }
 
@@ -125,8 +125,8 @@ final class Number extends BaseRule
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
                         'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                        'rule' => __CLASS__ . ':' . __LINE__,
                     ];
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                     return;
                 }
             }
@@ -162,8 +162,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -177,8 +177,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
         }
@@ -197,8 +197,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
         }
 
         // Перед числом число до 3 знаков?
@@ -216,8 +216,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
         }
 
         !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__, false);
@@ -330,8 +330,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             }
 
             // Перед числом токен char?
@@ -340,8 +340,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -358,8 +358,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -368,8 +368,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -392,8 +392,8 @@ final class Number extends BaseRule
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
                         'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                        'rule' => __CLASS__ . ':' . __LINE__,
                     ];
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 }
                 return;
             }
@@ -406,8 +406,8 @@ final class Number extends BaseRule
                     $tokens[$space_index] = [
                         'type' => 'nbsp',
                         'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                        'rule' => __CLASS__ . ':' . __LINE__,
                     ];
+                    !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 }
                 return;
             }
@@ -420,8 +420,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -431,8 +431,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             }
         }
 
@@ -443,8 +443,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -459,8 +459,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -470,8 +470,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -481,8 +481,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
                 return;
             }
 
@@ -492,8 +492,8 @@ final class Number extends BaseRule
                 $tokens[$space_index] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':' . __LINE__,
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             }
 
             // После текста нет точки
@@ -511,8 +511,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -522,8 +522,8 @@ final class Number extends BaseRule
             $tokens[$space_index] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_index], __CLASS__ . ':' . __LINE__);
             return;
         }
 
@@ -545,8 +545,8 @@ final class Number extends BaseRule
                 $tokens[$space_before] = [
                     'type' => 'nbsp',
                     'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                    'rule' => __CLASS__ . ':roman-before',
                 ];
+                !empty($options['debug']) && TokenHelper::logRule($tokens[$space_before], __CLASS__ . ':roman-before');
             }
         }
 
@@ -580,8 +580,8 @@ final class Number extends BaseRule
             $tokens[$space_after] = [
                 'type' => 'nbsp',
                 'value' => HtmlEntityHelper::decodeEntity('&nbsp;'),
-                'rule' => __CLASS__ . ':' . __LINE__,
             ];
+            !empty($options['debug']) && TokenHelper::logRule($tokens[$space_after], __CLASS__ . ':' . __LINE__);
         }
     }
 

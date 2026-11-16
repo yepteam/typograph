@@ -75,7 +75,9 @@ final class ReplaceQuotes extends BaseRule
 
         // Является ли текущая кавычка открывающей
         $isOpeningQuote = self::isOpeningQuote($tokens, $index);
-        $tokens[$index]['isOpeningQuote'] = $isOpeningQuote;
+        if (!empty($options['debug'])) {
+            $tokens[$index]['isOpeningQuote'] = $isOpeningQuote;
+        }
 
         // Для открывающей кавычки ищем соответствующую закрывающую
         if ($isOpeningQuote) {
@@ -86,7 +88,9 @@ final class ReplaceQuotes extends BaseRule
                 // Заменяем символ кавычки для этого уровня
                 $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
                 // Указываем уровень кавычки для отладки
-                $tokens[$index]['level'] = self::$quoteLevel;
+                if (!empty($options['debug'])) {
+                    $tokens[$index]['level'] = self::$quoteLevel;
+                }
                 !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
                 // Выходим, не меняя уровень вложенности
                 return;
@@ -99,7 +103,9 @@ final class ReplaceQuotes extends BaseRule
             // Заменяем символ кавычки для этого уровня
             $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
-            $tokens[$index]['level'] = self::$quoteLevel;
+            if (!empty($options['debug'])) {
+                $tokens[$index]['level'] = self::$quoteLevel;
+            }
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         } else {
             // Проверяем, есть ли соответствующая открывающая кавычка
@@ -114,7 +120,9 @@ final class ReplaceQuotes extends BaseRule
             // Заменяем символ кавычки для текущего уровня
             $tokens[$index]['value'] = self::getClosingQuote(self::$quoteLevel);
             // Указываем уровень кавычки для отладки
-            $tokens[$index]['level'] = self::$quoteLevel;
+            if (!empty($options['debug'])) {
+                $tokens[$index]['level'] = self::$quoteLevel;
+            }
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             // Отмечаем, что кавычка на этом уровне закрыта
             self::$isQuoteOpenArr[self::$quoteLevel] = false;
@@ -122,7 +130,9 @@ final class ReplaceQuotes extends BaseRule
             self::$quoteLevel = max(-1, self::$quoteLevel - 1);
         }
 
-        $tokens[$index]['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
+        if (!empty($options['debug'])) {
+            $tokens[$index]['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
+        }
     }
 
     /**
