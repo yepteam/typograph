@@ -104,7 +104,7 @@ final class Tokenizer
         [
             'type' => 'reg',
             'name' => 'reg',
-            'pattern' => '/\([R|r]\)/',
+            'pattern' => '/\([Rr]\)/',
         ],
         [
             'type' => 'trade',

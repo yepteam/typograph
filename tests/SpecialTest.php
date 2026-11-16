@@ -93,6 +93,17 @@ final class SpecialTest extends TestCase
         $this->assertSame('My Product ®', $typographRaw->format('My Product (r)'));
     }
 
+    public function testPipeInParenthesesIsNotRegMark()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
+
+        $this->assertSame('(|)', $typograph->format('(|)'));
+        $this->assertSame('Выбор (|) вариант', $typograph->format('Выбор (|) вариант'));
+    }
+
     public function testReplaceTimes()
     {
         $typograph = new Typograph([
