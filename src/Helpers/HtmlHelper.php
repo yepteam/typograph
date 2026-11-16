@@ -73,9 +73,10 @@ final class HtmlHelper
      * Восстанавливает переносы строк из временных меток
      *
      * @param string $html
+     * @param string $eol Перевод строки, которым заменяются временные метки
      * @return array|string
      */
-    public static function restoreNewlinesInTags(string $html): array|string
+    public static function restoreNewlinesInTags(string $html, string $eol = "\n"): array|string
     {
         // Восстанавливаем переносы строк в специальных тегах
         $html = preg_replace_callback(
@@ -91,7 +92,7 @@ final class HtmlHelper
         );
 
         // Восстанавливаем атрибуты data-typograph-new-line в обычных тегах
-        return str_replace(' data-typograph-new-line ', PHP_EOL, $html);
+        return str_replace(' data-typograph-new-line ', $eol, $html);
     }
 
 }

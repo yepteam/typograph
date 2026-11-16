@@ -69,12 +69,12 @@ final class Tokenizer
         [
             'type' => 'url',
             'name' => 'url',
-            'pattern' => '#^(https?://|www\.)[^\s<>"\']+#i',
+            'pattern' => '#(https?://|www\.)[^\s<>"\']+#i',
         ],
         [
             'type' => 'email',
             'name' => 'email',
-            'pattern' => '/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i',
+            'pattern' => '/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i',
         ],
         [
             'type' => 'guid',
@@ -84,7 +84,7 @@ final class Tokenizer
         [
             'type' => 'initial',
             'name' => 'initial',
-            'pattern' => '/(?<=^|[(])\s*\K\p{Lu}\./u',
+            'pattern' => '/\s*\K\p{Lu}\./u',
         ],
         [
             'type' => 'double-hyphen',
@@ -114,7 +114,7 @@ final class Tokenizer
         [
             'type' => 'word',
             'name' => 'word',
-            'pattern' => '/\b[\p{L}\p{M}\p{Nd}\'‘’ʼ]+(?:-(?!\d)[\p{L}\p{M}\p{Nd}\'‘’ʼ]+)*\b/u',
+            'pattern' => '/(?=\w)[\p{L}\p{M}\p{Nd}\'‘’ʼ]+(?:-(?!\d)[\p{L}\p{M}\p{Nd}\'‘’ʼ]+)*\b/u',
         ],
         [
             'type' => 'new-line',
@@ -263,7 +263,25 @@ final class Tokenizer
         ],
     ];
 
+    /**
+     * @var array<string, string> Содержимое специальных тегов, замененных временными метками
+     */
     private array $specialTags = [];
+
+    /**
+     * @var string Уникальный префикс временных меток специальных тегов (свой для каждого вызова tokenize)
+     */
+    private string $placeholderPrefix = '';
+
+    /**
+     * @var string Перевод строки, используемый во входном тексте (сохраняется в результате)
+     */
+    private string $eol = "\n";
+
+    /**
+     * @var array|null Шаблоны TOKEN_PATTERNS, привязанные к текущей позиции (модификатор A)
+     */
+    private static ?array $anchoredPatterns = null;
 
     /**
      * Разбивает текст на токены с учетом переносов строк
@@ -279,7 +297,30 @@ final class Tokenizer
 
         $tokenizationStart = microtime(true);
 
+        // Состояние предыдущего вызова не должно влиять на текущий
+        $this->specialTags = [];
+        $this->placeholderPrefix = 'TYPOGRAPH_TAG_' . bin2hex(random_bytes(8));
+
+        // Регулярные выражения с модификатором /u не работают с невалидным UTF-8:
+        // возвращаем текст одним токеном, чтобы не потерять данные
+        if (!mb_check_encoding($input, 'UTF-8')) {
+            $this->metrics['countOfLines'] = 1;
+            $this->metrics['countOfTokens'] = 1;
+            $this->metrics['tokenizationTime'] = microtime(true) - $tokenizationStart;
+
+            return [
+                [
+                    'type' => 'char',
+                    'name' => 'invalid-utf8',
+                    'value' => $input,
+                ],
+            ];
+        }
+
         $input = trim($input, " \n\r\v\0");
+
+        // Запоминаем стиль переводов строк входного текста
+        $this->eol = preg_match('/\r\n|\r|\n/', $input, $eolMatches) ? $eolMatches[0] : "\n";
 
         // Сначала выделяем специальные теги (script, style, pre) с их содержимым
         $input = $this->preserveSpecialTags($input);
@@ -310,7 +351,7 @@ final class Tokenizer
         for ($i = 1; $i < count($lines); $i++) {
             $all_tokens[] = [
                 'type' => 'new-line',
-                'value' => PHP_EOL,
+                'value' => $this->eol,
             ];
             $tokens = self::tokenizeLine($lines[$i]);
             foreach ($tokens as $token) {
@@ -339,45 +380,36 @@ final class Tokenizer
 
         $tokens = [];
 
-        $lines = explode('\n', $input);
+        $processedInput = self::normalizeLineWhitespace($input);
 
-        $lines = array_map(function ($line) {
-            if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
-                return $line;
-            }
+        $processedInput = HtmlHelper::restoreNewlinesInTags($processedInput, $this->eol);
 
-            // Сохраняем табуляции только в начале строки
-            $leadingTabs = '';
-            $restOfLine = $line;
+        // PHP проверяет корректность UTF-8 всего остатка строки при каждом вызове preg_match с модификатором /u
+        // и ненулевым смещением, если строка еще не помечена как валидная. Пометка ставится только после
+        // /u-проверки с нулевого смещения — делаем ее сразу, иначе токенизация длинной строки становится квадратичной.
+        preg_match('//u', $processedInput);
 
-            // Выделяем ведущие табуляции
-            if (preg_match('/^(\t+)(.*)/u', $line, $matches)) {
-                $leadingTabs = $matches[1];
-                $restOfLine = trim($matches[2]);
-            }
+        $placeholderPattern = $this->placeholderPrefix !== ''
+            ? '/\[' . preg_quote($this->placeholderPrefix, '/') . ':(\w+):(\d+)]/A'
+            : null;
 
-            // Заменяем все пробелы и табуляции в оставшейся части на один пробел
-            $restOfLine = preg_replace('/[\s\t]+/u', ' ', trim($restOfLine));
-
-            return $leadingTabs . $restOfLine;
-        }, $lines);
-
-        $processedInput = implode(PHP_EOL, $lines);
-
-        $processedInput = HtmlHelper::restoreNewlinesInTags($processedInput);
-
+        // Смещение в байтах: шаблоны применяются с привязкой к текущей позиции,
+        // без копирования остатка строки, поэтому время работы линейно от длины строки
         $offset = 0;
-        $length = mb_strlen($processedInput, 'UTF-8');
+        $length = strlen($processedInput);
 
         while ($offset < $length) {
             $foundToken = null;
-            $substr = mb_substr($processedInput, $offset, null, 'UTF-8');
+            $consumedLength = 0;
 
             // Проверяем, не начинается ли подстрока с сохраненного специального тега
-            if (str_contains($substr, 'SPECIAL_TAG') && preg_match('/^\[SPECIAL_TAG:(\w+):(\d+)]/', $substr,
-                    $tagMatches)) {
+            if (
+                $placeholderPattern !== null &&
+                $processedInput[$offset] === '[' &&
+                preg_match($placeholderPattern, $processedInput, $tagMatches, 0, $offset)
+            ) {
                 $tagType = $tagMatches[1];
-                $tagId = $tagMatches[2];
+                $tagId = (int)$tagMatches[2];
                 $tagContent = $this->restoreSpecialTag($tagType, $tagId);
 
                 $tokens[] = [
@@ -386,22 +418,36 @@ final class Tokenizer
                     'value' => $tagContent,
                 ];
 
-                $offset += mb_strlen($tagMatches[0], 'UTF-8');
+                $offset += strlen($tagMatches[0]);
                 continue;
             }
 
             // Обычная обработка токенов
-            foreach (self::TOKEN_PATTERNS as $pattern) {
-                if (!preg_match($pattern['pattern'], $substr, $matches, PREG_OFFSET_CAPTURE)) {
+            foreach (self::getAnchoredPatterns() as $pattern) {
+                if (!preg_match($pattern['pattern'], $processedInput, $matches, PREG_OFFSET_CAPTURE, $offset)) {
                     continue;
                 }
 
-                // Проверяем, что совпадение найдено в начале строки
-                if ($matches[0][1] != 0) {
+                // Проверяем, что совпадение начинается с текущей позиции (\K может сдвинуть начало)
+                if ($matches[0][1] !== $offset || $matches[0][0] === '') {
                     continue;
                 }
 
                 $tokenValue = $matches[0][0];
+                $consumedLength = strlen($tokenValue);
+
+                // Совпадение захватило временную метку специального тега (например, URL вплотную к <pre>)
+                $placeholderStart = '[' . $this->placeholderPrefix . ':';
+                if ($this->specialTags && str_contains($tokenValue, $placeholderStart)) {
+                    if ($pattern['type'] === 'tag') {
+                        // Внутри тега или шорткода — восстанавливаем исходное содержимое
+                        $tokenValue = $this->restorePlaceholders($tokenValue);
+                    } else {
+                        // Обычный токен заканчивается перед меткой, метка станет отдельным токеном
+                        $tokenValue = substr($tokenValue, 0, strpos($tokenValue, $placeholderStart));
+                        $consumedLength = strlen($tokenValue);
+                    }
+                }
 
                 // Для тегов извлекаем название тега
                 if ($pattern['type'] === 'tag' && $pattern['name'] !== 'shortcode') {
@@ -434,20 +480,69 @@ final class Tokenizer
             // Если токен найден
             if ($foundToken) {
                 $tokens[] = $foundToken;
-                $offset += mb_strlen($foundToken['value'], 'UTF-8');
+                $offset += $consumedLength;
                 continue;
             }
 
-            // Токен не найден — сохраняем как одиночный символ
-            $char = mb_substr($processedInput, $offset, 1, 'UTF-8');
+            // Токен не найден — сохраняем как одиночный символ (или байт, если UTF-8 невалиден)
+            $char = preg_match('/./suA', $processedInput, $charMatches, 0, $offset)
+                ? $charMatches[0]
+                : $processedInput[$offset];
             $tokens[] = [
                 'type' => 'char',
                 'value' => $char
             ];
-            $offset++;
+            $offset += strlen($char);
         }
 
         return $tokens;
+    }
+
+    /**
+     * Схлопывает пробельные символы строки, сохраняя ведущие табуляции.
+     * Строки с многострочным открывающим тегом не изменяются.
+     *
+     * @param string $line
+     * @return string
+     */
+    private static function normalizeLineWhitespace(string $line): string
+    {
+        if (HtmlHelper::isStringContainsMultilineOpeningTag($line)) {
+            return $line;
+        }
+
+        // Сохраняем табуляции только в начале строки
+        $leadingTabs = '';
+        $restOfLine = $line;
+
+        // Выделяем ведущие табуляции
+        if (preg_match('/^(\t+)(.*)/us', $line, $matches)) {
+            $leadingTabs = $matches[1];
+            $restOfLine = $matches[2];
+        }
+
+        // Заменяем все пробелы и табуляции в оставшейся части на один пробел
+        $restOfLine = trim($restOfLine);
+        $restOfLine = preg_replace('/[\s\t]+/u', ' ', $restOfLine) ?? $restOfLine;
+
+        return $leadingTabs . $restOfLine;
+    }
+
+    /**
+     * Возвращает шаблоны токенов, привязанные к позиции начала поиска (модификатор A).
+     *
+     * @return array[]
+     */
+    private static function getAnchoredPatterns(): array
+    {
+        if (self::$anchoredPatterns === null) {
+            self::$anchoredPatterns = array_map(function (array $pattern) {
+                $pattern['pattern'] .= 'A';
+                return $pattern;
+            }, self::TOKEN_PATTERNS);
+        }
+
+        return self::$anchoredPatterns;
     }
 
     /**
@@ -483,14 +578,12 @@ final class Tokenizer
             return $input;
         }
 
-        $this->specialTags = [];
-
         // Вспомогательная функция для создания временной метки
         $createPlaceholder = function (array $matches, string $tagType): string {
             $id = count($this->specialTags);
             $placeholder = $tagType . ":" . $id;
             $this->specialTags[$placeholder] = $matches[0];
-            return "[SPECIAL_TAG:{$placeholder}]";
+            return "[{$this->placeholderPrefix}:{$placeholder}]";
         };
 
         $patternsAndCallbacks = [
@@ -528,6 +621,21 @@ final class Tokenizer
     {
         $key = "$tagType:$tagId";
         return $this->specialTags[$key] ?? '';
+    }
+
+    /**
+     * Восстанавливает все временные метки специальных тегов внутри строки
+     *
+     * @param string $value
+     * @return string
+     */
+    private function restorePlaceholders(string $value): string
+    {
+        return preg_replace_callback(
+            '/\[' . preg_quote($this->placeholderPrefix, '/') . ':(\w+):(\d+)]/',
+            fn(array $m) => $this->restoreSpecialTag($m[1], (int)$m[2]),
+            $value
+        ) ?? $value;
     }
 
     /**

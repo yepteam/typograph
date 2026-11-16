@@ -297,6 +297,12 @@ final class Typograph
             return $text;
         }
 
+        // Не форматировать текст в невалидной кодировке (регулярные выражения с /u на нем не работают)
+        if (!mb_check_encoding($text, 'UTF-8')) {
+            $this->metrics['resultContentLength'] = $this->metrics['originalContentLength'];
+            return $text;
+        }
+
         // Не форматировать сериализованные строки
         if (preg_match('/^[abdisON]:(.*);/', $text)) {
             return $text;
