@@ -1,4 +1,4 @@
-name: PHP Composer
+name: Tests
 
 on:
   push:
@@ -10,27 +10,46 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  tests:
+    name: PHP ${{ matrix.php }}
 
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.1', '8.2', '8.3', '8.4', '8.5' ]
 
-    - name: Validate composer.json and composer.lock
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: mbstring
+        coverage: none
+        tools: composer:v2
+
+    - name: Validate composer.json
       run: composer validate --strict
 
-    - name: Cache Composer packages
+    # composer.lock не хранится в репозитории (библиотека), поэтому кэшируется
+    # не vendor, а загрузки Composer: зависимости каждый раз разрешаются заново
+    - name: Get Composer cache directory
       id: composer-cache
-      uses: actions/cache@v3
+      run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Composer downloads
+      uses: actions/cache@v6
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-php-
+          ${{ runner.os }}-composer-php${{ matrix.php }}-
 
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      run: composer update --prefer-dist --no-progress --no-interaction
 
     - name: Run test suite
-      run: composer run-script test
+      run: composer test
