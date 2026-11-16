@@ -304,7 +304,8 @@ final class Typograph
         }
 
         // Не форматировать сериализованные строки
-        if (preg_match('/^[abdisON]:(.*);/', $text)) {
+        if (self::isSerialized($text)) {
+            $this->metrics['resultContentLength'] = $this->metrics['originalContentLength'];
             return $text;
         }
 
@@ -362,6 +363,39 @@ final class Typograph
         $this->metrics['memoryUsage'] = memory_get_usage() - $memory;
 
         return $text;
+    }
+
+    /**
+     * Грамматика значения в формате serialize().
+     * Длины строк не сверяются: их часто указывают в символах вместо байтов.
+     */
+    private const SERIALIZED_PATTERN = '/^(?<value>
+          N;
+        | b:[01];
+        | i:[+-]?\d+;
+        | d:(?:[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|NAN|-?INF);
+        | [sS]:\d+:".*?";
+        | E:\d+:".*?";
+        | [rR]:\d+;
+        | a:\d+:\{(?:(?&value)(?&value))*\}
+        | O:\d+:"[^"]*":\d+:\{(?:(?&value)(?&value))*\}
+        | C:\d+:"[^"]*":\d+:\{.*\}
+    )\z/sx';
+
+    /**
+     * Является ли текст целиком сериализованным значением
+     *
+     * @param string $text
+     * @return bool
+     */
+    private static function isSerialized(string $text): bool
+    {
+        // Сериализованное значение всегда заканчивается на ";" или "}"
+        if (!str_ends_with($text, ';') && !str_ends_with($text, '}')) {
+            return false;
+        }
+
+        return preg_match(self::SERIALIZED_PATTERN, $text) === 1;
     }
 
     /**

@@ -62,6 +62,43 @@ final class BaseTest extends TestCase
         $this->assertSame($str, $typograph->format($str));
     }
 
+    public function testSerializedValuesAreNotFormatted()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
+        $object = new stdClass();
+        $object->title = 'Он сказал "привет" - и ушёл...';
+
+        $values = [
+            serialize(['text' => 'Он сказал "привет" - и ушёл', 'n' => 1.5, 'ok' => true, 'none' => null]),
+            serialize(['nested' => ['a' => 'x - y; z', 'b' => [1, 2, 3]]]),
+            serialize($object),
+            serialize("строка с\nпереводом строки - и \"кавычками\""),
+            serialize(false),
+            serialize(42),
+            serialize(-0.5),
+        ];
+
+        foreach ($values as $str) {
+            $this->assertSame($str, $typograph->format($str));
+        }
+    }
+
+    public function testTextLikeSerializedPrefixIsFormatted()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_RAW,
+            'nbsp' => [],
+        ]);
+
+        $this->assertSame('a: «Цитата» — это; тест', $typograph->format('a: "Цитата" - это; тест'));
+        $this->assertSame('s: он сказал «привет» — и ушёл; потом', $typograph->format('s: он сказал "привет" - и ушёл; потом'));
+        $this->assertSame('O: заметка; «текст»', $typograph->format('O: заметка; "текст"'));
+        $this->assertSame('i:5; «текст»', $typograph->format('i:5; "текст"'));
+    }
+
     public function testDebugTrue()
     {
         $typograph = new Typograph([
