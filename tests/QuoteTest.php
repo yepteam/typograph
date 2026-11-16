@@ -266,4 +266,49 @@ EOF
         $this->assertSame($expectedRaw, $typographRaw->format($original));
     }
 
+    // ─────────────────────────────────────────────
+    // Состояние правила кавычек не разделяется между экземплярами
+    // ─────────────────────────────────────────────
+
+    /**
+     * Применяет правило кавычек напрямую, как это делает Typograph
+     */
+    private static function applyQuotesRule(string $text, array $options): string
+    {
+        $tokens = (new \Yepteam\Typograph\Tokenizer())->tokenize($text);
+        foreach (array_keys($tokens) as $index) {
+            \Yepteam\Typograph\Rules\Quotes\ReplaceQuotes::apply($index, $tokens, $options);
+        }
+
+        return implode('', array_column($tokens, 'value'));
+    }
+
+    public function testQuoteRuleUsesQuoteMarksFromOptions()
+    {
+        // Другой экземпляр с другими кавычками не влияет на правило
+        (new Typograph(['entities' => Typograph::ENTITIES_RAW, 'quotes' => [['«', '»']]]))->format('"x"');
+
+        $this->assertSame('„x“', self::applyQuotesRule('"x"', ['quotes' => [['„', '“']]]));
+    }
+
+    public function testQuoteRuleIgnoresQuoteLevelOfPreviousRun()
+    {
+        $quotes = [['«', '»'], ['„', '“']];
+
+        // Непарные кавычки оставляют незакрытый уровень вложенности
+        (new Typograph(['entities' => Typograph::ENTITIES_RAW, 'quotes' => $quotes]))->format('""""');
+
+        $this->assertSame('«x»', self::applyQuotesRule('"x"', ['quotes' => $quotes]));
+    }
+
+    public function testInstancesWithDifferentQuotesDoNotAffectEachOther()
+    {
+        $guillemets = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'quotes' => [['«', '»'], ['„', '“']], 'nbsp' => []]);
+        $english = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'quotes' => [['“', '”'], ['‘', '’']], 'nbsp' => []]);
+
+        $this->assertSame('«a „b“ c»', $guillemets->format('"a "b" c"'));
+        $this->assertSame('“a ‘b’ c”', $english->format('"a "b" c"'));
+        $this->assertSame('«a „b“ c»', $guillemets->format('"a "b" c"'));
+    }
+
 }

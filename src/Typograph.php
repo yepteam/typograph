@@ -310,19 +310,12 @@ final class Typograph
 
         $processingStart = microtime(true);
 
-        // Если обработка кавычек включена
-        if (!empty($this->options['quotes'])) {
-
-            // Установка массива кавычек
-            Quotes\ReplaceQuotes::setQuoteMarks($this->options['quotes'] ?? []);
-
-            // Сброс счетчиков состояния кавычек
-            Quotes\ReplaceQuotes::resetQuoteLevels();
-        }
-
         $tokens_count = count($this->tokens);
 
         $options = $this->getOptions();
+
+        // Состояние расстановки кавычек: свое для каждого вызова, не разделяется между экземплярами
+        $options[Quotes\ReplaceQuotes::STATE_OPTION] = new Quotes\QuotesState();
 
         for ($index = 0; $index < $tokens_count; $index++) {
             $tokenType = $this->tokens[$index]['type'] ?? null;

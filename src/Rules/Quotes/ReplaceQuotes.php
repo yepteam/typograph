@@ -12,51 +12,39 @@ use Yepteam\Typograph\Rules\BaseRule;
 final class ReplaceQuotes extends BaseRule
 {
     /**
-     * @var int Текущий уровень кавычек
+     * Ключ опций, в котором передается состояние расстановки кавычек (QuotesState).
+     * Typograph создает новое состояние для каждого вызова format().
+     * Без него каждый вызов apply() начинает с нулевого уровня вложенности.
      */
-    private static int $quoteLevel = -1;
+    public const STATE_OPTION = 'quotes-state';
 
     /**
-     * @var bool[] Массив с флагами открытости/закрытости кавычек на уровнях.
-     * True - кавычка на уровне с этим индексом открыта
-     * False - кавычка на уровне с этим индексом закрыта
-     */
-    private static array $isQuoteOpenArr = [];
-
-    /**
-     * Массив для хранения кавычек по уровням вложенности.
-     * Каждый элемент - массив из двух строк (открывающая и закрывающая кавычки)
-     * @var array<array{array{string, string}}>
-     */
-    private static array $quoteMarks = [];
-
-    /**
-     * Сброс счетчиков состояния кавычек
+     * @deprecated Состояние больше не хранится в классе: Typograph передает его через опцию STATE_OPTION
      */
     public static function resetQuoteLevels(): void
     {
-        self::$quoteLevel = -1;
-        self::$isQuoteOpenArr = [];
     }
 
     /**
-     * Установка массива кавычек
+     * @deprecated Кавычки берутся из опции quotes, переданной в apply()
      * @param array|false|null $quoteMarks
      * @return void
      */
     public static function setQuoteMarks(array|false|null $quoteMarks): void
     {
-        if (empty($quoteMarks)) {
-            self::$quoteMarks = [];
-        } else {
-            self::$quoteMarks = $quoteMarks;
-        }
     }
 
     public static function apply(int $index, array &$tokens, array $options): void
     {
+        /**
+         * Кавычки по уровням вложенности.
+         * Каждый элемент - массив из двух строк (открывающая и закрывающая кавычки)
+         * @var array<array{string, string}> $quoteMarks
+         */
+        $quoteMarks = $options['quotes'] ?? [];
+
         // Не обрабатывать кавычки при пустом массиве
-        if (empty(self::$quoteMarks)) {
+        if (empty($quoteMarks) || !is_array($quoteMarks)) {
             return;
         }
 
@@ -65,8 +53,13 @@ final class ReplaceQuotes extends BaseRule
             return;
         }
 
+        $state = $options[self::STATE_OPTION] ?? null;
+        if (!$state instanceof QuotesState) {
+            $state = new QuotesState();
+        }
+
         // Нужно ли заменить кавычку на Prime
-        if (self::shouldBeReplacedWithPrime($tokens, $index)) {
+        if (self::shouldBeReplacedWithPrime($tokens, $index, $quoteMarks)) {
             $tokens[$index]['type'] = 'Prime'; // &Prime;
             $tokens[$index]['value'] = '″'; // &Prime;
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
@@ -74,22 +67,22 @@ final class ReplaceQuotes extends BaseRule
         }
 
         // Является ли текущая кавычка открывающей
-        $isOpeningQuote = self::isOpeningQuote($tokens, $index);
+        $isOpeningQuote = self::isOpeningQuote($tokens, $index, $quoteMarks);
         if (!empty($options['debug'])) {
             $tokens[$index]['isOpeningQuote'] = $isOpeningQuote;
         }
 
         // Для открывающей кавычки ищем соответствующую закрывающую
         if ($isOpeningQuote) {
-            $closingIndex = self::findMatchingClosingQuote($tokens, $index);
+            $closingIndex = self::findMatchingClosingQuote($tokens, $index, $quoteMarks);
 
             // Не нашли закрывающую кавычку?
             if ($closingIndex === null) {
                 // Заменяем символ кавычки для этого уровня
-                $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
+                $tokens[$index]['value'] = self::getOpeningQuote($quoteMarks, $state->level);
                 // Указываем уровень кавычки для отладки
                 if (!empty($options['debug'])) {
-                    $tokens[$index]['level'] = self::$quoteLevel;
+                    $tokens[$index]['level'] = $state->level;
                 }
                 !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
                 // Выходим, не меняя уровень вложенности
@@ -97,19 +90,19 @@ final class ReplaceQuotes extends BaseRule
             }
 
             // Повышаем уровень кавычек
-            self::$quoteLevel++;
+            $state->level++;
             // Отмечаем, что кавычка на этом уровне открыта
-            self::$isQuoteOpenArr[self::$quoteLevel] = true;
+            $state->isOpen[$state->level] = true;
             // Заменяем символ кавычки для этого уровня
-            $tokens[$index]['value'] = self::getOpeningQuote(self::$quoteLevel);
+            $tokens[$index]['value'] = self::getOpeningQuote($quoteMarks, $state->level);
             // Указываем уровень кавычки для отладки
             if (!empty($options['debug'])) {
-                $tokens[$index]['level'] = self::$quoteLevel;
+                $tokens[$index]['level'] = $state->level;
             }
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
         } else {
             // Проверяем, есть ли соответствующая открывающая кавычка
-            $openingIndex = self::findMatchingOpeningQuote($tokens, $index);
+            $openingIndex = self::findMatchingOpeningQuote($tokens, $index, $quoteMarks);
 
             // Не нашли открывающую кавычку — оставляем как есть
             if ($openingIndex === null) {
@@ -118,20 +111,20 @@ final class ReplaceQuotes extends BaseRule
             }
 
             // Заменяем символ кавычки для текущего уровня
-            $tokens[$index]['value'] = self::getClosingQuote(self::$quoteLevel);
+            $tokens[$index]['value'] = self::getClosingQuote($quoteMarks, $state->level);
             // Указываем уровень кавычки для отладки
             if (!empty($options['debug'])) {
-                $tokens[$index]['level'] = self::$quoteLevel;
+                $tokens[$index]['level'] = $state->level;
             }
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             // Отмечаем, что кавычка на этом уровне закрыта
-            self::$isQuoteOpenArr[self::$quoteLevel] = false;
+            $state->isOpen[$state->level] = false;
             // Понижаем уровень кавычек
-            self::$quoteLevel = max(-1, self::$quoteLevel - 1);
+            $state->level = max(-1, $state->level - 1);
         }
 
         if (!empty($options['debug'])) {
-            $tokens[$index]['$isQuoteOpen'] = json_encode(self::$isQuoteOpenArr);
+            $tokens[$index]['$isQuoteOpen'] = json_encode($state->isOpen);
         }
     }
 
@@ -140,21 +133,22 @@ final class ReplaceQuotes extends BaseRule
      *
      * @param array $tokens Массив всех токенов
      * @param int $index Идентификатор токена в массиве
+     * @param array $quoteMarks Кавычки по уровням вложенности
      * @return bool
      */
-    public static function shouldBeReplacedWithPrime(array $tokens, int $index): bool
+    public static function shouldBeReplacedWithPrime(array $tokens, int $index, array $quoteMarks = []): bool
     {
         if ($tokens[$index]['type'] !== 'quote') {
             return false;
         }
 
-        $isOpeningQuote = self::isOpeningQuote($tokens, $index);
+        $isOpeningQuote = self::isOpeningQuote($tokens, $index, $quoteMarks);
         if ($isOpeningQuote) {
             return false;
         }
 
         // Проверяем, есть ли соответствующая открывающая кавычка
-        $openingIndex = self::findMatchingOpeningQuote($tokens, $index);
+        $openingIndex = self::findMatchingOpeningQuote($tokens, $index, $quoteMarks);
         if ($openingIndex !== null) {
             return false;
         }
@@ -184,12 +178,12 @@ final class ReplaceQuotes extends BaseRule
     /**
      * Находит закрывающую кавычку, соответствующую открывающей на указанной позиции
      */
-    private static function findMatchingClosingQuote(array $tokens, int $openingIndex): ?int
+    private static function findMatchingClosingQuote(array $tokens, int $openingIndex, array $quoteMarks): ?int
     {
         $balance = 1;
         for ($i = $openingIndex + 1; $i < count($tokens); $i++) {
             if ($tokens[$i]['type'] === 'quote') {
-                if (self::isOpeningQuote($tokens, $i)) {
+                if (self::isOpeningQuote($tokens, $i, $quoteMarks)) {
                     $balance++;
                 } else {
                     $balance--;
@@ -205,7 +199,7 @@ final class ReplaceQuotes extends BaseRule
     /**
      * Находит открывающую кавычку, соответствующую закрывающей на указанной позиции
      */
-    private static function findMatchingOpeningQuote(array $tokens, int $closingIndex): ?int
+    private static function findMatchingOpeningQuote(array $tokens, int $closingIndex, array $quoteMarks): ?int
     {
         $balance = 1;
 
@@ -218,7 +212,7 @@ final class ReplaceQuotes extends BaseRule
             }
 
             // Найденная кавычка является открывающей?
-            if (self::isOpeningQuote($tokens, $i)) {
+            if (self::isOpeningQuote($tokens, $i, $quoteMarks)) {
 
                 // Уменьшаем уровень вложенности кавычек
                 $balance--;
@@ -240,7 +234,7 @@ final class ReplaceQuotes extends BaseRule
     /**
      * Определяет, является ли кавычка открывающей
      */
-    private static function isOpeningQuote(array $tokens, int $index): bool
+    private static function isOpeningQuote(array $tokens, int $index, array $quoteMarks): bool
     {
         $prev_index = TokenHelper::findPrevToken($tokens, $index);
 
@@ -282,7 +276,7 @@ final class ReplaceQuotes extends BaseRule
         }
 
         // Перед кавычкой стоит открывающая кавычка?
-        foreach (self::$quoteMarks as $quoteLevel) {
+        foreach ($quoteMarks as $quoteLevel) {
             if (!isset($quoteLevel[0])) {
                 continue;
             }
@@ -309,28 +303,28 @@ final class ReplaceQuotes extends BaseRule
     /**
      * Возвращает открывающую кавычку для текущего уровня вложенности
      */
-    private static function getOpeningQuote(int $level): string
+    private static function getOpeningQuote(array $quoteMarks, int $level): string
     {
         if ($level < 0) {
             $level = 0;
         }
 
-        return self::$quoteMarks[$level][0]
-            ?? self::$quoteMarks[count(self::$quoteMarks) - 1][0]
+        return $quoteMarks[$level][0]
+            ?? $quoteMarks[count($quoteMarks) - 1][0]
             ?? '«';
     }
 
     /**
      * Возвращает закрывающую кавычку для текущего уровня вложенности
      */
-    private static function getClosingQuote(int $level): string
+    private static function getClosingQuote(array $quoteMarks, int $level): string
     {
         if ($level < 0) {
             $level = 0;
         }
 
-        return self::$quoteMarks[$level][1]
-            ?? self::$quoteMarks[count(self::$quoteMarks) - 1][1]
+        return $quoteMarks[$level][1]
+            ?? $quoteMarks[count($quoteMarks) - 1][1]
             ?? '»';
     }
 }
