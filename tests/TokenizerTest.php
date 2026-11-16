@@ -140,4 +140,65 @@ final class TokenizerTest extends TestCase
         $original = "<a\nhref=\"#\">ссылка</a>\nтекст";
         $this->assertSame($original, $this->plain()->format($original));
     }
+    // ─────────────────────────────────────────────
+    // Длинное содержимое специальных тегов не упирается в лимиты PCRE
+    // ─────────────────────────────────────────────
+
+    /**
+     * Выполняет функцию с пониженным лимитом бэктрекинга PCRE:
+     * так длинный по меркам лимита текст остается коротким для теста
+     */
+    private static function withLowBacktrackLimit(callable $fn): mixed
+    {
+        $limit = ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', '10000');
+        try {
+            return $fn();
+        } finally {
+            ini_set('pcre.backtrack_limit', $limit);
+        }
+    }
+
+    public function testLongSpecialTagContentIsPreserved()
+    {
+        $body = str_repeat("a -- \"b\"\n", 6000); // ~50 КБ, больше лимита бэктрекинга
+
+        $cases = [
+            "<pre class=\"x\">{$body}</pre>",
+            "<script>{$body}</script>",
+            "<style>{$body}</style>",
+            "<code>{$body}</code>",
+            "<textarea>{$body}</textarea>",
+            "<!-- {$body} -->",
+            "<?php {$body} ?>",
+        ];
+
+        foreach ($cases as $original) {
+            $result = self::withLowBacktrackLimit(fn() => $this->plain()->format($original));
+
+            // Сравниваем хэши: diff длинных строк строится очень долго
+            $this->assertSame(md5($original), md5($result), substr($original, 0, 15));
+        }
+    }
+
+    public function testLongUnclosedSpecialTagIsFormatted()
+    {
+        $body = str_repeat("a -- b\n", 7000);
+
+        // Начало текста => ожидаемое начало результата
+        $cases = [
+            '<pre class="x">' => '<pre class="x">',
+            '<script>' => '<script>',
+            '<style>' => '<style>',
+            // Без закрывающей ">" это не тег, а текст
+            '<pre class="x" ' => '<pre class=«x» ',
+        ];
+
+        foreach ($cases as $open => $expectedStart) {
+            $result = self::withLowBacktrackLimit(fn() => $this->plain()->format($open . $body));
+
+            $this->assertStringStartsWith($expectedStart, $result);
+            $this->assertStringEndsWith('a — b', $result, $open);
+        }
+    }
 }

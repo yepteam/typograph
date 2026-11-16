@@ -36,7 +36,7 @@ final class HtmlHelper
         }
 
         return preg_replace_callback(
-            '/<([^>]*)>/',
+            '/<([^>]*+)>/',
             function ($matches) use ($marker) {
                 $content = $matches[1];
                 $content = str_replace(["\r\n", "\r", "\n"], ' ' . $marker . ' ', $content);

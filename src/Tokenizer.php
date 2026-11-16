@@ -311,18 +311,10 @@ final class Tokenizer
         // Регулярные выражения с модификатором /u не работают с невалидным UTF-8:
         // возвращаем текст одним токеном, чтобы не потерять данные
         if (!mb_check_encoding($input, 'UTF-8')) {
-            $this->metrics['countOfLines'] = 1;
-            $this->metrics['countOfTokens'] = 1;
-            $this->metrics['tokenizationTime'] = microtime(true) - $tokenizationStart;
-
-            return [
-                [
-                    'type' => 'char',
-                    'name' => 'invalid-utf8',
-                    'value' => $input,
-                ],
-            ];
+            return $this->unprocessedTokens($input, 'invalid-utf8', $tokenizationStart);
         }
+
+        $originalInput = $input;
 
         $input = trim($input, " \n\r\v\0");
 
@@ -330,7 +322,15 @@ final class Tokenizer
         $this->eol = preg_match('/\r\n|\r|\n/', $input, $eolMatches) ? $eolMatches[0] : "\n";
 
         // Сначала выделяем специальные теги (script, style, pre) с их содержимым
-        $input = $this->preserveSpecialTags($input);
+        $preservedInput = $this->preserveSpecialTags($input);
+
+        // Ошибка PCRE (например, исчерпан лимит): без выделенных специальных тегов
+        // их содержимое было бы типографировано, поэтому возвращаем текст без обработки
+        if ($preservedInput === null) {
+            return $this->unprocessedTokens($originalInput, 'pcre-error', $tokenizationStart);
+        }
+
+        $input = $preservedInput;
 
         // Заменяем все неразрывные пробелы на обычные (потом будет не оптимально)
         $input = str_replace([' ', ' ', '&nbsp;'], ' ', $input);
@@ -533,7 +533,7 @@ final class Tokenizer
         // кроме пробелов внутри HTML-тегов (значения атрибутов не изменяются)
         $restOfLine = trim($restOfLine);
         $restOfLine = preg_replace_callback(
-            '/(<\/?[a-z][a-z0-9:-]*(?:"[^"]*"|\'[^\']*\'|[^\'">])*>)|\s+/iu',
+            '/(<\/?[a-z][a-z0-9:-]*+(?:"[^"]*+"|\'[^\']*+\'|[^\'">])*+>)|\s+/iu',
             fn(array $m) => ($m[1] ?? '') !== '' ? $m[1] : ' ',
             $restOfLine
         ) ?? $restOfLine;
@@ -580,12 +580,39 @@ final class Tokenizer
     }
 
     /**
+     * Возвращает весь текст одним токеном, который не изменяется правилами
+     *
+     * @param string $input Исходный текст
+     * @param string $reason Причина отказа от обработки (имя токена)
+     * @param float $tokenizationStart Время начала токенизации
+     * @return array[]
+     */
+    private function unprocessedTokens(string $input, string $reason, float $tokenizationStart): array
+    {
+        $this->metrics['countOfLines'] = 1;
+        $this->metrics['countOfTokens'] = 1;
+        $this->metrics['tokenizationTime'] = microtime(true) - $tokenizationStart;
+
+        return [
+            [
+                'type' => 'char',
+                'name' => $reason,
+                'value' => $input,
+            ],
+        ];
+    }
+
+    /**
      * Заменяет специальные теги на временные метки в тексте.
      *
+     * Содержимое тегов сканируется possessive-циклом до первого закрывающего тега:
+     * так время линейно, а длинное содержимое не упирается в pcre.backtrack_limit,
+     * как это было с ленивым [\s\S]*?.
+     *
      * @param string $input
-     * @return string
+     * @return string|null Null при ошибке PCRE
      */
-    private function preserveSpecialTags(string $input): string
+    private function preserveSpecialTags(string $input): ?string
     {
         if (!str_contains($input, '<')) {
             return $input;
@@ -600,26 +627,26 @@ final class Tokenizer
         };
 
         $patternsAndCallbacks = [
-            '/<!DOCTYPE\s[^>]+>/i' => function ($m) use ($createPlaceholder) {
+            '/<!DOCTYPE\s[^>]++>/i' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'doctype');
             },
-            '/<!--.*?-->/s' => function ($m) use ($createPlaceholder) {
+            '/<!--(?:[^-]++|-(?!->))*+-->/' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'comment');
             },
-            '/<\?(?:php|=)?\b.*?\?>/s' => function ($m) use ($createPlaceholder) {
+            '/<\?(?:php|=)?\b(?:[^?]++|\?(?!>))*+\?>/' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'php');
             },
-            '/<script\b[^>]*>[\s\S]*?<\/script>/is' => function ($m) use ($createPlaceholder) {
+            '/<script\b[^>]*+>(?:[^<]++|<(?!\/script>))*+<\/script>/i' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'script');
             },
-            '/<style\b[^>]*>[\s\S]*?<\/style>/is' => function ($m) use ($createPlaceholder) {
+            '/<style\b[^>]*+>(?:[^<]++|<(?!\/style>))*+<\/style>/i' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'style');
             },
-            '/<pre\b[^>]*>[\s\S]*?<\/pre>/is' => function ($m) use ($createPlaceholder) {
+            '/<pre\b[^>]*+>(?:[^<]++|<(?!\/pre>))*+<\/pre>/i' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'pre');
             },
             // Код, ввод с клавиатуры, вывод программ и поля ввода — не типографируются
-            '/<(textarea|code|kbd|samp)(?=[\s>\/])[^>]*>[\s\S]*?<\/\1\s*>/i' => function ($m) use ($createPlaceholder) {
+            '/<(textarea|code|kbd|samp)(?=[\s>\/])[^>]*+>(?:[^<]++|<(?!\/\1\s*+>))*+<\/\1\s*+>/i' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, strtolower($m[1]));
             },
         ];
