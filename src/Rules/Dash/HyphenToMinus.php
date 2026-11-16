@@ -19,10 +19,10 @@ final class HyphenToMinus extends BaseRule
 
         // Дефис находится между пробелом и цифрой
         if (self::isSurroundedBySpaceAndNumber($tokens, $index)) {
-            // Замена токена на mdash
+            // Замена токена на минус (кодирование выполнит HtmlEntityHelper согласно опции entities)
             $tokens[$index] = [
                 'type' => 'minus',
-                'value' => '&minus;',
+                'value' => '−',
             ];
             !empty($options['debug']) && TokenHelper::logRule($tokens[$index], __CLASS__ . ':' . __LINE__);
             return;

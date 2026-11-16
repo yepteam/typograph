@@ -87,6 +87,26 @@ final class DashTest extends TestCase
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    public function testHyphenToMinusRespectsEntitiesFormat()
+    {
+        $original = 'Температура: -2°С';
+
+        $expected = [
+            Typograph::ENTITIES_RAW => 'Температура: −2°С',
+            Typograph::ENTITIES_NUMERIC => 'Температура: &#8722;2&#176;С',
+            Typograph::ENTITIES_HEX => 'Температура: &#x2212;2&#xb0;С',
+        ];
+
+        foreach ($expected as $entities => $result) {
+            $typograph = new Typograph([
+                'entities' => $entities,
+                'nbsp' => [],
+            ]);
+
+            $this->assertSame($result, $typograph->format($original), "entities: $entities");
+        }
+    }
+
     public function testDashNotChange()
     {
         $typograph = new Typograph([
