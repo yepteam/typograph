@@ -602,6 +602,27 @@ final class NbspTest extends TestCase
         $expected = 'Лет&nbsp;10 Иванов&nbsp;И.&nbsp;И. заблуждался';
         $this->assertSame($expected, $typograph->format($original));
     }
+    public function testInitialAfterNumberEndingWithZero()
+    {
+        $typograph = new Typograph([
+            'entities' => Typograph::ENTITIES_NAMED,
+        ]);
+
+        // Число перед инициалами обрабатывается одинаково, независимо от последней цифры
+        foreach (['5', '10', '2020'] as $number) {
+            $this->assertSame(
+                "Дом {$number}&nbsp;А. Пушкина",
+                $typograph->format("Дом {$number} А. Пушкина"),
+                "number: {$number}"
+            );
+
+            $this->assertSame(
+                "{$number}&nbsp;А.&nbsp;С. Пушкин",
+                $typograph->format("{$number} А. С. Пушкин"),
+                "number: {$number}"
+            );
+        }
+    }
 
     public function testTags()
     {

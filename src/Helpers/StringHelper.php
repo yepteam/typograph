@@ -125,7 +125,7 @@ final class StringHelper
      */
     public static function isEndsWithNumber(string $value): bool
     {
-        return preg_match('/[1-9]$/', $value) === 1;
+        return preg_match('/[0-9]$/', $value) === 1;
     }
 
     /**
