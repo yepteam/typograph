@@ -201,4 +201,48 @@ final class TokenizerTest extends TestCase
             $this->assertStringEndsWith('a — b', $result, $open);
         }
     }
+    // ─────────────────────────────────────────────
+    // Совместимость шаблонов с PCRE2 в PHP 8.1
+    // ─────────────────────────────────────────────
+
+    public function testFormatDoesNotTriggerPhpWarnings()
+    {
+        $errors = [];
+        set_error_handler(function (int $errno, string $errstr) use (&$errors) {
+            $errors[] = $errstr;
+            return true;
+        });
+
+        try {
+            $result = $this->plain()->format('Привет 😀 - мир 👍🏽 и 👨‍👩‍👧 "тест" (c) 2025');
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $errors);
+        $this->assertSame('Привет 😀 — мир 👍🏽 и 👨‍👩‍👧 «тест» © 2025', $result);
+    }
+
+    public function testEmojiFallbackPatternMatchesEmojiProperty()
+    {
+        // Символ => является ли он Emoji по Unicode
+        $samples = [
+            '😀' => true, '👍' => true, '🏽' => true, '🇷' => true, '⌚' => true, '☺' => true,
+            '©' => true, '®' => true, '™' => true, '‼' => true, '#' => true, '*' => true, '0' => true, '9' => true,
+            'a' => false, 'Я' => false, '—' => false, '«' => false, '€' => false, ' ' => false, "\u{200D}" => false,
+        ];
+
+        // \p{Emoji} поддерживается начиная с PCRE2 10.40 (PHP 8.2)
+        $isPropertySupported = @preg_match('/\p{Emoji}/u', '') !== false;
+
+        foreach ($samples as $char => $isEmoji) {
+            $char = (string) $char; // Ключи '0' и '9' PHP приводит к int
+
+            $this->assertSame($isEmoji, preg_match(Tokenizer::EMOJI_FALLBACK_PATTERN, $char) === 1, "U+" . dechex(mb_ord($char)));
+
+            if ($isPropertySupported) {
+                $this->assertSame($isEmoji, preg_match('/\p{Emoji}/u', $char) === 1, "U+" . dechex(mb_ord($char)));
+            }
+        }
+    }
 }
