@@ -521,9 +521,14 @@ final class Tokenizer
             $restOfLine = $matches[2];
         }
 
-        // Заменяем все пробелы и табуляции в оставшейся части на один пробел
+        // Заменяем все пробелы и табуляции в оставшейся части на один пробел,
+        // кроме пробелов внутри HTML-тегов (значения атрибутов не изменяются)
         $restOfLine = trim($restOfLine);
-        $restOfLine = preg_replace('/[\s\t]+/u', ' ', $restOfLine) ?? $restOfLine;
+        $restOfLine = preg_replace_callback(
+            '/(<\/?[a-z][a-z0-9:-]*(?:"[^"]*"|\'[^\']*\'|[^\'">])*>)|\s+/iu',
+            fn(array $m) => ($m[1] ?? '') !== '' ? $m[1] : ' ',
+            $restOfLine
+        ) ?? $restOfLine;
 
         return $leadingTabs . $restOfLine;
     }
@@ -604,6 +609,10 @@ final class Tokenizer
             },
             '/<pre\b[^>]*>[\s\S]*?<\/pre>/is' => function ($m) use ($createPlaceholder) {
                 return $createPlaceholder($m, 'pre');
+            },
+            // Код, ввод с клавиатуры, вывод программ и поля ввода — не типографируются
+            '/<(textarea|code|kbd|samp)(?=[\s>\/])[^>]*>[\s\S]*?<\/\1\s*>/i' => function ($m) use ($createPlaceholder) {
+                return $createPlaceholder($m, strtolower($m[1]));
             },
         ];
 

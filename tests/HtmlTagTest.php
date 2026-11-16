@@ -312,4 +312,67 @@ get_template_part( \'templates/spoiler\', null, [
         $this->assertSame($expected, $typograph->format($original));
     }
 
+    // ─────────────────────────────────────────────
+    // Содержимое code, kbd, samp, textarea не обрабатывается
+    // ─────────────────────────────────────────────
+
+    public function testCodeContentIsNotFormatted()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = '<code>a -- b "x"...</code>';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
+    public function testKbdAndSampContentIsNotFormatted()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = 'Нажмите <kbd>Ctrl - C</kbd> и увидите <samp>"OK" -- (c)</samp>';
+        $this->assertSame(
+            'Нажмите <kbd>Ctrl - C</kbd> и увидите <samp>"OK" -- (c)</samp>',
+            $typograph->format($original)
+        );
+    }
+
+    public function testTextareaContentIsNotFormatted()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = "<textarea name=\"t\">a  --  b\n\"x\"</textarea>";
+        $this->assertSame($original, $typograph->format($original));
+    }
+
+    public function testTextAroundCodeIsFormatted()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $this->assertSame(
+            'Команда <code>ls -la</code> — список «файлов»',
+            $typograph->format('Команда <code>ls -la</code> - список "файлов"')
+        );
+    }
+
+    // ─────────────────────────────────────────────
+    // Пробелы внутри атрибутов тегов не схлопываются
+    // ─────────────────────────────────────────────
+
+    public function testAttributeWhitespaceIsPreserved()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $this->assertSame(
+            '<a title="a    b" class=\'x  y\'>ссылка тут</a>',
+            $typograph->format('<a title="a    b" class=\'x  y\'>ссылка    тут</a>')
+        );
+    }
+
+    public function testAttributeWithGreaterThanSignIsPreserved()
+    {
+        $typograph = new Typograph(['entities' => Typograph::ENTITIES_RAW, 'nbsp' => []]);
+
+        $original = '<div x-show="a  >  b">текст</div>';
+        $this->assertSame($original, $typograph->format($original));
+    }
+
 }
